@@ -1,6 +1,7 @@
 ---
 name: using-superpowers
 description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
+disable-model-invocation: true
 ---
 
 <SUBAGENT-STOP>
@@ -54,7 +55,6 @@ These thoughts mean STOP—you're rationalizing:
 If your harness appears here, read its reference file for special instructions:
 
 - Codex: `references/codex-tools.md`
-- Pi: `references/pi-tools.md`
 - Antigravity: `references/antigravity-tools.md`
 - Hermes Agent: `references/hermes-tools.md`
 

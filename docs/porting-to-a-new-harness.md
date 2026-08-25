@@ -46,13 +46,14 @@ into the harness's native tools. Three components:
    harness's bootstrap injector (see Part 5). It says, e.g., "*dispatch a
    subagent* → call `task` with `subagent_type`."
 
-3. **Bootstrap (per-harness).** At the start of every session, the full
-   `skills/using-superpowers/SKILL.md` is injected into the model's context,
-   wrapped in `<EXTREMELY_IMPORTANT>` tags, with the tool mapping appended. That
-   injected skill is what teaches the model that skills exist and that it must
-   check for a relevant skill before acting. **The bootstrap is the entire
-   integration.** Without it, the skill files are inert — present on disk, never
-   invoked.
+3. **Bootstrap (per-harness).** At the start of every session, the model must
+   learn that Superpowers skills exist and how their actions map to harness
+   tools. Most harnesses inject the full `skills/using-superpowers/SKILL.md`,
+   wrapped in `<EXTREMELY_IMPORTANT>` tags, with the tool mapping appended. A
+   harness that natively and reliably surfaces installed skill trigger
+   descriptions may use that discovery as the behavioral bootstrap and inject
+   only its tool mapping; pi is the live reference. Without either mechanism,
+   the skill files are inert — present on disk, never invoked.
 
 ### Two rules that make this work
 
@@ -83,11 +84,13 @@ edited in the user's home.)
 A harness can support Superpowers only if it can do all of the following. Check
 these before writing code — if the first one fails, stop.
 
-### Hard requirement: automatic session-start injection
+### Hard requirement: automatic session-start bootstrap
 
-The harness must let you inject text into the model's context **at the start of
-every session, with no per-session opt-in by your human partner.** This is the
-one non-negotiable capability. It can take any form:
+The harness must automatically surface Superpowers at the start of every
+session, with no per-session opt-in by your human partner. Usually that means
+injecting text into the model's context; native skill discovery is sufficient
+only when it reliably surfaces trigger descriptions and passes the acceptance
+test. The bootstrap can take any form:
 
 - a **hook/event system** that runs a shell command at session start and reads
   its stdout (Claude Code, Cursor, Copilot CLI), or
@@ -135,8 +138,9 @@ nothing to this repo but a paragraph in the README is a perfectly good outcome.
 
 A port is finished when **all** of these are true:
 
-1. The `using-superpowers` bootstrap loads at session start, every session, with
-   no per-session opt-in.
+1. The `using-superpowers` behavior loads at session start, every session, with
+   no per-session opt-in — either as injected skill content or through reliable
+   native skill discovery — and any required tool mapping is in context.
 2. A tool mapping exists for the harness (in
    `references/<harness>-tools.md`, inline in the bootstrap, or both — per Part 5).
 3. Skills can actually be invoked — natively, or via the documented
@@ -256,9 +260,9 @@ The harness loads a JS/TS module that exposes lifecycle callbacks. You register
 the skills directory through the harness's API and inject the bootstrap by
 mutating the message array in code.
 
-- Reference: `.opencode/plugins/superpowers.js` (JavaScript) and
-  `.pi/extensions/superpowers.ts` (TypeScript). pi is the closest reference for
-  any harness that has **no native skill tool**.
+- Reference: `.opencode/plugins/superpowers.js` (JavaScript) for full bootstrap
+  injection and `.pi/extensions/superpowers.ts` (TypeScript) for a harness that
+  natively discovers skills and needs only tool-mapping injection.
 
 ### Shape C — Instructions-file
 
@@ -349,11 +353,13 @@ ones in spirit:
 
 ### Step 3 — Wire the bootstrap injection
 
-This is the heart of the port. The shared goal: at session start, get the
-`using-superpowers` skill content (wrapped in `<EXTREMELY_IMPORTANT>` tags) plus
-the harness's tool mapping in front of the model, with a note that the skill is
-already active so the model doesn't try to load it again. *How* you do that —
-and what you assemble vs. what the harness loads raw — depends entirely on your
+This is the heart of the port. The shared goal is to make the
+`using-superpowers` behavior and the harness's tool mapping available at session
+start. Usually that means injecting the skill content (wrapped in
+`<EXTREMELY_IMPORTANT>` tags) plus mapping, with a note that the skill is already
+active. If reliable native discovery supplies the behavioral trigger, inject
+only the mapping and let Pi load `SKILL.md` on demand. *How* you do that — and
+what you assemble vs. what the harness loads raw — depends entirely on your
 shape. Do **not** apply one shape's recipe to another.
 
 **Shape A — a script reads `SKILL.md` and prints the harness's JSON.** The
@@ -407,14 +413,15 @@ and emits a marker, then observe which env var identifies the harness and
 whether/how the harness ingests your stdout. Pin these down before writing the
 real branch.
 
-**Shape B — assemble the string in code, then inject as a user message.** Here
-you build the bootstrap yourself: read `SKILL.md`, strip its YAML frontmatter,
-and assemble `<EXTREMELY_IMPORTANT>` + a short preamble that the skill is already
-loaded and must not be re-invoked + the stripped body + the inline tool mapping +
-`</EXTREMELY_IMPORTANT>`. One subtlety the references disagree on: OpenCode's
-preamble says "do NOT use the skill tool…" (assumes a `skill` tool exists), while
-pi's just says "do not try to load using-superpowers again." If your harness has
-no skill tool, use pi's wording, not OpenCode's.
+**Shape B — assemble the context string in code, then inject it as a user
+message.** If the harness needs a full bootstrap, read `SKILL.md`, strip its YAML
+frontmatter, and assemble `<EXTREMELY_IMPORTANT>` + a short preamble that the
+skill is already loaded and must not be re-invoked + the stripped body + the
+inline tool mapping + `</EXTREMELY_IMPORTANT>` (OpenCode is the live reference).
+If the harness already discovers skills natively and reliably surfaces their
+trigger descriptions, inject only the tool mapping instead of duplicating the
+entire `using-superpowers` body (pi is the live reference). In either variant,
+the injected text needs a stable marker for deduplication.
 
 Inject the result as a **user-role message, not a system message** — system
 messages bloat tokens when repeated every turn (#750) and multiple system
@@ -423,12 +430,12 @@ messages break some models (#894). Three things you must replicate:
 - **Dedup guard.** The lifecycle callback can fire repeatedly (OpenCode's
   transform runs on *every* agent step; pi's `context` fires per turn). Before
   injecting, check whether a bootstrap marker is already present and skip if so.
-  (The references pick different markers — pi a custom string, OpenCode the
-  `EXTREMELY_IMPORTANT` tag; matching the tag is more robust since it needs no
-  harness-specific constant.) Cache the bootstrap content at module level so
-  you're not re-reading and re-parsing `SKILL.md` on every call (#1202).
+  (The references pick different markers — pi a custom tool-mapping string,
+  OpenCode the `EXTREMELY_IMPORTANT` tag.) If assembling a full bootstrap, cache
+  it at module level so you're not re-reading and re-parsing `SKILL.md` on every
+  call (#1202).
 - **Compaction.** If the harness compacts/summarizes history, re-inject
-  afterward. pi sets an `injectBootstrap` flag on `session_start` and
+  afterward. pi sets an `injectToolMapping` flag on `session_start` and
   `session_compact`, clears it on `agent_end`, and inserts the message *after*
   any leading compaction-summary messages. OpenCode relies on its per-step
   re-injection plus the dedup guard.
@@ -490,9 +497,9 @@ Where the mapping lives depends on shape:
   The agent reaches it from the bootstrap — `SKILL.md`'s "Platform Adaptation"
   section links the per-harness references files. (Shape A harnesses have no
   instructions file; the mapping is *not* inlined into the hook output.)
-- **Shape B:** the mapping is typically inlined into the bootstrap string you
-  inject (see the `toolMapping` constant in `superpowers.js`). pi keeps it in
-  *both* places — `piToolMapping()` inline **and** `references/pi-tools.md`. If
+- **Shape B:** the mapping is typically inlined into the context string you
+  inject (see the `toolMapping` constant in `superpowers.js`). pi keeps its
+  entire mapping inline in `piToolMapping()` — no separate reference file. If
   you maintain it in two places, update both, or the port is half-done.
 - **Shape C:** put it in `references/<harness>-tools.md` and pull it into the
   always-loaded instructions file (e.g. `GEMINI.md` `@`-includes
@@ -523,7 +530,7 @@ honors the rule rather than breaking it. Distinguish three cases:
    → `skillPaths`; OpenCode via its `config` hook; `agy plugin install` copies
    them in), and tell the model to load a skill by **reading its `SKILL.md` with
    the file-read tool when the skill applies** — the sanctioned mechanism here,
-   the way `references/pi-tools.md` states it.
+   as pi's injected tool mapping states it.
 
    **For the bootstrap itself, prefer a declared context file (Part 6).** If the
    harness has a `contextFileName`-style manifest field — as Antigravity does —
@@ -578,9 +585,9 @@ Match the existing per-harness test style:
   consumes, and that it contains the bootstrap. See `tests/hooks/test-session-start.sh`,
   which validates each harness's output shape.
 - **Shape B:** a unit test that fakes the harness's plugin API and asserts the
-  lifecycle handlers register, the bootstrap injects once, the dedup guard
-  works, and (if relevant) compaction re-injection works. See
-  `tests/pi/test-pi-extension.mjs`. Add an isolated-install integration check in
+  lifecycle handlers register, the intended context (full bootstrap or mapping
+  only) injects once, the dedup guard works, and (if relevant) compaction
+  re-injection works. See `tests/pi/test-pi-extension.mjs`. Add an isolated-install integration check in
   the style of `tests/opencode/`.
 - If the bootstrap is cached, test that the cache behaves when the file is
   missing (see the OpenCode caching tests).
@@ -791,12 +798,13 @@ Use this as the live index; when in doubt, read the files, not this table.
 | Gemini CLI | `gemini-extension.json` + `GEMINI.md` | instructions file `@`-includes bootstrap + mapping | `references/gemini-tools.md` | — | `gemini extensions install` |
 | Kimi Code | `.kimi-plugin/plugin.json` | manifest `sessionStart.skill` loads `using-superpowers` | inline `skillInstructions` in manifest | `tests/kimi/` | marketplace or `/plugins install` GitHub URL |
 | OpenCode | `.opencode/plugins/superpowers.js` (declared via root `package.json` `main`) | in-process: `config` hook registers skills dir; `experimental.chat.messages.transform` injects user message | inline in `superpowers.js` | `tests/opencode/` | `opencode.json` plugin git URL |
-| pi | `.pi/extensions/superpowers.ts` | in-process: `resources_discover` registers skills; `context` event injects user message; lifecycle-flag + compaction-aware | `piToolMapping()` inline **and** `references/pi-tools.md` | `tests/pi/` | repo-root `package.json` fields |
+| pi | `.pi/extensions/superpowers.ts` | in-process: `resources_discover` registers skills; `context` injects only dynamic tool mapping; lifecycle-flag + compaction-aware | `piToolMapping()` inline (single source) | `tests/pi/` | repo-root `package.json` fields |
 
 ## Appendix B — Gotchas that have bitten porters
 
 - **Opt-in isn't a port.** If your human partner has to do anything per session
-  to get Superpowers, the acceptance test fails. Re-read Part 2.
+  to get Superpowers, the acceptance test fails. Native skill discovery counts
+  only when it surfaces triggers automatically. Re-read Part 2.
 - **Wrong JSON field → silent failure or double injection.** Shape A only.
   Confirm the exact field/nesting; Claude Code reads two fields without dedup.
 - **Hook-config schema varies per harness.** Shape A. Cursor's `hooks-cursor.json`

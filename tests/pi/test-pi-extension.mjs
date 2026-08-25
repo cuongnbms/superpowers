@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
@@ -9,7 +8,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../..');
 const packageJsonPath = resolve(repoRoot, 'package.json');
 const extensionPath = resolve(repoRoot, '.pi/extensions/superpowers.ts');
-const piToolsPath = resolve(repoRoot, 'skills/using-superpowers/references/pi-tools.md');
 
 async function readPackageJson() {
   return JSON.parse(await readFile(packageJsonPath, 'utf8'));
@@ -60,6 +58,14 @@ test('extension registers lifecycle hooks without pre-compaction injection', asy
   assert.equal((handlers.get('session_before_compact') ?? []).length, 0);
 });
 
+test('extension source does not read or embed the using-superpowers skill body', async () => {
+  const source = await readFile(extensionPath, 'utf8');
+
+  assert.doesNotMatch(source, /readFileSync|readFile\(/);
+  assert.doesNotMatch(source, /using-superpowers[\\/]+SKILL\.md/);
+  assert.doesNotMatch(source, /stripFrontmatter|cachedBootstrap/);
+});
+
 test('resources_discover contributes the bundled skills directory', async () => {
   const { handlers } = await loadExtension();
   const discover = firstHandler(handlers, 'resources_discover');
@@ -69,7 +75,7 @@ test('resources_discover contributes the bundled skills directory', async () => 
   assert.deepEqual(result.skillPaths, [resolve(repoRoot, 'skills')]);
 });
 
-test('startup context injects the bootstrap as one user message until agent_end', async () => {
+test('startup context injects the Pi tool mapping as one user message until agent_end', async () => {
   const { handlers } = await loadExtension();
   const sessionStart = firstHandler(handlers, 'session_start');
   const context = firstHandler(handlers, 'context');
@@ -84,23 +90,36 @@ test('startup context injects the bootstrap as one user message until agent_end'
 
   assert.equal(result.messages.length, 2);
   assert.equal(result.messages[0].role, 'user');
-  assert.match(textOf(result.messages[0]), /You have superpowers/);
-  assert.match(textOf(result.messages[0]), /Pi tool mapping/);
+  const injectedText = textOf(result.messages[0]);
+  assert.match(injectedText, /Pi Tool Mapping/);
+  for (const tool of [
+    'Agent',
+    'get_subagent_result',
+    'steer_subagent',
+    'TaskCreate',
+    'TaskList',
+    'TaskGet',
+    'TaskUpdate',
+    'TaskExecute',
+    'TaskOutput',
+    'TaskStop',
+  ]) {
+    assert.match(injectedText, new RegExp(`\\b${tool}\\b`), `mapping documents ${tool}`);
+  }
+  assert.doesNotMatch(injectedText, /If you think there is even a 1% chance/);
+  assert.doesNotMatch(injectedText, /## The Rule/);
+  assert.doesNotMatch(injectedText, /## Red Flags/);
   assert.equal(result.messages[1], originalMessages[0]);
 
-  const repeatedProviderRequest = await context({ type: 'context', messages: originalMessages }, {});
-  assert.equal(repeatedProviderRequest.messages.length, 2);
-  assert.match(textOf(repeatedProviderRequest.messages[0]), /You have superpowers/);
-
   const alreadyInjected = await context({ type: 'context', messages: result.messages }, {});
-  assert.equal(alreadyInjected, undefined, 'bootstrap should not duplicate when already present');
+  assert.equal(alreadyInjected, undefined, 'mapping should not duplicate when already present');
 
   await agentEnd({ type: 'agent_end', messages: [] }, {});
   const afterEnd = await context({ type: 'context', messages: originalMessages }, {});
-  assert.equal(afterEnd, undefined, 'startup bootstrap should clear after agent_end');
+  assert.equal(afterEnd, undefined, 'startup mapping should clear after agent_end');
 });
 
-test('session_compact injects bootstrap after compaction summaries, not before compaction', async () => {
+test('session_compact injects mapping after compaction summaries, not before compaction', async () => {
   const { handlers } = await loadExtension();
   const sessionCompact = firstHandler(handlers, 'session_compact');
   const context = firstHandler(handlers, 'context');
@@ -114,24 +133,19 @@ test('session_compact injects bootstrap after compaction summaries, not before c
   assert.equal(result.messages.length, 3);
   assert.equal(result.messages[0], summary);
   assert.equal(result.messages[1].role, 'user');
-  assert.match(textOf(result.messages[1]), /You have superpowers/);
+  assert.match(textOf(result.messages[1]), /Pi Tool Mapping/);
   assert.equal(result.messages[2], user);
 });
 
-test('pi tools reference documents pi-specific mappings', async () => {
-  assert.equal(existsSync(piToolsPath), true, 'pi-tools.md should exist');
-  const text = await readFile(piToolsPath, 'utf8');
+test('using-superpowers is marked user-invoked only', async () => {
+  const skill = await readFile(resolve(repoRoot, 'skills/using-superpowers/SKILL.md'), 'utf8');
 
-  // Assert against the mapping-table rows only. The surrounding prose mentions
-  // these same tokens, so matching the whole file would still pass if the table
-  // were deleted — the exact regression this test exists to catch.
-  const rows = text.split('\n').filter((line) => line.startsWith('|'));
-  assert.ok(
-    rows.some((row) => /subagent/i.test(row)),
-    'mapping table documents subagent dispatch',
-  );
-  assert.ok(
-    rows.some((row) => /todo|task/i.test(row)),
-    'mapping table documents task tracking',
-  );
+  assert.match(skill, /^---\n[\s\S]*?disable-model-invocation: true[\s\S]*?---/);
+});
+
+test('mapping tells the agent not to self-invoke using-superpowers', async () => {
+  const source = await readFile(extensionPath, 'utf8');
+
+  assert.match(source, /user-invoked only/);
+  assert.match(source, /\/skill:using-superpowers/);
 });
