@@ -307,7 +307,7 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 - **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
 
 **Meta**
-- **writing-skills** - Create new skills following best practices (includes testing methodology)
+- **writing-skills** - Create, evaluate, and improve skills: baseline-first drafting, with-skill versus baseline evals, description tuning, offline copy of Anthropic's best practices
 - **using-superpowers** - Introduction to the skills system
 
 ## Philosophy
@@ -331,7 +331,7 @@ The general contribution process for Superpowers is below. Keep in mind that we 
 
 Skill-behavior tests use the drill eval harness from [superpowers-evals](https://github.com/prime-radiant-inc/superpowers-evals/), cloned into `evals/` — see `evals/README.md` for setup. Plugin-infrastructure tests live at `tests/` and run via the relevant `run-*.sh` or `npm test`.
 
-See `skills/writing-skills/SKILL.md` for the complete guide.
+See `skills/writing-skills/SKILL.md` for the workflow and `skills/writing-skills/references/anthropic-best-practices.md` for the rules.
 
 ## Updating
 
