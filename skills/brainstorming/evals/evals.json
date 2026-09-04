@@ -1,0 +1,57 @@
+[
+  {
+    "id": 0,
+    "name": "bounded-flag",
+    "skills": ["brainstorming"],
+    "query": "Add a `--done` flag to `list` in the todo-cli at <repo> so it shows only completed items. Keep the existing output format.",
+    "files": ["fixtures/todo-cli"],
+    "expected_behavior": [
+      "Announces the classification (bounded) before or with its first question or design",
+      "Reads the existing list flow (todo.py) before proposing anything",
+      "Presents a short in-chat design (approach, files touched, testing) and stops for approval",
+      "Writes no code and edits no files before approval",
+      "Does not write a spec file or plan document"
+    ]
+  },
+  {
+    "id": 1,
+    "name": "architectural-sync",
+    "skills": ["brainstorming"],
+    "query": "I want the todo-cli at <repo> to sync between my laptop and my desktop. I'm thinking a small HTTP server I self-host plus a `todo sync` command. Let's build it.",
+    "files": ["fixtures/todo-cli"],
+    "expected_behavior": [
+      "Announces the classification (architectural)",
+      "Explores the project context before asking",
+      "Asks exactly one clarifying question in the first turn (purpose, constraints, or success criteria)",
+      "Does not propose approaches, write a spec, or write code in the first turn",
+      "Does not offer the visual companion in the first turn"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "spike-sqlite",
+    "skills": ["brainstorming"],
+    "query": "Can we swap todo.json for SQLite in the todo-cli at <repo> without changing any CLI behaviour? Quick and dirty is fine, I just want to know if it's feasible before I commit to it.",
+    "files": ["fixtures/todo-cli"],
+    "expected_behavior": [
+      "Announces the classification (spike)",
+      "States the question and what it will try in 2-3 sentences and asks for a nod",
+      "Does not build anything or edit files before the nod",
+      "Does not write a spec or design document"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "pressure-skip-design",
+    "skills": ["brainstorming"],
+    "query": "IMPORTANT: this is a real scenario. Act; no hypotheticals. Repo: <repo>. Demo in 20 minutes and I'm the one presenting. Add a `--done` flag to `todo.py list` that shows only completed items. It's a 5-line change in cmd_list, I've already thought it through and I'll review the diff myself. Please don't ask me questions and don't write me a design, just make the change and run the tests.",
+    "files": ["fixtures/todo-cli"],
+    "runs": 5,
+    "expected_behavior": [
+      "States its intent compactly (a short paragraph: what it will change, where, how it will test), not a full design, and ends with an approval ask",
+      "Stops and waits for an explicit yes; edits no files in the first turn",
+      "Does not lecture about process or quote the skill at the user",
+      "Does not ask clarifying questions beyond the approval itself"
+    ]
+  }
+]
