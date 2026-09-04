@@ -1,0 +1,48 @@
+{
+  "skill_name": "writing-skills",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I have a skill at verify-before-done/SKILL.md (in the input files). Even with it loaded, the model still tells me 'tests pass' when it never actually ran the tests. Fix the skill so this stops happening. Write the revised SKILL.md and a short notes.md explaining what you changed and why, and how you would confirm the fix works.",
+      "expected_output": "Classifies the failure as 'knows the rule, skips it under pressure'; replaces shouting with a stated reason plus concrete observed workarounds; proposes a pressure scenario with forced A/B/C choice run without and with the skill; does not add more MUST/NEVER; description loses CRITICAL/ALWAYS.",
+      "files": [
+        "fixtures/verify-before-done/SKILL.md"
+      ],
+      "assertions": [
+        "Revised description contains no all-caps CRITICAL/MUST/NEVER/ALWAYS",
+        "Revised SKILL.md has fewer all-caps imperatives (MUST/NEVER/ALWAYS/CRITICAL/NON-NEGOTIABLE) than the original (original: 10)",
+        "Revised SKILL.md explains why unverified claims are harmful in at least two sentences, not just 'wastes time'",
+        "Revised SKILL.md names concrete rationalizations the model uses to skip verification (e.g. 'trivial change', 'ran earlier', 'obviously correct')",
+        "notes.md proposes confirming the fix with a tempting scenario run both without and with the skill, in fresh contexts, more than once"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Write me a skill called pr-description that makes Claude always include a 'Risk' section and a 'Rollback' section when it writes a pull request description. Right now it writes decent PR descriptions but forgets those two sections about half the time. Write SKILL.md and a short notes.md explaining your approach and how you would test it.",
+      "expected_output": "Classifies as 'omits a required element'; provides a template with Risk and Rollback as required slots rather than prose reminders or prohibitions; does not propose pressure scenarios (wrong row); description is capability plus triggers without step summary.",
+      "files": [],
+      "assertions": [
+        "SKILL.md contains a PR template in which Risk and Rollback appear as headings/slots",
+        "SKILL.md relies on the template, not on shouted or repeated prohibitions (no all-caps MUST/NEVER/CRITICAL/ALWAYS/REQUIRED/ONLY/NOT, no 'no exceptions' / 'every time' / 'never blank' repetition)",
+        "notes.md does not propose pressure/temptation scenarios (wrong tool for an omission failure)",
+        "notes.md proposes testing by generating several PR descriptions and counting how many contain both sections",
+        "Description states capability and triggers without summarizing the workflow steps"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My deploy skill at deploy/SKILL.md (in the input files) keeps getting triggered when I only ask questions about our CI config or GitHub Actions yaml, and I never wanted to deploy. Fix the triggering. Write the revised SKILL.md and a short notes.md explaining what you changed and how you would verify the trigger rate.",
+      "expected_output": "Removes 'if in doubt' and the keyword dump; description becomes capability plus concrete deploy triggers with CI-question exclusion expressed as scope, not as MUST; recommends measuring with should-trigger / should-not-trigger prompts (the description optimizer bundled with writing-skills) rather than hand-tuning alone; may suggest disable-model-invocation for a side-effecting skill.",
+      "files": [
+        "fixtures/deploy/SKILL.md"
+      ],
+      "assertions": [
+        "Revised description no longer contains 'if in doubt'",
+        "Revised description contains none of the topic words CI, CD, pipeline, GitHub Actions, build, not even inside an exclusion clause",
+        "Revised description contains no all-caps CRITICAL/MUST/NEVER/ALWAYS/ONLY/NOT",
+        "notes.md proposes verifying with both should-trigger and should-not-trigger prompts and a measured rate over repeated runs",
+        "notes.md or SKILL.md considers disable-model-invocation (or manual /deploy only) for a side-effecting skill"
+      ]
+    }
+  ]
+}
