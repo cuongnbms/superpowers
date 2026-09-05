@@ -173,14 +173,14 @@ other two.
 
 **"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Execution options:**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task in this session and review between tasks; fast iteration
+**1. Subagent-Driven** - I dispatch a fresh subagent per task in this session and review between tasks; fast iteration
 
-**2. New Session** - same subagent-driven process, run by a fresh `claude` or `pi` agent in a sibling Herdr pane; this session stays free for other work
+**2. Subagent-Driven in new session** - same subagent-driven process, run by a fresh `claude` or `pi` agent in a sibling Herdr pane; this session stays free for other work
 
 **3. Inline Execution** - execute tasks in this session using executing-plans, batch execution with checkpoints; for harnesses without subagents
 
 **Which approach?"**
 
 - Subagent-Driven chosen: use superpowers:subagent-driven-development (fresh subagent per task, two-stage review).
-- New Session chosen: use superpowers:sdd-in-new-session with the plan path; add `--pi` when the user wants pi, `--branch` when they want a branch in this checkout instead of a worktree.
+- Subagent-Driven in new session chosen: use superpowers:sdd-in-new-session with the plan path; add `--pi` when the user wants pi, `--branch` when they want a branch in this checkout instead of a worktree.
 - Inline Execution chosen: use superpowers:executing-plans (batch execution with checkpoints for review).
