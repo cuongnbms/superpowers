@@ -13,7 +13,8 @@ Subagent (general-purpose):
     ## Task Description
 
     Read your task brief first: [BRIEF_FILE]
-    It contains the full task text from the plan.
+    It contains the plan's Global Constraints followed by the full task
+    text. Both bind you: the reviewer grades against the same file.
 
     ## Context
 

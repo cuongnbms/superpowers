@@ -21,9 +21,11 @@ Subagent (general-purpose):
     ## What Was Requested
 
     Read the task brief: [BRIEF_FILE]
+    It carries the plan's Global Constraints followed by the task text;
+    the implementer worked from the same file.
 
-    Global constraints from the spec/design that bind this task:
-    [GLOBAL_CONSTRAINTS]
+    Spec requirements that bind this task beyond the brief (may be empty):
+    [SPEC_CONSTRAINTS]
 
     ## What the Implementer Claims They Built
 
@@ -191,10 +193,10 @@ Subagent (general-purpose):
 - `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection
 - `[BRIEF_FILE]` — REQUIRED: the task brief file (`scripts/task-brief PLAN N`
   prints the path; same file the implementer worked from)
-- `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from
-  the plan's Global Constraints section or the spec: exact values, formats,
-  and stated relationships between components (not process rules — those
-  are already in this template)
+- `[SPEC_CONSTRAINTS]` — requirements the spec states and the plan's Global
+  Constraints omit, copied verbatim: exact values, formats, and stated
+  relationships between components (not process rules — those are already
+  in this template). Empty when the brief's constraints cover the task.
 - `[REPORT_FILE]` — REQUIRED: the file the implementer wrote its detailed
   report to
 - `[BASE_SHA]` — commit before this task
