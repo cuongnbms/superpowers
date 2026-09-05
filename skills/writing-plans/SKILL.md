@@ -157,15 +157,20 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the plan, offer execution choice. Option 2 exists only inside
+Herdr: run `test "${HERDR_ENV:-}" = 1` first, and outside Herdr list the
+other two.
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Two execution options:**
+**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Execution options:**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task in this session and review between tasks; fast iteration
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+**2. New Session** - same subagent-driven process, run by a fresh `claude` or `pi` agent in a sibling Herdr pane; this session stays free for other work
+
+**3. Inline Execution** - execute tasks in this session using executing-plans, batch execution with checkpoints; for harnesses without subagents
 
 **Which approach?"**
 
 - Subagent-Driven chosen: use superpowers:subagent-driven-development (fresh subagent per task, two-stage review).
+- New Session chosen: use superpowers:sdd-in-new-session with the plan path; add `--pi` when the user wants pi, `--branch` when they want a branch in this checkout instead of a worktree.
 - Inline Execution chosen: use superpowers:executing-plans (batch execution with checkpoints for review).
