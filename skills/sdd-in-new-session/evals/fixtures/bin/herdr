@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+# Test double for the herdr CLI. No server is needed: every call is appended
+# to $HERDR_SHIM_LOG (one shell-quoted line per invocation) and answered with
+# JSON shaped like the real socket API (see `herdr api schema`).
+#
+# Knobs (set by setup-case.sh in env.sh):
+#   HERDR_SHIM_LOG        call log, required
+#   HERDR_SHIM_STATE      directory for counters, prompts, started agents
+#   HERDR_SHIM_LAYOUT     wide (220x50, split right) | tall (80x60, split down)
+#   HERDR_SHIM_REJECT_FIRST_START   1 → the first `agent start` fails name_taken
+#
+# Waits are simulated: a wait that would block until the agent's turn ends
+# (bare --wait, --until done/idle, agent wait, pane wait-output) sleeps
+# $HERDR_SHIM_TURN_SECONDS (default 25) so the cost shows up in timing.
+set -u
+log="${HERDR_SHIM_LOG:?HERDR_SHIM_LOG not set}"
+state="${HERDR_SHIM_STATE:-$(dirname "$log")/.herdr-shim}"
+mkdir -p "$state"
+{ printf 'herdr'; for a in "$@"; do printf ' %q' "$a"; done; printf '\n'; } >> "$log"
+
+turn=${HERDR_SHIM_TURN_SECONDS:-25}
+pane_id="${HERDR_PANE_ID:-w1:p1}"
+ws="${HERDR_WORKSPACE_ID:-w1}"
+tab="${HERDR_TAB_ID:-w1:t1}"
+
+err() { # code message
+  printf '{"id":"cli:%s","error":{"code":"%s","message":"%s"}}\n' "$1" "$2" "$3" >&2
+  exit 1
+}
+ok() { printf '%s\n' "$1"; exit 0; }
+
+has_flag() { local f=$1; shift; for a in "$@"; do [ "$a" = "$f" ] && return 0; done; return 1; }
+flag_val() { local f=$1; shift; while [ $# -gt 0 ]; do if [ "$1" = "$f" ]; then printf '%s' "${2:-}"; return 0; fi; shift; done; return 1; }
+positional() { # nth positional after the two subcommand words, skipping --flag value pairs
+  local n=$1; shift; local i=0
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --wait|--no-focus|--current|--json|--verbose) shift ;;
+      --*) shift 2 ;;
+      *) i=$((i+1)); if [ $i -eq $n ]; then printf '%s' "$1"; return 0; fi; shift ;;
+    esac
+  done
+  return 1
+}
+agent_json() { printf '{"name":"%s","kind":"%s","pane_id":"%s","status":"%s"}' "$1" "$2" "$3" "$4"; }
+
+case "${1:-}" in
+  --skill)
+    f="$HOME/.agents/skills/herdr/SKILL.md"
+    [ -f "$f" ] && cat "$f" || echo "# Herdr (skill file not installed on this machine)"
+    exit 0 ;;
+  --help|-h|"") echo "herdr — terminal workspace manager for AI coding agents (test double)"; exit 0 ;;
+esac
+
+group="${1:-}"; sub="${2:-}"; shift 2 2>/dev/null || true
+
+case "$group $sub" in
+  "pane layout")
+    if [ "${HERDR_SHIM_LAYOUT:-wide}" = tall ]; then w=80; h=60; else w=220; h=50; fi
+    ok "{\"id\":\"cli:pane:layout\",\"result\":{\"type\":\"pane_layout\",\"layout\":{\"workspace_id\":\"$ws\",\"tab_id\":\"$tab\",\"zoomed\":false,\"area\":{\"x\":0,\"y\":0,\"width\":$w,\"height\":$h},\"focused_pane_id\":\"$pane_id\",\"panes\":[{\"pane_id\":\"$pane_id\",\"focused\":true,\"rect\":{\"x\":0,\"y\":0,\"width\":$w,\"height\":$h}}],\"splits\":[]}}}" ;;
+
+  "pane current"|"pane get")
+    ok "{\"id\":\"cli:pane:$sub\",\"result\":{\"type\":\"pane\",\"pane\":{\"pane_id\":\"$pane_id\",\"workspace_id\":\"$ws\",\"tab_id\":\"$tab\",\"cwd\":\"$PWD\"}}}" ;;
+
+  "pane list")
+    ok "{\"id\":\"cli:pane:list\",\"result\":{\"type\":\"panes\",\"panes\":[{\"pane_id\":\"$pane_id\",\"workspace_id\":\"$ws\",\"tab_id\":\"$tab\"}]}}" ;;
+
+  "pane split")
+    dir=$(flag_val --direction "$@") || err pane:split invalid_params "--direction is required"
+    case "$dir" in right|down|left|up) ;; *) err pane:split invalid_params "unknown direction $dir" ;; esac
+    n=$(( $(cat "$state/pane_counter" 2>/dev/null || echo 1) + 1 )); echo "$n" > "$state/pane_counter"
+    new="$ws:p$n"
+    printf '%s\n' "$new" >> "$state/panes"
+    cwd=$(flag_val --cwd "$@" || printf '%s' "$PWD")
+    ok "{\"id\":\"cli:pane:split\",\"result\":{\"type\":\"pane_split\",\"pane\":{\"pane_id\":\"$new\",\"workspace_id\":\"$ws\",\"tab_id\":\"$tab\",\"cwd\":\"$cwd\",\"direction\":\"$dir\"}}}" ;;
+
+  "pane rename")
+    p=$(positional 1 "$@") || err pane:rename invalid_params "pane id required"
+    label=$(positional 2 "$@" || true)
+    printf '%s\t%s\n' "$p" "$label" >> "$state/renames"
+    ok "{\"id\":\"cli:pane:rename\",\"result\":{\"type\":\"pane_renamed\",\"pane\":{\"pane_id\":\"$p\",\"label\":\"$label\"}}}" ;;
+
+  "pane close")
+    ok "{\"id\":\"cli:pane:close\",\"result\":{\"type\":\"pane_closed\"}}" ;;
+
+  "pane wait-output")
+    sleep "$turn"
+    ok "{\"id\":\"cli:pane:wait-output\",\"result\":{\"type\":\"pane_output_matched\",\"matched\":true}}" ;;
+
+  "pane read")
+    ok "{\"id\":\"cli:pane:read\",\"result\":{\"type\":\"pane_output\",\"text\":\"$ claude\\n> working on task 1...\"}}" ;;
+
+  "pane run"|"pane send-text"|"pane send-keys")
+    ok "{\"id\":\"cli:pane:$sub\",\"result\":{\"type\":\"ok\"}}" ;;
+
+  "worktree "*)
+    err worktree:$sub not_allowed "worktree commands are not part of this scenario" ;;
+
+  "agent list")
+    ok "{\"id\":\"cli:agent:list\",\"result\":{\"type\":\"agents\",\"agents\":[]}}" ;;
+
+  "agent start")
+    name=$(positional 1 "$@") || err agent:start invalid_params "agent name required"
+    kind=$(flag_val --kind "$@") || err agent:start invalid_params "--kind is required"
+    p=$(flag_val --pane "$@") || err agent:start invalid_params "--pane is required"
+    if ! printf '%s' "$name" | grep -Eq '^[a-z][a-z0-9_-]{0,31}$'; then
+      err agent:start invalid_agent_name "agent name '$name' must match [a-z][a-z0-9_-]{0,31}"
+    fi
+    if [ "${HERDR_SHIM_REJECT_FIRST_START:-0}" = 1 ] && [ ! -f "$state/start_rejected" ]; then
+      touch "$state/start_rejected"
+      err agent:start agent_name_taken "an agent named '$name' is already live"
+    fi
+    if grep -qx "$name" "$state/started" 2>/dev/null; then
+      err agent:start agent_name_taken "an agent named '$name' is already live"
+    fi
+    printf '%s\n' "$name" >> "$state/started"
+    printf '%s\t%s\t%s\n' "$name" "$kind" "$p" >> "$state/agents"
+    ok "{\"id\":\"cli:agent:start\",\"result\":{\"type\":\"agent_started\",\"agent\":$(agent_json "$name" "$kind" "$p" idle),\"argv\":[\"$kind\"]}}" ;;
+
+  "agent prompt")
+    target=$(positional 1 "$@") || err agent:prompt invalid_params "target required"
+    text=$(positional 2 "$@") || err agent:prompt invalid_params "text required"
+    grep -q "^$target	" "$state/agents" 2>/dev/null || err agent:prompt agent_not_found "no live agent '$target'"
+    kind=$(grep "^$target	" "$state/agents" | tail -1 | cut -f2)
+    p=$(grep "^$target	" "$state/agents" | tail -1 | cut -f3)
+    printf '%s' "$text" > "$state/prompt-$target.txt"
+    n=$(( $(cat "$state/prompt_count" 2>/dev/null || echo 0) + 1 )); echo "$n" > "$state/prompt_count"
+    status=working
+    if has_flag --wait "$@"; then
+      until=$(flag_val --until "$@" || true)
+      case "$until" in
+        working) status=working ;;
+        "") sleep "$turn"; status=done ;;
+        *) sleep "$turn"; status=$until ;;
+      esac
+    fi
+    ok "{\"id\":\"cli:agent:prompt\",\"result\":{\"type\":\"agent_prompted\",\"agent\":$(agent_json "$target" "$kind" "$p" "$status")}}" ;;
+
+  "agent wait")
+    target=$(positional 1 "$@") || err agent:wait invalid_params "target required"
+    until=$(flag_val --until "$@" || true)
+    [ "$until" = working ] || sleep "$turn"
+    ok "{\"id\":\"cli:agent:wait\",\"result\":{\"type\":\"agent_waited\",\"agent\":$(agent_json "$target" claude "$ws:p2" "${until:-done}")}}" ;;
+
+  "agent get")
+    target=$(positional 1 "$@") || err agent:get invalid_params "target required"
+    ok "{\"id\":\"cli:agent:get\",\"result\":{\"type\":\"agent\",\"agent\":$(agent_json "$target" claude "$ws:p2" working)}}" ;;
+
+  "agent read")
+    ok "{\"id\":\"cli:agent:read\",\"result\":{\"type\":\"agent_output\",\"text\":\"> Reading the plan...\\nUsing superpowers:subagent-driven-development\"}}" ;;
+
+  "agent explain"|"agent rename"|"agent focus"|"agent send-keys"|"agent attach")
+    ok "{\"id\":\"cli:agent:$sub\",\"result\":{\"type\":\"ok\"}}" ;;
+
+  "workspace list"|"tab list")
+    ok "{\"id\":\"cli:$group:list\",\"result\":{\"type\":\"list\",\"items\":[]}}" ;;
+
+  *)
+    err "$group:$sub" unknown_command "test double does not implement 'herdr $group $sub'" ;;
+esac
