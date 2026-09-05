@@ -297,6 +297,7 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 
 **Collaboration** 
 - **brainstorming** - Socratic design refinement
+- **domain-modeling** - Sharpen terminology and record CONTEXT.md glossary and ADRs; invoked by brainstorming on the architectural path
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
 - **dispatching-parallel-agents** - Concurrent subagent workflows
