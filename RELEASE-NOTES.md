@@ -1,5 +1,31 @@
 # Superpowers Release Notes
 
+## v6.4.0 (2026-09-05)
+
+Fork release. Skills are being re-tuned for Claude 5 models, which over-trigger on emphatic text: descriptions become third-person capability plus triggers, MUST/NEVER give way to stated reasons, and every edited skill ships an `evals/` directory so the change can be re-measured.
+
+### New Skills
+
+- **domain-modeling**: builds and sharpens a project's vocabulary during design, records the glossary in `CONTEXT.md` and hard-to-reverse decisions as ADRs. Brainstorming invokes it on the architectural path right after exploring context; bounded requests only on a term conflict with an existing `CONTEXT.md`; spikes never. Glossary and ADR writes wait for design approval so the approval gate holds. Ships `agents/openai.yaml` for the Codex sync.
+- **sdd-in-new-session**: hands a written plan to a fresh `claude` or `pi` agent in a sibling Herdr pane, which runs subagent-driven development in its own context while the current session stays free. Gated on `HERDR_ENV=1`.
+
+### Writing Plans
+
+- **Execution Handoff has a third option.** Inside Herdr the choices are: subagent-driven here, subagent-driven in a new Herdr session, inline. Outside Herdr the first and last remain. The two subagent-driven variants sit together; inline is last as the fallback for harnesses without subagents.
+- Dead `plan-document-reviewer-prompt.md` removed (the subagent review loop had already been replaced by inline Self-Review). Description leads with capability so triggering no longer depends on the user saying "spec". Task versus step wording unified; header and No Placeholders state their reasons instead of MUST. Eval: 20/20 on both old and new bodies (Opus, 3 cases), so a cleanup rather than a behavior change.
+
+### Brainstorming
+
+- **Body trimmed from 250 to 160 lines for Claude 5.** Third-person description without emphatic words, approval gate stated once with its reason, dot graph and duplicated visual-companion text gone, orphaned reviewer prompt deleted. Under pressure the old body slipped the gate 1/5 ("your message already contained the design and the approval", now a rationalization row); the new body held 10/10.
+
+### Writing Skills
+
+- **Rewritten around measurement.** Merges Anthropic's `skill-creator` tooling (scripts, grader/comparator/analyzer agents, eval viewer, trigger-description optimizer; Apache 2.0), a form-matching table that maps each baseline failure to the kind of text that fixes it, pressure-scenario testing for discipline skills, and `references/anthropic-best-practices.md`, an offline copy of the official skill-authoring guidance with a "Last synced" header. The "make descriptions pushy" advice is dropped in favor of measuring should/should-not trigger rates. Root `.gitignore` now scopes `/evals/` so per-skill `evals/` directories are tracked.
+
+### Pi
+
+- **Session bootstrap injects only the tool mapping** (subagents via `@tintinweb/pi-subagents`, tasks via `@tintinweb/pi-tasks`) instead of the whole using-superpowers body, at session start and after compaction. `using-superpowers` is now user-invoked only.
+
 ## v6.3.0 (2026-08-12)
 
 ### Harness Support
