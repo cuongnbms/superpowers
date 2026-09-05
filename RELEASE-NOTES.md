@@ -1,5 +1,26 @@
 # Superpowers Release Notes
 
+## v6.4.2 (2026-09-05)
+
+Patch release: subagent-driven development and its Herdr handoff get evidence-backed fixes, and the glossary write-timing rule moves to the skill that owns it.
+
+### Subagent-Driven Development
+
+- **Task briefs carry the plan's Global Constraints.** The implementer and reviewer are now bound by the same text; previously only the reviewer template had a constraints slot. Brief extraction stops at the next same-level heading, so a trailing plan section no longer leaks into the last task. Reviewer slot renamed `[SPEC_CONSTRAINTS]`.
+- **SKILL.md 568 to 482 lines.** When to Use routes to executing-plans and sdd-in-new-session by subagent availability, Model Selection is one table, duplicated review passages and the process graph are gone, and the description leads with capability. Dry-run-to-dispatch evals: new 46/46 vs old 44/46 (Opus); the no-graph body used about 10% fewer tokens.
+
+### SDD in New Session
+
+- **Herdr overrides are stated with reasons** (`--wait` form, working directory, worktree) now that the herdr skill is installed alongside and its defaults contradict the handoff. The prompt template is a real unquoted heredoc so `<ABS_PLAN_PATH>` expands, agent names are cut at 26 characters so a collision suffix still fits the name regex, and split direction is derived from the pane layout instead of hardcoded. Evals run against a herdr test double: 40/40 on both bodies, collision case twice as fast.
+
+### Domain Modeling
+
+- **CONTEXT.md write timing is a conditional in domain-modeling itself.** A direct glossary or ADR request writes immediately; a term settled inside an unapproved design is held and written with the spec. Brainstorming drops its override paragraph and points at that rule, so the two skills no longer contradict each other. Multi-turn eval (3 old, 3 new) showed no behavior delta; the standalone glossary eval confirms the immediate-write branch still fires. Both skills gained eval cases.
+
+### Writing Plans
+
+- Execution options renamed so the two subagent-driven variants read as siblings; no option is labeled "recommended".
+
 ## v6.4.1 (2026-09-05)
 
 Patch release tightening skill routing and making written plans reliably available across execution sessions.
