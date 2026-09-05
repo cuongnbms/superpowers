@@ -75,17 +75,36 @@ Announce the path, create a task per item, complete them in order.
 
 **Architectural**
 1. Explore project context: files, docs, recent commits
-2. Ask clarifying questions, one at a time: purpose, constraints, success criteria
-3. Propose 2-3 approaches with trade-offs and your recommendation
-4. Present the design in sections scaled to their complexity; get approval after each section
-5. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit it
-6. Self-review the spec (below) and fix inline
-7. Ask the user to review the written spec; wait for approval
-8. Invoke the writing-plans skill. It is the only skill that follows an architectural
+2. Invoke the superpowers:domain-modeling skill (see "Domain modeling" below)
+3. Ask clarifying questions, one at a time: purpose, constraints, success criteria
+4. Propose 2-3 approaches with trade-offs and your recommendation
+5. Present the design in sections scaled to their complexity; get approval after each section
+6. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, together with the
+   glossary terms and ADRs resolved along the way, and commit it
+7. Self-review the spec (below) and fix inline
+8. Ask the user to review the written spec; wait for approval
+9. Invoke the writing-plans skill. It is the only skill that follows an architectural
    brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
 
 The visual companion (last section) is offered just-in-time on the architectural path, never
 upfront.
+
+## Domain modeling
+
+Design conversations are where a project's vocabulary gets settled, and what is settled only
+in chat is lost. On the architectural path, invoke superpowers:domain-modeling right after
+exploring the project context and keep it active for the rest of the brainstorm: it challenges
+vague or conflicting terms, stress-tests relationships with concrete scenarios, and records the
+glossary (`CONTEXT.md`) and hard-to-reverse decisions (ADRs). One adjustment so it fits the
+approval gate above: sharpen terms in the conversation as they come up, but write `CONTEXT.md`
+and `docs/adr/` only once the design is approved, alongside the spec. A file edited before
+approval is a decision your human partner never got to veto. The trade-off chosen in step 4 is
+the usual ADR candidate; apply domain-modeling's three-part test before creating one.
+
+On the bounded path, invoke it only when the request uses a term that conflicts with an
+existing `CONTEXT.md`. A new flag or a one-file fix does not change the domain model, and
+loading the skill adds questions the task does not need. Spikes never invoke it: their output
+is an answer, not a model.
 
 ## Understanding the idea
 
@@ -117,7 +136,8 @@ upfront.
 ## After the design (architectural)
 
 **Spec.** Write the validated design to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-(the user's preferred location overrides this default) and commit it.
+(the user's preferred location overrides this default). Write the glossary terms and ADRs that
+domain-modeling resolved during the conversation in the same pass, then commit it all.
 
 **Self-review.** Read the spec with fresh eyes and fix inline, no second pass:
 
