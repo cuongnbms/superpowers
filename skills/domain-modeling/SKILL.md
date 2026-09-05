@@ -37,7 +37,7 @@ If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The ma
 │       └── docs/adr/
 ```
 
-Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create it the first time you write a term (see "Write settled terms down" for when that is). If no `docs/adr/` exists, create it when the first ADR is needed.
 
 ## During the session
 
@@ -57,9 +57,14 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
 
-### Update CONTEXT.md inline
+### Write settled terms down
 
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+A term settled only in chat is lost, so every resolved term ends up in `CONTEXT.md`, in the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md). When it gets written depends on what the conversation is:
+
+- The user asked you directly to edit the glossary, record an ADR, or work through terminology: write each term as it is resolved. The file is the deliverable.
+- The term was resolved while designing something the user has not approved yet (a brainstorm, a spec in progress): sharpen it in the conversation now, keep a running list, and write `CONTEXT.md` once the design is approved, in the same pass as the spec. A file edited before approval is a decision the user never got to veto.
+
+ADRs follow the same timing.
 
 `CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 

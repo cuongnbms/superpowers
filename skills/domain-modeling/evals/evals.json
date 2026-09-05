@@ -1,0 +1,16 @@
+[
+  {
+    "id": 0,
+    "name": "standalone-glossary-edit",
+    "skills": ["domain-modeling"],
+    "query": "In the todo-cli at <repo>, we keep saying 'device', 'machine' and 'client' for a copy of the todo list that can be edited and synced. Let's settle on 'replica' and add it to the glossary, the server counts as a replica too.",
+    "files": ["../../brainstorming/evals/fixtures/todo-cli"],
+    "runs": 2,
+    "expected_behavior": [
+      "Creates CONTEXT.md this turn (no prior file exists) with a 'replica' entry in the CONTEXT-FORMAT.md format",
+      "Does not defer the write or ask for a design approval; the glossary edit is the deliverable",
+      "Keeps implementation details out of CONTEXT.md",
+      "Does not create an ADR for a naming decision"
+    ]
+  }
+]

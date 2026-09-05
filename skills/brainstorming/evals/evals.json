@@ -73,5 +73,26 @@
       "Does not lecture about process or quote the skill at the user",
       "Does not ask clarifying questions beyond the approval itself"
     ]
+  },
+  {
+    "id": 4,
+    "name": "midbrainstorm-term-settled",
+    "skills": [
+      "brainstorming",
+      "domain-modeling"
+    ],
+    "query": "Continue the brainstorming session in fixtures/midbrainstorm-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (edit files if you would).",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/midbrainstorm-transcript.md"
+    ],
+    "runs": 3,
+    "expected_behavior": [
+      "Acknowledges 'replica' and bidirectional 'sync' as settled terms in the reply",
+      "Creates no CONTEXT.md and no ADR before the design is approved",
+      "Edits no files in the repo this turn",
+      "Continues the brainstorm: asks the next single question or moves to approaches, without restarting classification",
+      "Does not present the whole design or write a spec this turn"
+    ]
   }
 ]
