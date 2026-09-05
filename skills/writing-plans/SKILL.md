@@ -1,19 +1,17 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Writes a task-by-task implementation plan from an approved spec or requirements - exact files, test code, implementation code, and commit steps per task, so an engineer or subagent with no context can execute it. Use when the user has a spec or requirements for a multi-step change and needs an implementation plan, or asks to plan the work before touching code.
 ---
 
 # Writing Plans
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as small tasks made of single-action steps. DRY. YAGNI. TDD. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
-
-**Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
@@ -33,18 +31,18 @@ Before defining tasks, map out which files will be created or modified and what 
 
 This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
 
-## Task Right-Sizing
+## Tasks and Steps
 
-A task is the smallest unit that carries its own test cycle and is worth a
-fresh reviewer's gate. When drawing task boundaries: fold setup,
-configuration, scaffolding, and documentation steps into the task whose
-deliverable needs them; split only where a reviewer could meaningfully
-reject one task while approving its neighbor. Each task ends with an
-independently testable deliverable.
+A plan has two levels. A **task** is the smallest unit that carries its own
+test cycle and is worth a fresh reviewer's gate. A **step** is one action
+inside a task, 2-5 minutes of work.
 
-## Bite-Sized Task Granularity
+**Drawing task boundaries:** fold setup, configuration, scaffolding, and
+documentation steps into the task whose deliverable needs them; split only
+where a reviewer could meaningfully reject one task while approving its
+neighbor. Each task ends with an independently testable deliverable.
 
-**Each step is one action (2-5 minutes):**
+**Steps inside a task**, each one action:
 - "Write the failing test" - step
 - "Run it to make sure it fails" - step
 - "Implement the minimal code to make the test pass" - step
@@ -53,7 +51,9 @@ independently testable deliverable.
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+Every plan starts with this exact header. Executors read Spec and Global
+Constraints by name (the orchestrator loads the spec and copies the
+constraints into every task brief), so keep the field labels as written.
 
 ```markdown
 # [Feature Name] Implementation Plan
@@ -130,11 +130,16 @@ git commit -m "feat: add specific feature"
 
 ## No Placeholders
 
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
+A task's implementer sees only their own task: not the spec, not the other
+tasks, not this conversation, and often not in order. Whatever a step leaves
+out, they have to invent, and they will invent it differently from the
+neighboring task. So every step carries the actual content an engineer
+needs. These are plan failures:
+
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
 - "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
+- "Similar to Task N" (repeat the code; they cannot see Task N)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
 
@@ -162,10 +167,5 @@ After saving the plan, offer execution choice:
 
 **Which approach?"**
 
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
-
-**If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
-- Batch execution with checkpoints for review
+- Subagent-Driven chosen: use superpowers:subagent-driven-development (fresh subagent per task, two-stage review).
+- Inline Execution chosen: use superpowers:executing-plans (batch execution with checkpoints for review).
