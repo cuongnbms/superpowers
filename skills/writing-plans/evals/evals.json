@@ -1,0 +1,55 @@
+{
+  "skill_name": "writing-plans",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "The design for the rate limiter is approved and lives at docs/superpowers/specs/2026-08-20-rate-limiter-design.md (in the input files). Write the implementation plan for it and save it under docs/superpowers/plans/.",
+      "expected_output": "A plan file at docs/superpowers/plans/2026-08-20-rate-limiter.md (or similar name) with the required header including a Spec path and a Global Constraints section quoting the spec's exact values (120/min, burst 20, env var names, Python 3.11+, FastAPI 0.110+); one task per architecture unit, each with Files, Interfaces, and TDD steps containing real test and implementation code; no placeholders; consistent function and class names across tasks; ends by offering subagent-driven vs inline execution.",
+      "files": [
+        "fixtures/rate-limiter-design.md"
+      ],
+      "expectations": [
+        "Plan starts with the header block containing Goal, Architecture, Tech Stack, Spec (a path), and a Global Constraints section",
+        "Global Constraints copies exact values from the spec verbatim: 120 requests per minute, burst 20, RATE_LIMIT_PER_MINUTE, RATE_LIMIT_BURST, Python 3.11+, FastAPI 0.110+, no new runtime dependencies, no sleeping in tests",
+        "Every task has a Files block with exact paths and an Interfaces block with Consumes/Produces naming exact signatures",
+        "Every code step (write test, implement) contains an actual code block; no step says 'add tests', 'handle errors', 'similar to Task N', TODO, or TBD",
+        "Class and function names (TokenBucket, try_consume, BucketRegistry) are spelled identically in every task that references them",
+        "Each task includes explicit run-test steps with the command and the expected outcome (FAIL then PASS) and a commit step",
+        "The 429 JSON body and the three X-RateLimit headers from the spec each appear in a test in some task",
+        "Response ends by offering the two execution options (subagent-driven vs inline) rather than starting implementation"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "We agreed on this: add a `--json` flag to the `harness list` CLI command (Go, cobra; the repo is in the input files) that prints the same rows the table view prints, as a JSON array of objects with keys name, status, updated_at (RFC 3339). Exit code and filtering must stay identical to the table view. Repo uses go test and testify. Plan this out before we touch code.",
+      "expected_output": "A saved plan with the full header; Spec field states there is no separate spec file and cites the user's message; Global Constraints capture RFC 3339, identical exit code and filtering, testify; tasks are small (likely 2-3) with real Go test code and implementation code, exact file paths, run commands with expected FAIL/PASS, commits; offers execution choice at the end.",
+      "files": [
+        "fixtures/harness-cli/"
+      ],
+      "expectations": [
+        "Plan is saved to docs/superpowers/plans/ with a dated filename and contains the header block with Goal, Architecture, Tech Stack, Spec, and Global Constraints",
+        "Global Constraints lists RFC 3339 timestamps, identical exit code and filtering to the table view, and testify as one line each",
+        "Every task has Files and Interfaces blocks; Interfaces name the exact Go function signatures later tasks consume",
+        "Test steps contain real Go test code using testify, not a description of tests to write",
+        "Run-test steps give the go test command and expected outcome, and each task ends with a git commit step",
+        "No placeholder phrases (TODO, TBD, 'add error handling', 'similar to Task N', 'write tests for the above')",
+        "Response ends by offering the two execution options rather than beginning implementation"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Spec at docs/superpowers/specs/2026-08-20-rate-limiter-design.md (in the input files). Write the plan. The plan should be short, I don't want fifty pages, just get the team moving.",
+      "expected_output": "Despite the pressure for brevity, the plan keeps the header, Global Constraints, per-task Interfaces, and real code in every step; brevity comes from fewer, right-sized tasks and terse prose, not from placeholders or 'similar to' shortcuts. Every spec requirement (429 body, headers, 401 before limiting, eviction after 10 minutes, env config) maps to a task.",
+      "files": [
+        "fixtures/rate-limiter-design.md"
+      ],
+      "expectations": [
+        "Header block with Spec path and Global Constraints is present despite the request for brevity",
+        "Every task still has Interfaces (Consumes/Produces) and real code blocks in test and implementation steps",
+        "No task uses 'similar to Task N', 'as above', TODO, TBD, or 'add validation/error handling' as a step",
+        "Each of these spec requirements is covered by a named task: 429 JSON body with retry_after_seconds, X-RateLimit-* headers, 401 for missing API key, eviction of idle buckets after 10 minutes, env var configuration",
+        "Self-review is evident: no name drift between tasks for TokenBucket, try_consume, BucketRegistry"
+      ]
+    }
+  ]
+}
