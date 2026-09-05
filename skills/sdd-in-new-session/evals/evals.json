@@ -1,0 +1,56 @@
+{
+  "skill_name": "sdd-in-new-session",
+  "notes": "Each case runs the real handoff against a `herdr` test double (fixtures/bin/herdr) that logs every call and answers with API-shaped JSON, so no Herdr server is needed. Materialize a case with `evals/setup-case.sh <case> <dest>`; it prints the repo, the plan path, and an env.sh that the executor must source at the start of every shell command to be 'inside Herdr'. Grade from artifacts: <dest>/herdr-calls.log (one shell-quoted line per herdr invocation), <dest>/.herdr-shim/prompt-<agent>.txt (the exact prompt text the agent received), <dest>/.herdr-shim/renames and agents, and the executor's final message.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "worktree-claude-wide",
+      "setup": "setup-case.sh worktree",
+      "prompt": "I'm in Herdr. Hand the plan at docs/superpowers/plans/2026-09-05-notes-tags.md (repo at <REPO>) to a new session so this one stays free. Default isolation, claude.",
+      "expected_output": "One split to the right (the pane is 220x50), at the repo root, without focus; the new pane renamed to the agent name; a claude agent started in it; one prompt sent that carries the absolute plan path, names superpowers:subagent-driven-development, and asks for a worktree; the wait is --until working; the session returns at once with pane id, agent name, plan path, isolation mode, and check-in commands.",
+      "files": ["fixtures/repo/", "fixtures/bin/herdr"],
+      "expectations": [
+        "herdr-calls.log has exactly one `pane split` call, with `--direction right`, `--cwd <REPO>` (the repo root), and `--no-focus`",
+        "herdr-calls.log has a `pane rename` of the split pane (w1:p2) to the agent name, and the agent name starts with `sdd-` and matches ^[a-z][a-z0-9_-]{0,31}$",
+        "herdr-calls.log has exactly one `agent start` call, with `--kind claude` and `--pane w1:p2`, and no permission-bypass flag after `--` (no dangerously-skip-permissions, no --yes, no auto-approve)",
+        "herdr-calls.log has exactly one `agent prompt` call and it carries `--until working`; there is no `agent prompt` with `--wait` but without `--until`, no `agent wait`, and no `pane wait-output`",
+        "The prompt file contains the absolute plan path (<REPO>/docs/superpowers/plans/2026-09-05-notes-tags.md), the words `subagent-driven-development` and `worktree`, and no unfilled placeholder such as <ABS_PLAN_PATH>, <ROOT>, or <ISOLATION>",
+        "herdr-calls.log has no `worktree` command, no `pane close`, and no `agent read`/`agent get`/`pane read` call after the `agent prompt` line (no polling)",
+        "The final message reports the pane id, the agent name, the plan path, the isolation mode (worktree), and at least one check-in command (`herdr agent get` or `herdr agent read`), and does not claim the plan finished or wait for it"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "branch-pi-tall",
+      "setup": "setup-case.sh branch-pi",
+      "prompt": "/sdd-in-new-session docs/superpowers/plans/2026-09-05-notes-tags.md --branch --pi   (I'm in Herdr; repo at <REPO>)",
+      "expected_output": "The pane is 80x60 so the split goes down; a pi agent is started; the prompt tells the agent not to create a worktree but a new branch in <REPO>; the report warns that the working tree is shared.",
+      "files": ["fixtures/repo/", "fixtures/bin/herdr"],
+      "expectations": [
+        "herdr-calls.log has exactly one `pane split` call with `--direction down`, `--cwd <REPO>`, and `--no-focus`",
+        "herdr-calls.log has exactly one `agent start` call with `--kind pi` and `--pane w1:p2`",
+        "herdr-calls.log has exactly one `agent prompt` call with `--until working`, and no bare `--wait`, `agent wait`, or `pane wait-output`",
+        "The prompt file contains the absolute plan path, says not to create a worktree, and says to create a new branch in <REPO> (the checkout path appears in the text); no unfilled placeholder remains",
+        "The prompt file still names superpowers:subagent-driven-development",
+        "The final message reports isolation mode as branch and warns that the working tree is shared with this session (editing here will collide)",
+        "herdr-calls.log has no `worktree` command, no `pane close`, and no polling call after the prompt"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "name-collision-long-slug",
+      "setup": "setup-case.sh collision",
+      "prompt": "I'm in Herdr. Run docs/superpowers/plans/2026-09-05-add-tag-based-filtering-and-search-to-notes-cli.md in a separate pane with a fresh claude agent (repo at <REPO>). Keep this session free.",
+      "expected_output": "The derived name from the 52-character slug is truncated so that it fits the 32-character agent-name limit; the first `agent start` is rejected as name_taken; the retry uses a suffixed name that still fits the limit; the pane label is updated to the final name; the prompt goes to the final name and carries the absolute plan path.",
+      "files": ["fixtures/repo/", "fixtures/bin/herdr"],
+      "expectations": [
+        "herdr-calls.log has two `agent start` calls; the first fails with agent_name_taken and the second succeeds (its name is the one in .herdr-shim/agents)",
+        "Every agent name passed to `agent start` (both attempts) matches ^[a-z][a-z0-9_-]{0,31}$ (length 32 or less); the second differs from the first by a suffix such as -2",
+        "The last `pane rename` of w1:p2 sets the label to the final (started) agent name",
+        "The single `agent prompt` call targets the final agent name (or its pane id) with `--until working`",
+        "The prompt file contains the absolute plan path <REPO>/docs/superpowers/plans/2026-09-05-add-tag-based-filtering-and-search-to-notes-cli.md and no unfilled placeholder",
+        "The prompt was not sent twice (`.herdr-shim/prompt_count` is 1) and the final message reports the final agent name and pane id"
+      ]
+    }
+  ]
+}
