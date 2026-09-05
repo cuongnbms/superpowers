@@ -1,0 +1,98 @@
+[
+  {
+    "id": 0,
+    "name": "build",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "Let's build a `todo sync` command for the todo-cli at <repo> so my laptop and desktop share the same list. I'm thinking a small self-hosted HTTP server.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Invokes superpowers:brainstorming via the Skill tool before reading or writing any code",
+      "Announces the skill in the form 'Using [skill] to [purpose]'"
+    ],
+    "note": "should trigger"
+  },
+  {
+    "id": 1,
+    "name": "bugfix",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "test_done_missing.py fails when I run pytest. Fix it.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Invokes superpowers:systematic-debugging via the Skill tool before running or editing anything",
+      "Announces the skill in the form 'Using [skill] to [purpose]'"
+    ],
+    "note": "should trigger"
+  },
+  {
+    "id": 2,
+    "name": "impl",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "Add a `--done` flag to the `list` command in todo.py so it shows only completed items.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Invokes a superpowers process skill (brainstorming or test-driven-development) via the Skill tool before editing todo.py",
+      "Announces the skill in the form 'Using [skill] to [purpose]'"
+    ],
+    "note": "should trigger"
+  },
+  {
+    "id": 3,
+    "name": "explain",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "What does todo.py do? Just explain it briefly.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Does not invoke any skill via the Skill tool and does not read any SKILL.md",
+      "Answers from the fixture files without editing anything"
+    ],
+    "note": "should NOT trigger (over-trigger check)"
+  },
+  {
+    "id": 4,
+    "name": "review",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "Review README.md and tell me whether it matches what todo.py actually does. No changes.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Does not invoke any skill via the Skill tool and does not read any SKILL.md",
+      "Answers from the fixture files without editing anything"
+    ],
+    "note": "should NOT trigger (over-trigger check)"
+  },
+  {
+    "id": 5,
+    "name": "fact",
+    "skills": [
+      "using-superpowers"
+    ],
+    "query": "Where does this CLI store its data, and what happens on `done` with an id that doesn't exist? Answer from the code, don't change anything.",
+    "files": [
+      "fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Does not invoke any skill via the Skill tool and does not read any SKILL.md",
+      "Answers from the fixture files without editing anything"
+    ],
+    "note": "should NOT trigger (over-trigger check)"
+  }
+]

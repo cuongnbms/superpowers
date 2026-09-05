@@ -1,6 +1,6 @@
 ---
 name: using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
+description: Use when starting any conversation - establishes how to find and use skills, and when to check for a matching skill before the first response or action
 disable-model-invocation: true
 ---
 
@@ -8,17 +8,22 @@ disable-model-invocation: true
 If you were dispatched as a subagent to execute a specific task, ignore this skill.
 </SUBAGENT-STOP>
 
-<EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
-
-IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
-
-This is not negotiable. You cannot rationalize your way out of this.
-</EXTREMELY-IMPORTANT>
+You have a library of skills: tested workflows for building, debugging, planning, and shipping. They change how the work is done, not just how it is checked, so they only help when invoked before the work starts.
 
 ## The Rule
 
-**Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
+**Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. The skill tells you what to look for and what to ask, so orientation done before it is done again inside it. If the skill turns out wrong for the situation, set it aside and say so.
+
+Which skill comes first:
+
+| Request | First skill |
+|---------|-------------|
+| "Let's build X", add, change, or extend something, at any size (a flag or an option counts) | superpowers:brainstorming |
+| Something is broken: failing test, error, wrong output | superpowers:systematic-debugging |
+| Execute a written plan | superpowers:executing-plans or superpowers:subagent-driven-development |
+| Anything else a skill in your list describes | that skill |
+
+A question answered from the code or the conversation, a read-only look at a file or config, or an opinion on something you are not being asked to change needs no skill. Answer it directly. If it turns into a change request, invoke the skill then.
 
 **Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
 
@@ -37,17 +42,15 @@ These thoughts mean STOP—you're rationalizing:
 
 | Thought | Reality |
 |---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
+| "I'll start by looking at the file / the failing test" | That is the step the skill scripts. Invoke it first; it tells you what to read. |
+| "Let me get oriented first, then bring in the skill" | In practice the skill call never comes: sessions that orient first finish the task without it. |
 | "I need more context first" | Skill check comes BEFORE clarifying questions. |
 | "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
 | "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. |
 | "This doesn't need a formal skill" | If a skill exists, use it. |
 | "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
+| "The skill is overkill" | Small tasks are where tests get skipped and designs go unstated. The bounded paths are short. |
 | "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
 | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
 
 ## Platform Adaptation
