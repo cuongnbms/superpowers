@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
-# Extract one task's full text from an implementation plan into a file the
+# Extract one task's brief from an implementation plan into a file the
 # implementer reads in one call, so the task text never has to be pasted
 # through the controller's context.
+#
+# The brief is the plan's "Global Constraints" section (when the plan has
+# one) followed by the task's full text. Every task's requirements
+# implicitly include the global constraints, and the reviewer grades
+# against them — so the implementer must see them in the same file.
+#
+# A task ends at the next heading of the same or a shallower level, whether
+# or not it is another Task: a trailing "## Self-Review" or "## Notes"
+# section after the last task never leaks into that task's brief. Headings
+# inside fenced code blocks are ignored.
 #
 # Usage: task-brief PLAN_FILE TASK_NUMBER [OUTFILE]
 # Default OUTFILE: <repo-root>/.superpowers/sdd/<plan-basename>/task-<N>-brief.md
@@ -26,16 +36,41 @@ else
 fi
 
 awk -v n="$n" '
+  function level(line) { match(line, /^#+/); return RLENGTH }
   /^```/ { infence = !infence }
-  !infence && /^#+[ \t]+Task[ \t]+[0-9]+/ {
-    intask = ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)"))
+  !infence && /^#+[ \t]+/ {
+    lvl = level($0)
+    if (intask && lvl <= tasklvl) intask = 0
+    if (incons && lvl <= conslvl) incons = 0
+    # Any Task heading ends the constraints block, even a deeper one: a
+    # hand-written plan may go straight from "## Global Constraints" to
+    # "### Task 1" with no rule or wrapper heading between them.
+    if ($0 ~ /^#+[ \t]+Task[ \t]+[0-9]+/) incons = 0
+    if ($0 ~ ("^#+[ \t]+Task[ \t]+" n "([^0-9]|$)")) { intask = 1; tasklvl = lvl }
+    else if ($0 ~ /^#+[ \t]+Global Constraints/) { incons = 1; conslvl = lvl }
   }
-  intask { print }
-' "$plan" > "$out"
+  # A bare "---" rule closes the constraints block (the plan template puts
+  # one right after it); it carries nothing the implementer needs.
+  incons && /^---[ \t]*$/ { incons = 0; next }
+  incons { cons = cons $0 "\n" }
+  intask { task = task $0 "\n" }
+  END {
+    if (task == "") exit 3
+    if (cons != "") { printf "%s\n", cons; found_cons = 1 }
+    printf "%s", task
+    exit (found_cons ? 0 : 4)
+  }
+' "$plan" > "$out" || rc=$?
+rc=${rc:-0}
 
-if [ ! -s "$out" ]; then
+if [ "$rc" -eq 3 ] || [ ! -s "$out" ]; then
+  rm -f "$out"
   echo "task ${n} not found in ${plan} (no heading matching 'Task ${n}')" >&2
   exit 3
+fi
+
+if [ "$rc" -eq 4 ]; then
+  echo "note: ${plan} has no 'Global Constraints' section; the brief carries only the task text" >&2
 fi
 
 echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines"

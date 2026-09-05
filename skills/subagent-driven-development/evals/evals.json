@@ -1,0 +1,62 @@
+{
+  "skill_name": "subagent-driven-development",
+  "notes": "Each case is a dry run: the controller does everything up to its next subagent dispatch, writes the dispatch prompt to dispatch.md, and stops. Materialize a case with `evals/setup-case.sh <case> <dest>` (real git repo on a feature branch, ledger state planted). Grade from artifacts: the ledger, the brief, dispatch.md, and the final message.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "fresh-start-preflight",
+      "setup": "setup-case.sh fresh",
+      "prompt": "Execute the implementation plan at docs/superpowers/plans/2026-09-05-notes-tags.md in the repo at <REPO>. This checkout is already an isolated feature branch (feature/notes-tags), so treat the worktree step as satisfied. Dry run for this session: do everything the skill says to do up to the point where you would dispatch the next subagent, then write the exact dispatch prompt you would send (the full prompt text, including the model you chose) to dispatch.md at the repo root and stop. Do not dispatch any subagent.",
+      "expected_output": "Ledger created at .superpowers/sdd/2026-09-05-notes-tags/progress.md naming the plan on its first line; pre-flight table with a Task 1/Task 2 row that catches parse_tags vs extract_tags and a Ruling line resolving it; task-1-brief.md written by the script and starting with Global Constraints; dispatch.md for Task 1 that points at the brief and report paths, names a model, and does not paste the plan.",
+      "files": [
+        "fixtures/notes-cli/"
+      ],
+      "expectations": [
+        "Ledger exists at .superpowers/sdd/2026-09-05-notes-tags/progress.md and its first line is '# SDD ledger — plan: docs/superpowers/plans/2026-09-05-notes-tags.md'",
+        "Ledger holds a pre-flight table with a row for the Task 1 / Task 2 pair naming parse_tags against extract_tags",
+        "Ledger holds a 'Ruling:' line resolving the parse_tags/extract_tags mismatch, with a reason and what it costs if wrong",
+        "task-1-brief.md exists in the plan workspace and starts with the plan's Global Constraints section",
+        "dispatch.md is for Task 1, contains the brief path and a report-file path, and names the model explicitly",
+        "dispatch.md does not paste the plan: it contains neither the Task 2/Task 3 headings nor the regex literal (?<![\\w#]) from the plan",
+        "The final message asks the human no question and does not offer to continue; the only stop is the dry-run stop the prompt requested"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "resume-after-task-1",
+      "setup": "setup-case.sh resume",
+      "prompt": "Execute the implementation plan at docs/superpowers/plans/2026-09-05-notes-tags.md in the repo at <REPO>. This checkout is already an isolated feature branch (feature/notes-tags), so treat the worktree step as satisfied. Dry run for this session: do everything the skill says to do up to the point where you would dispatch the next subagent, then write the exact dispatch prompt you would send (the full prompt text, including the model you chose) to dispatch.md at the repo root and stop. Do not dispatch any subagent.",
+      "expected_output": "Controller reads the plan's ledger, sees Task 1 complete, and prepares the Task 2 dispatch carrying the parse_tags ruling; the stray flat ledger for another plan is untouched; no pre-flight rerun, no Task 1 re-dispatch.",
+      "files": [
+        "fixtures/notes-cli/"
+      ],
+      "expectations": [
+        "dispatch.md is a dispatch for Task 2 (not a Task 1 re-dispatch, not a Task 3 dispatch); naming Task 3 as out of scope is fine",
+        "dispatch.md carries Task 1's interface or the ruling: it tells the implementer to use parse_tags (the plan text says extract_tags)",
+        "task-2-brief.md exists in the plan workspace and starts with the plan's Global Constraints section",
+        "dispatch.md contains the brief path and a report-file path and names the model explicitly",
+        "The stray ledger at .superpowers/sdd/progress.md is byte-identical to the planted one and the plan ledger's first line is unchanged",
+        "The plan ledger still has exactly one 'Task 1: complete' line (no duplicate completion, no re-dispatch of Task 1)",
+        "The final message asks the human no question and does not offer to continue"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "resume-mid-fix-loop",
+      "setup": "setup-case.sh midloop",
+      "prompt": "Execute the implementation plan at docs/superpowers/plans/2026-09-05-notes-tags.md in the repo at <REPO>. This checkout is already an isolated feature branch (feature/notes-tags), so treat the worktree step as satisfied. Dry run for this session: do everything the skill says to do up to the point where you would dispatch the next subagent, then write the exact dispatch prompt you would send (the full prompt text, including the model you chose) to dispatch.md at the repo root and stop. Do not dispatch any subagent.",
+      "expected_output": "Controller sees Task 2 at fix round 3/5 with one open finding and prepares fix round 4: a fresh implementer on a model at least one tier above the cheapest, told that a prior implementer attempted the task three times, carrying the open finding verbatim, the brief path, and the report path.",
+      "files": [
+        "fixtures/notes-cli/"
+      ],
+      "expectations": [
+        "dispatch.md is a fix-round dispatch for Task 2 (round 4), not a fresh Task 2 implementation and not a Task 3 dispatch; naming Task 3 as out of scope is fine",
+        "dispatch.md chooses a model above the cheapest tier (sonnet or higher; mentioning haiku while explaining the choice is fine) and says a prior implementer attempted the task (three times) and this one owns it now",
+        "dispatch.md carries the open finding (list_by_tag ordering, newest first) and points at task-2-brief.md and task-2-report.md",
+        "The controller does not fix notes/store.py itself: the working tree has no uncommitted change to notes/store.py and HEAD is the planted round-3 commit",
+        "The plan ledger keeps its first line and its Task 1: complete line; no pre-flight scan is re-run",
+        "The final message asks the human no question and does not offer to continue"
+      ]
+    }
+  ]
+}
