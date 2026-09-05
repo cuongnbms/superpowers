@@ -1,5 +1,18 @@
 # Superpowers Release Notes
 
+## v6.4.1 (2026-09-05)
+
+Patch release tightening skill routing and making written plans reliably available across execution sessions.
+
+### Skill Routing
+
+- **using-superpowers** replaces its coercive bootstrap block with a concise routing table, clarifying when each workflow skill applies without over-triggering. New eval fixtures cover the routing behavior.
+
+### Writing Plans
+
+- **Plans are committed before execution handoff**, so fresh sessions and isolated worktrees can read the exact reviewed plan.
+- **sdd-in-new-session** now assumes the committed-plan workflow and removes obsolete warnings about plans being absent from worktrees.
+
 ## v6.4.0 (2026-09-05)
 
 Fork release. Skills are being re-tuned for Claude 5 models, which over-trigger on emphatic text: descriptions become third-person capability plus triggers, MUST/NEVER give way to stated reasons, and every edited skill ships an `evals/` directory so the change can be re-measured.
