@@ -22,8 +22,7 @@ Hand a plan to a fresh agent in a sibling Herdr pane, confirm the handoff, and r
 1. `test "${HERDR_ENV:-}" = 1` — otherwise say you are not inside Herdr and stop.
 2. `PLAN=$(realpath "$PLAN_PATH")` — must exist. The spawned agent changes directory into a worktree, so only an absolute path survives.
 3. `ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)`.
-4. `git status --porcelain -- "$PLAN"` non-empty → plan is uncommitted. Do not commit it yourself; note it in the final report (it will be absent from the worktree and from any merged branch until committed).
-5. Agent name — must match `[a-z][a-z0-9_-]{0,31}`, so the `sdd-` prefix is load-bearing (plan slugs start with a date):
+4. Agent name — must match `[a-z][a-z0-9_-]{0,31}`, so the `sdd-` prefix is load-bearing (plan slugs start with a date):
    ```bash
    NAME="sdd-$(basename "$PLAN" .md | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-//; s/[^a-z0-9_-]/-/g' | cut -c1-28)"
    ```
@@ -52,7 +51,7 @@ Execute the implementation plan at <ABS_PLAN_PATH> using superpowers:subagent-dr
 
 Isolation: <ISOLATION>
 
-Read the plan from the absolute path above (it may not be committed yet).
+Read the plan from the absolute path above.
 ```
 
 `<ISOLATION>`:
@@ -68,7 +67,6 @@ Return immediately — no polling, no `agent wait`, no reading the transcript. R
 - pane id and label, agent name, plan path, isolation mode (worktree | branch `<name>`)
 - check-in commands: `herdr agent get NAME`, `herdr agent read NAME --source recent-unwrapped --lines 80`
 - with `--branch`: the working tree is shared — editing files here before the agent finishes will collide
-- if the plan was uncommitted: say so
 
 Leave the pane open; never close a pane hosting a live agent.
 

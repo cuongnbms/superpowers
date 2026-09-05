@@ -155,13 +155,23 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
+## Commit the Plan
+
+After self-review and before handoff, commit the completed plan so new
+sessions and worktrees can access the exact reviewed version.
+
+```bash
+git add docs/superpowers/plans/<filename>.md
+git commit -m "docs: add <feature-name> implementation plan"
+```
+
 ## Execution Handoff
 
 After saving the plan, offer execution choice. Option 2 exists only inside
 Herdr: run `test "${HERDR_ENV:-}" = 1` first, and outside Herdr list the
 other two.
 
-**"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Execution options:**
+**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Execution options:**
 
 **1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task in this session and review between tasks; fast iteration
 
