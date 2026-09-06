@@ -1,5 +1,16 @@
 # Superpowers Release Notes
 
+## v6.4.3 (2026-09-06)
+
+Patch release: the ADR format in domain-modeling is rebuilt around one sectioned shape and one location.
+
+### Domain Modeling
+
+- **One ADR shape.** Every ADR has a numbered title that names the accepted cost, a one-line `Status · Date · Context` header, and Context and Decision sections. Decision is two slots, the what and the why, so the reason a decision won cannot drop out even when an alternatives table is present. Consequences and Alternatives considered are optional, each with a stated condition for when it earns its place.
+- **ADRs live only in the root `docs/adr/`.** Multi-context repos no longer get per-context ADR directories; the owning context goes in the header's `Context` field (`System` for cross-cutting decisions). One directory means one number sequence and no relative-link gymnastics between contexts.
+- **Updates and supersession are append-only.** Follow-on events go in a dated `## Updates` section; a reversal is a new ADR plus a `Superseded by` header on the old one. Editing an accepted ADR in place is ruled out because it erases what the project once decided.
+- **The three-part test and "what qualifies" list live in SKILL.md only.** ADR-FORMAT.md is now strictly about the file's shape; the duplicated gate text is gone so the two copies cannot drift.
+
 ## v6.4.2 (2026-09-05)
 
 Patch release: subagent-driven development and its Herdr handoff get evidence-backed fixes, and the glossary write-timing rule moves to the skill that owns it.
