@@ -1,47 +1,103 @@
 # ADR Format
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+An ADR records one decision that passed the three-part test in [SKILL.md](./SKILL.md#offer-adrs-sparingly). This file is only about the shape of the file: where it goes, what it contains, and how it changes over time.
 
-Create the `docs/adr/` directory lazily: only when the first ADR is needed.
+## Location and numbering
+
+All ADRs live in `docs/adr/` at the repo root, including in a multi-context repo. One directory means one number sequence, one place to scan for "what has this project decided", and no question of which context a cross-cutting decision belongs to. A context-specific decision records its owner in the header's `Context` field instead.
+
+Scan `docs/adr/` for the highest existing number and add one. Files are named `NNNN-slug.md`, four digits, where the slug is the title in kebab-case trimmed to its key words (`# 0003: Event-sourced write model for Orders` becomes `0003-event-sourced-orders.md`). Refer to another ADR as `[0003](./0003-event-sourced-orders.md)`.
 
 ## Template
 
-```md
-# {Short title of the decision}
+The value of an ADR is in recording *that* a decision was made and *why*, not in filling out sections. Context and Decision are always present; Consequences and Alternatives appear when they have something to say. Sections keep this order so a reader scanning ten ADRs finds each thing in the same place.
 
-{1-3 sentences: what's the context, what did we decide, and why.}
+```md
+# {NNNN}: {The decision as a verb phrase, naming the accepted cost if there is one}
+
+> Status: Accepted · Date: {YYYY-MM-DD} · Context: {name}
+
+## Context
+
+{Why a decision was needed. The forces at play, the constraint that made the obvious path unavailable.}
+
+## Decision
+
+{What we do.}
+
+{Why this wins: the reason, stated against the forces in Context, naming the option it beat.}
+
+## Consequences                      ← optional
+
+{What gets better, what gets worse, what follows. Split into **Positive** / **Negative** / **Neutral** subheadings only when there are enough items for the split to help.}
+
+## Alternatives considered           ← optional
+
+| Alternative | Why not chosen |
+|-------------|----------------|
+| {option} | {the specific reason it lost} |
 ```
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
+Rules for filling it in:
 
-## Optional sections
+- **`Context:` in the header appears only when the repo has a `CONTEXT-MAP.md`.** Name the context from the map that owns the decision, or `System` when it spans contexts. A single-context repo omits the field.
+- **Decision has two parts, the what and the why.** A Decision with only the what is incomplete even when the alternatives table is full, because the table records why the others lost, not why this one won. One sentence each is enough.
+- **Consequences appears when a downstream effect is non-obvious**: something the reader would not predict from the decision alone and might otherwise treat as a bug. Omit it when the effects are the obvious ones.
+- **Alternatives considered appears when more than one option lost, or when the losing option needs more than the phrase in Decision to be understood.** A decision between two options whose why already names the loser needs no table.
+- **A one-sentence section is valid.** Write as much as the decision needs and no more. The sections exist so the reader knows where to look, not to be filled.
+- **The title names the trade-off.** "Squash the four heaviest apps' migrations, accepting cosmetic constraint-name divergence" tells the reader the decision and its price before they open the file. "Migration squash" tells them nothing.
+- **Every row of the alternatives table gives a specific reason.** "Not a good fit" is not a reason; "would keep the inline `RunPython` that references a since-deleted model" is.
+- **Add a `Source:` line** at the end of Context when the ADR came out of a brainstorm or spec, for example `Source: [design spec](../superpowers/specs/2026-09-06-order-billing-design.md)`. Omit it when there is no such document.
 
-Only include these when they add genuine value. Most ADRs won't need them.
+### Example
 
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`): useful when decisions are revisited
-- **Considered Options**: only when the rejected alternatives are worth remembering
-- **Consequences**: only when non-obvious downstream effects need to be called out
+```md
+# 0004: Communicate between Ordering and Billing via domain events
 
-## Numbering
+> Status: Accepted · Date: 2026-09-06 · Context: System
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+## Context
 
-## When to offer an ADR
+Ordering needs Billing to invoice after an order is placed. Billing has had two multi-hour outages this quarter, and Ordering must keep accepting orders through the next one.
 
-All three of these must be true:
+Source: [design spec](../superpowers/specs/2026-09-06-order-billing-design.md)
 
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will look at the code and wonder "why on earth did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
+## Decision
 
-If a decision is easy to reverse, skip it: you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
+Ordering publishes an `OrderPlaced` event that Billing consumes. Ordering never calls Billing directly.
 
-### What qualifies
+An event lets Ordering keep accepting orders through a Billing outage, which a synchronous call to Billing cannot.
 
-- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
-- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
-- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library: just the ones that would take a quarter to swap out.
-- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
-- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
-- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
-- **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it; otherwise someone will suggest GraphQL again in six months.
+## Consequences
+
+Ordering's uptime no longer depends on Billing's. Invoices lag order placement by the consumer's delay, so "invoice not yet created" is a normal state that the customer portal must display rather than treat as an error.
+
+## Alternatives considered
+
+| Alternative | Why not chosen |
+|-------------|----------------|
+| Synchronous HTTP call from Ordering to Billing | Couples the two services' uptime; an order would fail whenever Billing is down. |
+| Ordering writes the invoice itself | Puts invoicing rules in two contexts; Billing already owns them. |
+```
+
+## Updates and supersession
+
+The sections above are written once. The two ways an ADR changes afterwards:
+
+**Something happened, the decision stands.** A follow-on phase shipped, a predicted consequence materialised, a workaround was needed. Append an `## Updates` section at the end of the file, with one dated subheading per entry, newest last. Create the section with the first update; never edit the original sections to fold the news in, because the reader needs to see what was known at decision time separately from what was learned later.
+
+```md
+## Updates
+
+### 2026-10-02: Phase 2 shipped
+
+{What happened, and anything non-obvious the reader needs.}
+```
+
+**The decision was reversed.** Do not edit the old file's body. Write a new ADR with the next number explaining what changed and why, then change the old file's header line to point at it:
+
+```md
+> Status: Superseded by [0007](./0007-sync-billing-calls.md) · Date: 2026-09-06 · Context: System
+```
+
+`Date` and `Context` stay as they were. A decision that is retired without a replacement uses `> Status: Deprecated · Date: ...` plus an update entry saying why. Editing in place erases the fact that the project once decided otherwise, which is exactly what the next reader needs to know before they propose the old approach again.
