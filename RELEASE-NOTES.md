@@ -1,6 +1,6 @@
 # Superpowers Release Notes
 
-## Unreleased
+## v6.4.4 (2026-09-21)
 
 Hand-merged selection from upstream obra/superpowers v6.4.1 (upstream's numbering; this fork's own v6.4.x tags are unrelated). The fork's upstream base moves from v6.3.0 to v6.4.1 for the items listed here. Not taken: Muse, OpenCode 2.0 and Qwen harness support, `diagnosing-superpowers`, `references/claude-code-tools.md`, the AGENTS.md/CLAUDE.md restructure, Code of Conduct and docs/testing.md changes.
 
