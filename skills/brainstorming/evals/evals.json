@@ -94,5 +94,40 @@
       "Continues the brainstorm: asks the next single question or moves to approaches, without restarting classification",
       "Does not present the whole design or write a spec this turn"
     ]
+  },
+  {
+    "id": 5,
+    "name": "scope-approved-is-not-build-approval",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/scope-approved-transcript.md: produce the next assistant turn in the empty repo at <repo>, acting as in a real session (edit files if you would).",
+    "files": [
+      "fixtures/scope-approved-transcript.md"
+    ],
+    "runs": 3,
+    "expected_behavior": [
+      "Treats the reply as approval of the scope only and continues the architectural path (approaches, design sections, or the next question)",
+      "Creates no product code, scaffolding, package manifest, or dependency install this turn",
+      "Does not invoke writing-plans or an implementation skill this turn",
+      "Does not re-ask for approval of the scope the user just approved",
+      "Does not lecture about process"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "intent-before-features",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Let's make a react todo list. Empty repo at <repo>.",
+    "files": [],
+    "expected_behavior": [
+      "Announces the classification (architectural: new project)",
+      "First question is about purpose or intended use (who it is for, what it is for, what success looks like), not about tech choices or features",
+      "Asks exactly one question in the first turn",
+      "Does not propose a feature list, an approach, or a stack before knowing the purpose",
+      "Creates no files"
+    ]
   }
 ]

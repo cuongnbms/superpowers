@@ -1,5 +1,33 @@
 # Superpowers Release Notes
 
+## Unreleased
+
+Hand-merged selection from upstream obra/superpowers v6.4.1 (upstream's numbering; this fork's own v6.4.x tags are unrelated). The fork's upstream base moves from v6.3.0 to v6.4.1 for the items listed here. Not taken: Muse, OpenCode 2.0 and Qwen harness support, `diagnosing-superpowers`, `references/claude-code-tools.md`, the AGENTS.md/CLAUDE.md restructure, Code of Conduct and docs/testing.md changes.
+
+### Executing Plans
+
+- **Rebuilt as continuous inline execution** (upstream #2318). The session implements every task itself on the same workspace and ledger as subagent-driven development, without pausing between tasks, then dispatches one whole-branch review on the most capable model. New `scripts/task-start` and `scripts/task-done` helpers; they call the SDD scripts through `bash`. The old batch-with-checkpoints behavior is gone, and README, SDD's When to Use, and the writing-plans handoff describe the new mode.
+
+### Writing Plans
+
+- **Review Focus section** in the plan header plus Self-Review item 4 (upstream #2319): up to five inputs or failure modes the spec implies but no task's tests exercise, each pinned by a test in the owning task. `task-brief` still ends Global Constraints at the next same-level heading, so Review Focus does not leak into briefs.
+- **The human reviews the committed plan before anything runs** (upstream #2258). The handoff keeps this fork's three options and `HERDR_ENV` gate, and adds the review request, what each option costs, and a one-sentence recommendation drawn from the plan. A method chosen earlier is kept.
+
+### Brainstorming
+
+- **Approval covers the stage presented** (upstream #2258, adapted rather than pasted): one paragraph in the approval gate, one rationalization row, and two bullets in Understanding the idea (find out why before proposing what; write back what they said versus what you assumed). Two eval cases added.
+
+### Code Review, TDD
+
+- Reviewer judges behavior the spec is silent on by what a reasonable user expects, and lists what it declined to judge (upstream #2319). Multi-commit `BASE_SHA` alternative is `git merge-base origin/main HEAD` (upstream #2133).
+- TDD: the project's suite defines green, not only the named test file; every failure is reported by name (upstream #2110).
+
+### Subagent-Driven Development
+
+- `sdd-workspace` records each workspace's owning plan, so two plans with the same basename no longer share a directory (upstream #2138). `review-package` exits 3 on an empty or non-descendant `BASE..HEAD` range (upstream #2136).
+- Skill prose and helper scripts invoke bundled scripts through their interpreter, so they survive packagers that strip executable bits (upstream #2301). writing-skills states the rule for new skills.
+- Tests: `test-sdd-workspace.sh` extended, `test-executing-plans-scripts.sh` added to `run-skill-tests.sh`.
+
 ## v6.4.3 (2026-09-06)
 
 Patch release: the ADR format in domain-modeling is rebuilt around one sectioned shape and one location.
