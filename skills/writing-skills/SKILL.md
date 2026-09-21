@@ -91,7 +91,10 @@ wrong:
   SKILL.md; add a table of contents to any file over 100 lines.
 - **Prefer imperative form** in instructions, and explain why each instruction matters.
 - **Scripts for deterministic work.** If test runs show subagents each writing the same
-  helper, bundle it in `scripts/` and tell the skill to run it.
+  helper, bundle it in `scripts/` and tell the skill to run it. Invoke bundled scripts through
+  their interpreter in the prose (`bash scripts/tool.sh`, `node scripts/tool.js`), not by bare
+  path: some plugin packagers strip executable bits, and a bare `scripts/tool.sh` then fails
+  with `Permission denied`.
 - **Side-effecting skills** (deploy, commit, send): consider `disable-model-invocation: true`
   or `paths` rather than wording tricks to control when they fire.
 

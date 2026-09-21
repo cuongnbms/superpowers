@@ -266,7 +266,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 3. **writing-plans** - Activates with approved design. Breaks work into small tasks, each a sequence of single-action steps (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
 
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
+4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or implements every task inline in the session with one whole-branch review at the end.
 
 5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
 
@@ -300,7 +300,7 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 - **domain-modeling** - Sharpen terminology and record CONTEXT.md glossary and ADRs; invoked by brainstorming on the architectural path
 - **writing-plans** - Detailed implementation plans
 - **sdd-in-new-session** - Hand a plan to a fresh claude or pi agent in a sibling Herdr pane
-- **executing-plans** - Batch execution with checkpoints
+- **executing-plans** - Inline execution of the whole plan, one final whole-branch review
 - **dispatching-parallel-agents** - Concurrent subagent workflows
 - **requesting-code-review** - Pre-review checklist
 - **receiving-code-review** - Responding to feedback

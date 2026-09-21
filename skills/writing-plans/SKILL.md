@@ -76,6 +76,18 @@ naming and copy rules, platform requirements — one line each, with exact
 values copied verbatim from the spec. Every task's requirements implicitly
 include this section.]
 
+## Review Focus
+
+[Up to five input classes or failure modes the spec implies but no task's
+tests exercise, the ones most likely to bite a person using this software
+— one line each, naming the input or condition and the behavior a
+reasonable person would expect, most likely first. The spec is a vision
+document: it says what the software must do, not everything it will
+meet, and its silence on an input is not permission for that input to
+break the program. Write the list here, once, with the spec in front of
+you. Then, for each line, add the test that pins it to the task that
+owns the code, in that task's own step style.]
+
 ---
 ```
 
@@ -153,6 +165,8 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
+**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
+
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
 ## Commit the Plan
@@ -167,20 +181,30 @@ git commit -m "docs: add <feature-name> implementation plan"
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice. Option 2 exists only inside
-Herdr: run `test "${HERDR_ENV:-}" = 1` first, and outside Herdr list the
-other two.
+After committing the plan, link it for your human partner to read, and wait
+for their review before any implementation starts: approving an idea, a
+scope, or a spec is not approving a plan they have not seen. If they ask
+for changes, edit the plan and commit again before handing off.
 
-**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Execution options:**
+If they already chose an execution method, keep it and ask only for the
+review:
 
-**1. Subagent-Driven** - I dispatch a fresh subagent per task in this session and review between tasks; fast iteration
+**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Does it capture what you want?"**
+
+Otherwise offer the execution choice with the review. Option 2 exists only
+inside Herdr: run `test "${HERDR_ENV:-}" = 1` first, and outside Herdr list
+the other two.
+
+**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Execution options:**
+
+**1. Subagent-Driven** - I dispatch a fresh subagent per task in this session, a fresh reviewer checks each task before the next starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review
 
 **2. Subagent-Driven in new session** - same subagent-driven process, run by a fresh `claude` or `pi` agent in a sibling Herdr pane; this session stays free for other work
 
-**3. Inline Execution** - execute tasks in this session using executing-plans, batch execution with checkpoints; for harnesses without subagents
+**3. Inline Execution** - I implement every task myself in this session using executing-plans, without pausing between tasks, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well on a mid-tier session model, and is the option for harnesses without subagents
 
-**Which approach?"**
+**For this plan I recommend <one option>, because <one sentence drawn from the plan: how much the tasks depend on each other's interfaces, how many there are, what a shipped mistake would cost>. Does the plan capture what you want, and which approach should we use?"**
 
 - Subagent-Driven chosen: use superpowers:subagent-driven-development (fresh subagent per task, two-stage review).
 - Subagent-Driven in new session chosen: use superpowers:sdd-in-new-session with the plan path; add `--pi` when the user wants pi, `--branch` when they want a branch in this checkout instead of a worktree.
-- Inline Execution chosen: use superpowers:executing-plans (batch execution with checkpoints for review).
+- Inline Execution chosen: use superpowers:executing-plans (continuous inline execution, one whole-branch review at the end).

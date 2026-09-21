@@ -18,6 +18,11 @@ not scale. Small tasks are where unexamined assumptions waste the most work, and
 presented and started in the same breath gives your human partner nothing to veto. Present, then stop
 until you hear yes.
 
+A yes approves the stage actually presented. On the architectural path, approving the idea or
+the feature scope permits writing the spec, and approving the written spec permits invoking
+writing-plans; neither approves an artifact that does not exist yet. Resume at the earliest
+stage still missing its approval.
+
 ## Classify first
 
 Before your first question, classify the request and say the classification out loud ("this
@@ -51,6 +56,7 @@ approved spike.
 | "The design is obvious, I'll start while they read it" | The gate is the approval, not the design's length. |
 | "They told me not to ask questions, just do it" | Stating your intent in two sentences is not a question. It costs one message and catches the wrong assumption before the diff exists. |
 | "Their message already contains the design and the approval" | A request is not an approval of your reading of it. Restate it in two sentences; if you read it right, the yes costs one word. |
+| "They said the scope is fine, so I can start building" | They approved the scope, not a spec or plan they have not seen. Continue at the next stage of the path. |
 | "I understand this kind of app, so it's bounded" | A new project has no existing flow. It is architectural. |
 | "The spike works, so I'll keep the code" | A spike's output is an answer. Keeping the code is a new request. |
 | "It grew, but I'm almost done" | Hidden complexity upgrades the path. Stop and say so. |
@@ -112,6 +118,13 @@ is an answer, not a model.
   subsystems ("a platform with chat, file storage, billing, and analytics"), say so and help
   decompose: what the independent pieces are, how they relate, what order to build them. Then
   brainstorm the first sub-project; each gets its own spec, plan, and implementation cycle.
+- Find out why before proposing what. Knowing the genre of app does not tell you why your
+  human partner wants it: who it is for, what they will do with it, what success looks like.
+  When the request and context do not say, ask one focused question about purpose before
+  proposing features or an approach. When they already say, do not ask again.
+- Write your understanding back in a short note (intended outcome, constraints, success
+  criteria) with what they said kept separate from what you assumed, and invite correction.
+  The corrected note is the brief the design is checked against.
 - One question per message. Prefer multiple choice when the options are known; open-ended is
   fine. Focus on purpose, constraints, and success criteria.
 

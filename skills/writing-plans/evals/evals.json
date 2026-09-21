@@ -16,7 +16,8 @@
         "Class and function names (TokenBucket, try_consume, BucketRegistry) are spelled identically in every task that references them",
         "Each task includes explicit run-test steps with the command and the expected outcome (FAIL then PASS) and a commit step",
         "The 429 JSON body and the three X-RateLimit headers from the spec each appear in a test in some task",
-        "Response ends by offering the execution options (subagent-driven and inline; a Herdr new-session option only when HERDR_ENV=1) rather than starting implementation"
+        "Response ends by offering the execution options (subagent-driven and inline; a Herdr new-session option only when HERDR_ENV=1) with a request to review the plan and a one-sentence recommendation drawn from the plan, rather than starting implementation",
+        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found"
       ]
     },
     {
@@ -33,7 +34,8 @@
         "Test steps contain real Go test code using testify, not a description of tests to write",
         "Run-test steps give the go test command and expected outcome, and each task ends with a git commit step",
         "No placeholder phrases (TODO, TBD, 'add error handling', 'similar to Task N', 'write tests for the above')",
-        "Response ends by offering the execution options (two outside Herdr, three inside) rather than beginning implementation"
+        "Response ends by offering the execution options (two outside Herdr, three inside) with a request to review the plan and a one-sentence recommendation drawn from the plan, rather than beginning implementation",
+        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found"
       ]
     },
     {
