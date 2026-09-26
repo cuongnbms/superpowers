@@ -1,5 +1,21 @@
 # Superpowers Release Notes
 
+## Unreleased
+
+Hand-merged from upstream obra/superpowers v6.4.2 (upstream's numbering; this fork's own v6.4.2 from 2026-09-05 is unrelated). Upstream's motivating report: Opus 5.5 would sometimes implement the project while writing the plan, and plans were transcripts of the code. Not taken: the CLAUDE.md removal (this fork keeps the full guidelines in CLAUDE.md with AGENTS.md as a symlink, the opposite of upstream's pointer file) and `plan-document-reviewer-prompt.md` (already removed here on 2026-09-05).
+
+### Subagent-Driven Development, Executing Plans
+
+- Model Selection names the implementer that writing-plans now produces: signature, spec values and a complete test, body written by the implementer, mid tier. executing-plans' "transcription plus testing" sentence and its "plan's code is right" rationalization say the same thing. Consistency edits only: four dry-run controllers (two on the old wording, two on the new) all picked the mid tier for Task 1 of the `harness sync` plan and gave the same reason. Two Sonnet implementers built Tasks 1 and 2 of that plan from their briefs (7/7 and 9/9 tests, go vet clean, RED then GREEN in the reports), and an Opus task reviewer approved Task 2 from the brief and tests alone, naming nil-versus-empty slice as the one thing a written-out body would have settled.
+
+### Writing Plans
+
+- **A plan records decisions, not the code** (upstream #2333). "What a Step Contains" replaces "No Placeholders", keeping this fork's reason (the implementer sees only their own task, out of order): a test step carries the test's name and assertions with the spec's values; a code step carries the exact signature, the file, and the spec's values, with a body only for an algorithm those do not determine; a verification step carries the command and its passing output; a reference to another task goes through that task's Interfaces block. Placeholders remain the opposite failure. Template Step 3 shows the signature form.
+- **Self-review checks proportion** (item 5) and item 2 becomes a step scan that catches both a line that decides nothing and a body the signature and tests already determine.
+- **The reader is described as capable:** writes idiomatic code once they know the exact interface and test. Steps are sized as one action with a checkable result, not 2-5 minutes. The description drops "implementation code"; README's writing-plans lines follow.
+- **Fork-only, from the eval:** the test-step bullet says the test is complete and runnable as written, fixtures, helpers and imports included, because the test is the contract the reviewer grades against; upstream's "name and assertions" wording produced commented test outlines and prose fixtures on Opus. Proportion (item 5) targets implementation bodies only and says test code stays complete. A new Overview paragraph, "Planning is reading; execution is running", keeps scratch builds out of planning: upstream's release says its wording removed them, but on this fork's first pass Opus still built and ran the plan's code in a scratch copy whenever a repo was present (2 of 4 runs), and with the paragraph 0 of 5.
+- Evals: the three existing cases' assertions now expect complete tests, signatures in implementation steps, a small implementation-code share, and no build or test command during planning; a fourth case (`harness sync`, Go, spec fixture `sync-command-design.md`) is the case where scratch builds and test outlines showed up.
+
 ## v6.4.4 (2026-09-21)
 
 Hand-merged selection from upstream obra/superpowers v6.4.1 (upstream's numbering; this fork's own v6.4.x tags are unrelated). The fork's upstream base moves from v6.3.0 to v6.4.1 for the items listed here. Not taken: Muse, OpenCode 2.0 and Qwen harness support, `diagnosing-superpowers`, `references/claude-code-tools.md`, the AGENTS.md/CLAUDE.md restructure, Code of Conduct and docs/testing.md changes.

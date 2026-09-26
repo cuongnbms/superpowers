@@ -117,7 +117,7 @@ for anything that needs judgment.
 | Role | Tier |
 |------|------|
 | Implementer whose brief contains the complete code to write (transcription plus testing); single-file mechanical fix | Cheapest |
-| Implementer working from prose: multi-file coordination, pattern matching, debugging | Mid |
+| Implementer working from a signature, the spec's values and a complete test, which is what writing-plans produces: they write the body themselves. Also multi-file coordination, pattern matching, debugging | Mid |
 | Implementer needing design judgment or broad codebase understanding | Most capable |
 | Task reviewer | Scaled to the diff's size, complexity, and risk: mid for a small mechanical diff, most capable for a subtle concurrency change |
 | Scoped re-review of a small fix diff | Cheap-to-mid |
