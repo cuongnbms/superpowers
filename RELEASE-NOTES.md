@@ -1,6 +1,6 @@
 # Superpowers Release Notes
 
-## Unreleased
+## v6.4.5 (2026-09-26)
 
 Hand-merged from upstream obra/superpowers v6.4.2 (upstream's numbering; this fork's own v6.4.2 from 2026-09-05 is unrelated). Upstream's motivating report: Opus 5.5 would sometimes implement the project while writing the plan, and plans were transcripts of the code. Not taken: the CLAUDE.md removal (this fork keeps the full guidelines in CLAUDE.md with AGENTS.md as a symlink, the opposite of upstream's pointer file) and `plan-document-reviewer-prompt.md` (already removed here on 2026-09-05).
 
