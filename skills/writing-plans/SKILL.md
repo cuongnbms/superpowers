@@ -1,20 +1,25 @@
 ---
 name: writing-plans
-description: Writes a task-by-task implementation plan from an approved spec or requirements - exact files, test code, implementation code, and commit steps per task, so an engineer or subagent with no context can execute it. Use when the user has a spec or requirements for a multi-step change and needs an implementation plan, or asks to plan the work before touching code.
+description: Writes a task-by-task implementation plan from an approved spec or requirements - exact files, signatures, test assertions, and commit steps per task, so an engineer or subagent with no context can execute it. Use when the user has a spec or requirements for a multi-step change and needs an implementation plan, or asks to plan the work before touching code.
 ---
 
 # Writing Plans
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as small tasks made of single-action steps. DRY. YAGNI. TDD. Frequent commits.
-
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which tests prove each task. Document those. Give them the whole plan as small tasks made of single-action steps. DRY. YAGNI. TDD. Frequent commits.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
+
+**Planning is reading; execution is running.** Check the plan against the
+spec and the codebase by reading them (`grep`, `go doc`, the existing
+tests). Building or running the plan's code, in the repo or in a scratch
+copy, is execution, and execution starts after your human partner has
+reviewed the plan. A plan whose values were confirmed by a scratch build
+has spent the executor's work before the plan was approved.
 
 ## Scope Check
 
@@ -35,7 +40,7 @@ This structure informs the task decomposition. Each task should produce self-con
 
 A plan has two levels. A **task** is the smallest unit that carries its own
 test cycle and is worth a fresh reviewer's gate. A **step** is one action
-inside a task, 2-5 minutes of work.
+inside a task with a checkable result.
 
 **Drawing task boundaries:** fold setup, configuration, scaffolding, and
 documentation steps into the task whose deliverable needs them; split only
@@ -120,12 +125,11 @@ def test_specific_behavior():
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: FAIL with "function not defined"
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: Implement `function(input: InputType) -> ResultType` in `exact/path/to/file.py`**
 
-```python
-def function(input):
-    return expected
-```
+One line on the approach when the signature and the test leave a choice
+(which library call, which data structure); a code block only for an
+algorithm they do not determine.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -140,20 +144,35 @@ git commit -m "feat: add specific feature"
 ```
 ````
 
-## No Placeholders
+## What a Step Contains
 
 A task's implementer sees only their own task: not the spec, not the other
-tasks, not this conversation, and often not in order. Whatever a step leaves
-out, they have to invent, and they will invent it differently from the
-neighboring task. So every step carries the actual content an engineer
-needs. These are plan failures:
+tasks, not this conversation, and often not in order. A step is done when
+they can write exactly one reasonable thing from it. That is the whole
+requirement: unambiguous, not complete. Each kind of step carries what
+makes it unambiguous and nothing more:
 
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code; they cannot see Task N)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
+- **A test step:** the complete test as code, runnable as written, with
+  the spec's exact values in its assertions and the fixtures, helpers and
+  imports it needs. The test is the contract the reviewer grades the task
+  against; an outline, a commented assertion, or a fixture described in
+  prose lets the implementer pin less than the spec requires.
+- **A code step:** the exact signature (name, parameters, return type), the
+  file it lives in, and the specific values the spec pins. The implementer
+  writes the body. A body appears only for an algorithm the signature and
+  tests do not determine, or for exact copy the spec fixes.
+- **A verification step:** the command to run and the output that means it
+  passed.
+- **A reference to another task:** that task's Interfaces block says what
+  to use; the plan does not repeat that task's code. "Similar to Task N"
+  fails for the same reason: they cannot see Task N.
+
+A plan is the set of decisions the implementer cannot make alone. A plan
+whose implementation steps are longer than the code they describe has
+written the code instead. Lines that decide nothing ("TBD", "handle edge
+cases", "add appropriate validation", "write tests for the above", a type
+or function no task defines) are the opposite failure, and the self-review
+catches both.
 
 ## Self-Review
 
@@ -161,11 +180,13 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+**2. Step scan:** Every step must let the implementer write exactly one reasonable thing, and no step may carry more than that: a line that decides nothing is a gap, a function body the signature and tests already determine is a transcript. Fix both.
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 **4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
+
+**5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If implementation bodies are most of the document, replace them with signatures and the values the spec pins, and check that each step is still unambiguous. Test code is the plan's decisions and stays complete.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 

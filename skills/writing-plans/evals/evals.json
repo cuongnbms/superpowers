@@ -4,7 +4,7 @@
     {
       "id": 0,
       "prompt": "The design for the rate limiter is approved and lives at docs/superpowers/specs/2026-08-20-rate-limiter-design.md (in the input files). Write the implementation plan for it and save it under docs/superpowers/plans/.",
-      "expected_output": "A plan file at docs/superpowers/plans/2026-08-20-rate-limiter.md (or similar name) with the required header including a Spec path and a Global Constraints section quoting the spec's exact values (120/min, burst 20, env var names, Python 3.11+, FastAPI 0.110+); one task per architecture unit, each with Files, Interfaces, and TDD steps containing real test and implementation code; no placeholders; consistent function and class names across tasks; ends by offering subagent-driven vs inline execution.",
+      "expected_output": "A plan file at docs/superpowers/plans/2026-08-20-rate-limiter.md (or similar name) with the required header including a Spec path and a Global Constraints section quoting the spec's exact values (120/min, burst 20, env var names, Python 3.11+, FastAPI 0.110+); one task per architecture unit, each with Files, Interfaces, and TDD steps whose test steps carry real test code with the spec's values and whose implementation steps name the exact signature and file, with a body only where the signature and tests do not determine the algorithm; no placeholders; consistent function and class names across tasks; ends by offering execution options.",
       "files": [
         "fixtures/rate-limiter-design.md"
       ],
@@ -12,18 +12,21 @@
         "Plan starts with the header block containing Goal, Architecture, Tech Stack, Spec (a path), and a Global Constraints section",
         "Global Constraints copies exact values from the spec verbatim: 120 requests per minute, burst 20, RATE_LIMIT_PER_MINUTE, RATE_LIMIT_BURST, Python 3.11+, FastAPI 0.110+, no new runtime dependencies, no sleeping in tests",
         "Every task has a Files block with exact paths and an Interfaces block with Consumes/Produces naming exact signatures",
-        "Every code step (write test, implement) contains an actual code block; no step says 'add tests', 'handle errors', 'similar to Task N', TODO, or TBD",
+        "Implementation steps name the exact signature (name, parameters, return type) and file, and carry a code body only for an algorithm the signature and tests do not determine (the token-bucket refill arithmetic qualifies; a constructor or a header-setting line does not); no step says 'add tests', 'handle errors', 'similar to Task N', TODO, or TBD",
+        "Test steps carry complete test code, compilable as written, with the spec's exact values and the fixtures, helpers and imports they need; a commented outline or a fixture described only in prose is a failure",
         "Class and function names (TokenBucket, try_consume, BucketRegistry) are spelled identically in every task that references them",
         "Each task includes explicit run-test steps with the command and the expected outcome (FAIL then PASS) and a commit step",
         "The 429 JSON body and the three X-RateLimit headers from the spec each appear in a test in some task",
         "Response ends by offering the execution options (subagent-driven and inline; a Herdr new-session option only when HERDR_ENV=1) with a request to review the plan and a one-sentence recommendation drawn from the plan, rather than starting implementation",
-        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found"
+        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found",
+        "Implementation-code lines (code blocks inside implementation steps) are a small minority of the plan, and no implementation step reproduces a body that the signature and the test already determine",
+        "No build, test, or run command is executed while planning, in the repo or in a scratch copy; the plan is checked by reading the spec and the codebase"
       ]
     },
     {
       "id": 1,
       "prompt": "We agreed on this: add a `--json` flag to the `harness list` CLI command (Go, cobra; the repo is in the input files) that prints the same rows the table view prints, as a JSON array of objects with keys name, status, updated_at (RFC 3339). Exit code and filtering must stay identical to the table view. Repo uses go test and testify. Plan this out before we touch code.",
-      "expected_output": "A saved plan with the full header; Spec field states there is no separate spec file and cites the user's message; Global Constraints capture RFC 3339, identical exit code and filtering, testify; tasks are small (likely 2-3) with real Go test code and implementation code, exact file paths, run commands with expected FAIL/PASS, commits; offers execution choice at the end.",
+      "expected_output": "A saved plan with the full header; Spec field states there is no separate spec file and cites the user's message; Global Constraints capture RFC 3339, identical exit code and filtering, testify; tasks are small (likely 2-3) with real Go test code, implementation steps that give the exact Go signature and file (a body only where the tests do not determine it), exact file paths, run commands with expected FAIL/PASS, commits; offers execution choice at the end.",
       "files": [
         "fixtures/harness-cli/"
       ],
@@ -31,26 +34,48 @@
         "Plan is saved to docs/superpowers/plans/ with a dated filename and contains the header block with Goal, Architecture, Tech Stack, Spec, and Global Constraints",
         "Global Constraints lists RFC 3339 timestamps, identical exit code and filtering to the table view, and testify as one line each",
         "Every task has Files and Interfaces blocks; Interfaces name the exact Go function signatures later tasks consume",
-        "Test steps contain real Go test code using testify, not a description of tests to write",
+        "Test steps carry complete testify test code, compilable as written, with the spec's exact values and the fixtures, helpers and imports they need; a commented outline or a fixture described only in prose is a failure",
+        "Implementation steps name the exact Go signature and the file; a code body appears only where the signature and tests do not determine the algorithm",
         "Run-test steps give the go test command and expected outcome, and each task ends with a git commit step",
         "No placeholder phrases (TODO, TBD, 'add error handling', 'similar to Task N', 'write tests for the above')",
         "Response ends by offering the execution options (two outside Herdr, three inside) with a request to review the plan and a one-sentence recommendation drawn from the plan, rather than beginning implementation",
-        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found"
+        "Header has a Review Focus section (at most five lines naming an input or failure mode the spec implies and the expected behavior), and each line is pinned by a test in the task that owns the code; an empty section says none were found",
+        "No build, test, or run command is executed while planning, in the repo or in a scratch copy; the plan is checked by reading the spec and the codebase"
       ]
     },
     {
       "id": 2,
       "prompt": "Spec at docs/superpowers/specs/2026-08-20-rate-limiter-design.md (in the input files). Write the plan. The plan should be short, I don't want fifty pages, just get the team moving.",
-      "expected_output": "Despite the pressure for brevity, the plan keeps the header, Global Constraints, per-task Interfaces, and real code in every step; brevity comes from fewer, right-sized tasks and terse prose, not from placeholders or 'similar to' shortcuts. Every spec requirement (429 body, headers, 401 before limiting, eviction after 10 minutes, env config) maps to a task.",
+      "expected_output": "Despite the pressure for brevity, the plan keeps the header, Global Constraints, per-task Interfaces, real test code in every test step, and the exact signature and file in every implementation step; brevity comes from fewer, right-sized tasks, terse prose, and bodies left to the implementer, not from placeholders or 'similar to' shortcuts. Every spec requirement (429 body, headers, 401 before limiting, eviction after 10 minutes, env config) maps to a task.",
       "files": [
         "fixtures/rate-limiter-design.md"
       ],
       "expectations": [
         "Header block with Spec path and Global Constraints is present despite the request for brevity",
-        "Every task still has Interfaces (Consumes/Produces) and real code blocks in test and implementation steps",
+        "Every task still has Interfaces (Consumes/Produces); every test step carries complete test code with the spec's values, fixtures and helpers included; every implementation step names the exact signature and file",
         "No task uses 'similar to Task N', 'as above', TODO, TBD, or 'add validation/error handling' as a step",
         "Each of these spec requirements is covered by a named task: 429 JSON body with retry_after_seconds, X-RateLimit-* headers, 401 for missing API key, eviction of idle buckets after 10 minutes, env var configuration",
-        "Self-review is evident: no name drift between tasks for TokenBucket, try_consume, BucketRegistry"
+        "Self-review is evident: no name drift between tasks for TokenBucket, try_consume, BucketRegistry",
+        "No build, test, or run command is executed while planning, in the repo or in a scratch copy; the plan is checked by reading the spec and the codebase"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The design for `harness sync` is approved: docs/superpowers/specs/2026-09-26-sync-command-design.md (in the input files, next to the Go repo). Write the implementation plan and save it under docs/superpowers/plans/. Be as concrete as you can, the team starts on it first thing tomorrow and I do not want them guessing.",
+      "expected_output": "One plan file under docs/superpowers/plans/ and nothing else: no Go source or test files created or modified in the repo, no go build or go test run anywhere, including a scratch copy. The plan has the header with Spec path, Global Constraints (Go 1.22, stdlib net/http only, no network or sleeping in tests, Row and newListCmd unchanged), Review Focus, and one task per architecture unit (client with retry, cache, merge, sync command, list wiring). Test steps carry complete Go test code, compilable as written with helpers and imports, holding the spec's values (exit code 2 message, backoff 200/400/800ms, the report line format, orphaned status); implementation steps give the exact signatures from the spec's Architecture section and the file, with a body only for the merge rule or retry loop if the tests leave them open. Implementation-code lines are a small minority of the plan; most code is tests. Ends with the review request and execution options.",
+      "files": [
+        "fixtures/sync-command-design.md",
+        "fixtures/harness-cli/"
+      ],
+      "expectations": [
+        "The only file written in the repo is the plan under docs/superpowers/plans/; no .go file is created or modified there",
+        "Header block with Goal, Architecture, Tech Stack, Spec (path to the sync design), Global Constraints (Go 1.22, standard library net/http only, no network and no sleeping in tests, Row and newListCmd unchanged), and Review Focus",
+        "One task per architecture unit (registry client, cache, merge, sync command, list wiring) each with Files and Interfaces blocks naming the exact signatures from the spec (NewClient, Fetch, LoadCache, SaveCache, CachePath, Merge, Change, newSyncCmd)",
+        "Test steps carry complete Go test code, compilable as written with fixtures and helpers included, holding the spec's values: exit code 2 with 'registry url not set', backoff 200ms/400ms/800ms, 4xx exit code 1, the '<verb> <name> (<old> -> <new>)' report line, 'up to date', 'orphaned' status, --dry-run leaving the cache unwritten; a commented outline is a failure",
+        "Implementation steps name the exact signature and file; a code body appears only for the merge rule or the retry loop, not for constructors, path resolution, or cobra wiring",
+        "Implementation-code lines (code blocks inside implementation steps) are a small minority of the plan",
+        "Response ends by asking for plan review and offering execution options (two outside Herdr) with a one-sentence recommendation drawn from the plan, rather than starting implementation",
+        "No build, test, or run command is executed while planning, in the repo or in a scratch copy; the plan is checked by reading the spec and the codebase"
       ]
     }
   ]

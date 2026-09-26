@@ -36,7 +36,7 @@ It starts from the moment you fire up your coding agent. As soon as it sees that
 
 Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. 
 
-After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
+After you've signed off on the design, your agent puts together an implementation plan that records every decision an engineer with no project context would otherwise have to guess: which files, which signatures, which values from the spec, which test proves each task. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
 
 Next up, once you say "go", it launches a *subagent-driven-development* process, having agents work through each engineering task, inspecting and reviewing their work, and continuing forward. It's not uncommon for your agent to work autonomously for a couple hours at a time without deviating from the plan you put together.
 
@@ -264,7 +264,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
 
-3. **writing-plans** - Activates with approved design. Breaks work into small tasks, each a sequence of single-action steps (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
+3. **writing-plans** - Activates with approved design. Breaks work into small tasks, each a sequence of single-action steps with a checkable result. Every task has exact file paths, signatures, test assertions, and verification steps; the plan records decisions, not the code.
 
 4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or implements every task inline in the session with one whole-branch review at the end.
 
