@@ -162,7 +162,12 @@ git branch -D <feature-branch>
 preserve the worktree. Both callers have already changed directory to the
 main repo root — worktree removal must run from outside the worktree —
 and use the `GIT_DIR`/`GIT_COMMON`/`WORKTREE_PATH` values captured in
-Step 2, from before that directory change.
+Step 2, from before that directory change. In Claude Code the `cd` moves
+only the shell: if this session entered the worktree with `EnterWorktree`
+(using-git-worktrees enters by `path`), call `ExitWorktree` with
+`action: "keep"` as well, so the session itself is outside the directory
+about to be removed; that tool does not remove a worktree entered by path,
+so the removal below still runs.
 
 **If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
 

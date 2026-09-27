@@ -60,10 +60,12 @@ Setup, then per task: dispatch an implementer, review, run the fix loop if the r
 
 ## Setup
 
-Ensure the work happens in an isolated workspace: use
-superpowers:using-git-worktrees to create one or verify the existing one.
-Implementing on main/master is one of the four stops above: it needs your
-human partner's explicit consent.
+Run superpowers:using-git-worktrees (Prepare). The workspace was chosen
+before the spec was written, so its Step 0 verifies that choice and Steps 2
+and 3 install dependencies and check the baseline; it asks only when no
+choice was made in this conversation. Implementing on main/master is one of
+the four stops above: it needs your human partner's explicit consent, and a
+"stay on main" answer given at that earlier choice is that consent.
 
 Conversation memory does not survive compaction. In real sessions,
 controllers that lost their place have re-dispatched entire completed task

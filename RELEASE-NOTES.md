@@ -1,5 +1,35 @@
 # Superpowers Release Notes
 
+## Unreleased
+
+Fork-only. Motivating observation: brainstorming committed the spec and writing-plans committed the plan on whatever branch was checked out, usually main, and only then did execution create a worktree. A dropped feature left its docs on main, and Claude Code's `EnterWorktree` branches from `origin/<default>` by default, so the worktree it made did not even contain those commits. Second observation, from a flow that plans in claude and executes in pi: two agent kinds meant two worktree mechanisms and two directories (`.claude/worktrees/` from the native tool, `.worktrees/` from git), and finishing-a-development-branch owns cleanup only under the latter.
+
+### Using Git Worktrees
+
+- **One standard for every agent kind.** The worktree is created with `git worktree add .worktrees/<branch> -b <branch>` from the current HEAD, in every harness. The directory is checked with `git check-ignore` before every creation; when it is not ignored, `.worktrees/` is added to `.gitignore` and committed (the local exclude file only when a commit is impossible), so the other agents and machines inherit the ignore. Claude Code's `EnterWorktree` is used only with `path`, to move the session into the worktree git made; `ExitWorktree keep` leaves it, and the tool never removes a worktree entered that way, so cleanup stays with finishing-a-development-branch. Reason: in Claude Code a shell `cd` moves only the shell, and an `Edit` after it lands in the main checkout. The snippet's path variable is `WT_PATH`, because one of three Opus runs of the new text under zsh had `path=` clear `PATH` (zsh ties the lowercase name to it) and `git` vanishing. Deliberate departure from upstream, whose Step 1a preferred native creation and called `git worktree add` "the #1 mistake"; `tests/claude-code/test-worktree-native-preference.sh` is replaced by `test-worktree-standard-location.sh` (static text checks plus agent runs with the inverted expectation).
+- **Two entry points.** *Isolate* (Steps 0 and 1) runs right before the first write to the repository: the spec on the architectural path, the first code edit on the bounded path, the plan when it arrives from elsewhere. *Prepare* (Steps 2 and 3: dependencies, baseline suite) runs at execution setup. Step 0's question now has three answers, worktree, new branch in this checkout, or stay, with a recommendation; a "stay" on main is recorded as the consent the execution skills need and they do not ask again. A workspace chosen earlier in the conversation is honored, not re-asked.
+
+### Brainstorming
+
+- **The workspace is chosen with the design approval**, not as a separate question: the last approval ask names the choice with the alternatives in the same sentence, so a one-word yes covers both (the pressure-skip-design eval's "no questions beyond the approval" still holds). Bounded step 5 and architectural step 6 set the workspace up with using-git-worktrees before the first write. Spikes are unchanged. New "Workspace" section and one rationalization row.
+
+### Writing Plans
+
+- The execution handoff states the task count ("Execution options (N tasks):"), counted from the saved plan's task headings, since it is the first thing weighed when choosing an execution method and the number the recommendation is drawn from.
+- The plan is saved in the workspace chosen with the spec; a plan written with no workspace choice in the conversation runs Isolate first. The commit-the-plan rationale now says what the commit is for: the branch carries the reviewed version that a sibling agent reads.
+
+### Subagent-Driven Development, Executing Plans
+
+- Setup runs using-git-worktrees' Prepare: Step 0 verifies the earlier choice, Steps 2 and 3 prepare, and the question is asked only when no choice was made.
+
+### SDD In New Session
+
+- **Three workspace states**, because the plan now usually sits on its branch before the handoff. In a linked worktree the pane opens there, the spawned agent is told it is already isolated, and this session leaves the worktree (`ExitWorktree keep`, or `cd` to the main checkout when the tool is a no-op). On a feature branch in a normal checkout this session steps back to the base branch, makes sure `.worktrees/` is ignored there, and creates the agent's worktree with `git worktree add .worktrees/<branch> <branch>`, rewriting the plan path into it; `--branch` instead hands the agent this checkout on its current branch (shared tree). On the default branch the previous behavior is unchanged.
+
+### Finishing a Development Branch
+
+- Step 6 says to call `ExitWorktree keep` before removal when the session entered the worktree with `EnterWorktree`, since the `cd` to the main root moves only the shell.
+
 ## v6.4.21 (2026-09-27)
 
 Fork-only release, no upstream merge. The number marks this fork's upstream base: v6.4.5 ported obra/superpowers v6.4.2, so the fork's v6.4.2x line is the v6.4.2-equivalent (the fork's own v6.4.2 tag from 2026-09-05 is unrelated). Motivating report: the first full-flow A/B of v6.4.5 on a mid-sized CLI (spendlog, Vietcombank and Techcombank CSV imports), decisions-only plan against v6.4.4's code-in-plan on the same approved spec. Correctness was equal (100% on an independent acceptance set for both), planning was twice as fast with no scratch build, but a blind Opus review scored the decisions-only build one to two points lower on consistency: three error prefixes across modules, `main()` letting argparse's `SystemExit` escape, `PRAGMA user_version = 1` rewritten on every open including `--dry-run`. And the SDD controller amended the approved spec in two commits to match final-review findings, while ledgering the change as an ordinary ruling.

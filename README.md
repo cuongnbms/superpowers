@@ -262,7 +262,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
 
-2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
+2. **using-git-worktrees** - Activates after design approval, before the spec is written. Asks once where the work lives (worktree, new branch in this checkout, or the current branch) so the spec, plan, and code ride one branch; at execution setup it runs project setup and verifies a clean test baseline.
 
 3. **writing-plans** - Activates with approved design. Breaks work into small tasks, each a sequence of single-action steps with a checkable result. Every task has exact file paths, signatures, test assertions, and verification steps; the plan records decisions, not the code.
 

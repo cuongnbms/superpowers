@@ -23,6 +23,10 @@ the feature scope permits writing the spec, and approving the written spec permi
 writing-plans; neither approves an artifact that does not exist yet. Resume at the earliest
 stage still missing its approval.
 
+The approval that precedes the first write also settles where the work lives (see "Workspace"
+below). Creating a branch or worktree is not implementation; it is where the spec, the plan,
+and the code will land.
+
 ## Classify first
 
 Before your first question, classify the request and say the classification out loud ("this
@@ -60,6 +64,7 @@ approved spike.
 | "I understand this kind of app, so it's bounded" | A new project has no existing flow. It is architectural. |
 | "The spike works, so I'll keep the code" | A spike's output is an answer. Keeping the code is a new request. |
 | "It grew, but I'm almost done" | Hidden complexity upgrades the path. Stop and say so. |
+| "I'll commit the spec here and let execution branch off" | The spec is the feature's first commit. Written on main it stays there if the feature is dropped, and the branch created later starts without it unless someone remembers to cherry-pick. Choose the workspace before the first write. |
 
 ## Path checklists
 
@@ -75,25 +80,52 @@ Announce the path, create a task per item, complete them in order.
 **Bounded**
 1. Explore project context: files, docs, recent commits
 2. Ask clarifying questions, one at a time, only the ones that matter
-3. Present a short design in chat: approach, files touched, testing
+3. Present a short design in chat: approach, files touched, testing, and where the work will
+   live (worktree, new branch here, or this branch; see "Workspace")
 4. Get approval: stop and wait for an explicit yes
-5. Implement through the normal development workflow (TDD applies); no plan document
+5. Set up the chosen workspace with superpowers:using-git-worktrees (Isolate), then implement
+   through the normal development workflow (TDD applies); no plan document
 
 **Architectural**
 1. Explore project context: files, docs, recent commits
 2. Invoke the superpowers:domain-modeling skill (see "Domain modeling" below)
 3. Ask clarifying questions, one at a time: purpose, constraints, success criteria
 4. Propose 2-3 approaches with trade-offs and your recommendation
-5. Present the design in sections scaled to their complexity; get approval after each section
-6. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, together with the
+5. Present the design in sections scaled to their complexity; get approval after each section.
+   The last section's approval ask also names where the work will live (see "Workspace")
+6. Set up the chosen workspace with superpowers:using-git-worktrees (Isolate) before writing
+   any file
+7. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, together with the
    glossary terms and ADRs resolved along the way, and commit it
-7. Self-review the spec (below) and fix inline
-8. Ask the user to review the written spec; wait for approval
-9. Invoke the writing-plans skill. It is the only skill that follows an architectural
-   brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
+8. Self-review the spec (below) and fix inline
+9. Ask the user to review the written spec; wait for approval
+10. Invoke the writing-plans skill. It is the only skill that follows an architectural
+    brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
 
 The visual companion (last section) is offered just-in-time on the architectural path, never
 upfront.
+
+## Workspace
+
+The first write to the repository is the spec on the architectural path and the first code
+edit on the bounded path. Everything after it (plan, code, fixes) belongs to the same feature,
+and finishing-a-development-branch merges or discards them as one unit. So the workspace is
+chosen before that first write, not at execution time: a spec committed on main stays on main
+if the feature is dropped, and the branch or worktree made later has to be created from a
+HEAD that already carries it.
+
+Do not add a separate question for it. Name your choice inside the approval ask you are
+already making, with the alternatives in the same sentence, so a one-word yes covers both:
+
+> "...If that looks right I'll do this on a new branch `todo-done-flag` in this checkout (or
+> say worktree for `.worktrees/todo-done-flag`, or stay on `main`)."
+
+Recommend a worktree when the checkout has uncommitted work or your human partner will keep
+using it while this runs; a new branch in this checkout otherwise; staying only when the
+current branch is already this feature's. A "stay" on main or master is the consent the
+execution skills need to implement there, so they do not ask again. Once approved, invoke
+superpowers:using-git-worktrees (its Isolate steps) and only then write the spec or the first
+edit. Spikes skip this: their output is an answer, and anything built is throwaway.
 
 ## Domain modeling
 
@@ -146,6 +178,9 @@ is an answer, not a model.
   Do not propose unrelated refactoring.
 
 ## After the design (architectural)
+
+**Workspace.** Set up the approved workspace first with superpowers:using-git-worktrees
+(Isolate). The spec is the feature's first commit and must land on the feature's branch.
 
 **Spec.** Write the validated design to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
 (the user's preferred location overrides this default). Write the glossary terms and ADRs that
