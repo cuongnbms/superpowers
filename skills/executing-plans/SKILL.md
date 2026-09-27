@@ -36,6 +36,16 @@ as `Ruling: <what you decided> — <why> — <what it costs if wrong>`, and keep
 going. Deviating from the plan without a ledgered ruling is a decision made
 in secret.
 
+The approved design — the spec, `CONTEXT.md`, the ADRs — is read-only
+while the plan runs. Grading a finding by its effect sets its severity;
+your ruling decides whether the code follows the spec or departs from it;
+neither rewrites the approved text. A spec edited mid-execution is a
+decision your human partner never got to veto, and it hides the departure
+from everyone who reads the spec afterwards. When a ruling departs from the
+spec, write it as `Ruling (departs from spec): "<the spec's line, quoted>"
+→ <what the code does instead> — <why> — <what it costs if wrong>`, so
+whoever updates the spec later knows which line.
+
 Four things stop you, and only these: an irreversible or destructive
 operation; a security-sensitive action; a side effect outside this worktree
 that norms say you ask about first (a merge, a push to a shared branch, a
@@ -293,8 +303,11 @@ in the rulings list. There is no second fix pass.
 
 Before you delete anything, collect every ledger line containing
 `Ruling:` into your final message under "Rulings I made", in the order you
-made them, each with what it costs if wrong, and every `minor (deferred)`
-line under "Deferred minors". Both lists are exhaustive. Your final
+made them, each with what it costs if wrong — the `departs from spec`
+rulings first, under their own heading "Spec departures", each with the
+spec line it departs from, since that edit to the approved design is your
+human partner's to make — and every `minor (deferred)` line under
+"Deferred minors". Both lists are exhaustive. Your final
 message is the only place the decisions you took on your human partner's
 behalf — and the findings you chose not to act on — reach them.
 

@@ -24,6 +24,16 @@ judgment settles what neither answers. Record every decision in the ledger as
 going. A wrong ruling costs rework your human partner can see and undo; a
 session parked on a question costs their whole day and buys nothing.
 
+The approved design — the spec, `CONTEXT.md`, the ADRs — is read-only
+while the plan runs. Grading a finding by its effect sets its severity;
+your ruling decides whether the code follows the spec or departs from it;
+neither rewrites the approved text. A spec edited mid-execution is a
+decision your human partner never got to veto, and it hides the departure
+from everyone who reads the spec afterwards. When a ruling departs from the
+spec, write it as `Ruling (departs from spec): "<the spec's line, quoted>"
+→ <what the code does instead> — <why> — <what it costs if wrong>`, so
+whoever updates the spec later knows which line.
+
 Four things stop you, and only these: an irreversible or destructive
 operation; a security-sensitive action; a side effect outside this worktree
 that norms say you ask about first (a merge, a push to a shared branch, a
@@ -386,8 +396,11 @@ finishing-a-development-branch presents the options.
 Before you delete anything, collect every ledger line containing `Ruling:` —
 preflight rulings, parked findings, breaker adjudications, all of them — into
 your final message under "Rulings I made", in the order you made them, each
-with what it costs if wrong. The list is exhaustive: if the ledger holds a
-ruling, the list holds it. That list is the only place the decisions you
+with what it costs if wrong. Put the `departs from spec` rulings first, under
+their own heading "Spec departures", each with the spec line it departs
+from: those are the lines of the approved design your human partner now
+updates or reverts, and that edit is theirs to make. The list is exhaustive:
+if the ledger holds a ruling, the list holds it. That list is the only place the decisions you
 took on your human partner's behalf reach them — they read it and rework
 whatever you got wrong. A ruling that dies with the workspace was a decision
 made in secret. Add a second list, "Deferred minors left unfixed", for the

@@ -7,7 +7,7 @@ description: Writes a task-by-task implementation plan from an approved spec or 
 
 ## Overview
 
-Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which tests prove each task. Document those. Give them the whole plan as small tasks made of single-action steps. DRY. YAGNI. TDD. Frequent commits.
+Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which conventions every task shares, which tests prove each task. Document those. Give them the whole plan as small tasks made of single-action steps. DRY. YAGNI. TDD. Frequent commits.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
@@ -76,10 +76,17 @@ argues from the spec, so the spec travels with it; executors read both]
 
 ## Global Constraints
 
-[The spec's project-wide requirements — version floors, dependency limits,
-naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
+[One line each, exact values, from two sources. The spec's project-wide
+requirements — version floors, dependency limits, naming and copy rules,
+platform requirements — copied verbatim. And the shared conventions the
+spec leaves open that every task would otherwise settle on its own: the
+error-message format and exit-code contract, the one helper that
+normalizes input and where it lives, how a stored schema version is
+treated. Each implementer writes their bodies without seeing the others',
+so a convention not decided here is decided once per task and the person
+using the software sees the seams. State each as a decision — a format
+string, a name and file, a rule — not as code. Every task's requirements
+implicitly include this section.]
 
 ## Review Focus
 
@@ -187,6 +194,8 @@ After writing the complete plan, look at the spec with fresh eyes and check the 
 **4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
 
 **5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If implementation bodies are most of the document, replace them with signatures and the values the spec pins, and check that each step is still unambiguous. Test code is the plan's decisions and stays complete.
+
+**6. Shared conventions:** Read across the tasks for a choice two or more of them each make alone — how errors are worded and which exit code they carry, how input is normalized, how stored state is versioned, what a warning looks like. Each such choice becomes one Global Constraints line, and a task that restates it in its own steps drops the restatement. Different implementers settling the same choice separately is how one program ends up with three error prefixes.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
