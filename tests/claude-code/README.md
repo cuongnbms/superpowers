@@ -115,12 +115,11 @@ Full workflow execution test (~10-30 minutes):
 - Subagents follow the skill correctly
 - Final code is functional and tested
 
-#### test-worktree-native-preference.sh
-RED-GREEN-REFACTOR validation for the using-git-worktrees skill (~5 minutes):
-- RED: skill without Step 1a — agent should use `git worktree add`
-- GREEN: skill with Step 1a — agent should use the native EnterWorktree tool
-- PRESSURE: same as GREEN under urgency framing with pre-existing `.worktrees/`
-- Drill scenario `worktree-creation-under-pressure.yaml` covers the PRESSURE phase only
+#### test-worktree-standard-location.sh
+Validation of the fork's worktree standard for the using-git-worktrees skill:
+- STATIC (default, no model): the skill text creates with `git worktree add` under `.worktrees/` from HEAD, checks the directory is ignored first, and enters by `EnterWorktree` + `path` on Claude Code
+- STANDARD: agent report names `git worktree add` under `.worktrees/` and does not create with EnterWorktree
+- PRESSURE: same under urgency framing with pre-existing `.worktrees/` and a nudge toward the one-call native tool
 
 ## Adding New Tests
 

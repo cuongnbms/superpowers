@@ -13,6 +13,10 @@ Write implementation plans for an engineer who has not seen this codebase or thi
 
 **Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
 - (User preferences for plan location override this default)
+- In the workspace chosen when the spec was written. If none was chosen in
+  this conversation (the spec came from elsewhere, or this skill was invoked
+  directly), run superpowers:using-git-worktrees (Isolate) before saving:
+  otherwise the plan becomes the feature's first commit on the wrong branch.
 
 **Planning is reading; execution is running.** Check the plan against the
 spec and the codebase by reading them (`grep`, `go doc`, the existing
@@ -201,8 +205,9 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 
 ## Commit the Plan
 
-After self-review and before handoff, commit the completed plan so new
-sessions and worktrees can access the exact reviewed version.
+After self-review and before handoff, commit the completed plan so the
+feature branch carries the exact reviewed version: a fresh session or a
+sibling agent (sdd-in-new-session) reads that commit, not a working copy.
 
 ```bash
 git add docs/superpowers/plans/<filename>.md
@@ -216,16 +221,21 @@ for their review before any implementation starts: approving an idea, a
 scope, or a spec is not approving a plan they have not seen. If they ask
 for changes, edit the plan and commit again before handing off.
 
+State the task count in the handoff: it is the first thing your human
+partner weighs when choosing how to run the plan, and it is the number the
+recommendation below is drawn from. Count the task headings in the saved
+plan, not from memory.
+
 If they already chose an execution method, keep it and ask only for the
 review:
 
-**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Does it capture what you want?"**
+**"Plan complete (N tasks), saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Does it capture what you want?"**
 
 Otherwise offer the execution choice with the review. Option 2 exists only
 inside Herdr: run `test "${HERDR_ENV:-}" = 1` first, and outside Herdr list
 the other two.
 
-**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Execution options:**
+**"Plan complete, saved to `docs/superpowers/plans/<filename>.md`, and committed. Please review it. Execution options (N tasks):**
 
 **1. Subagent-Driven** - I dispatch a fresh subagent per task in this session, a fresh reviewer checks each task before the next starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review
 

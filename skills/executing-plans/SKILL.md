@@ -119,10 +119,12 @@ digraph process {
 
 ## Setup
 
-Ensure the work happens in an isolated workspace: use
-superpowers:using-git-worktrees to create one or verify the existing one.
-Never start implementation on a main/master branch without your human
-partner's explicit consent.
+Run superpowers:using-git-worktrees (Prepare). The workspace was chosen
+before the spec was written, so its Step 0 verifies that choice and Steps 2
+and 3 install dependencies and check the baseline; it asks only when no
+choice was made in this conversation. Never start implementation on a
+main/master branch without your human partner's explicit consent; a "stay
+on main" answer given at that earlier choice is that consent.
 
 Conversation memory does not survive compaction. An inline executor that
 loses its place re-implements tasks whose commits already exist — the same
