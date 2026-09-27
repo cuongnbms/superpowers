@@ -30,9 +30,10 @@ your ruling decides whether the code follows the spec or departs from it;
 neither rewrites the approved text. A spec edited mid-execution is a
 decision your human partner never got to veto, and it hides the departure
 from everyone who reads the spec afterwards. When a ruling departs from the
-spec, write it as `Ruling (departs from spec): "<the spec's line, quoted>"
-→ <what the code does instead> — <why> — <what it costs if wrong>`, so
-whoever updates the spec later knows which line.
+spec, write it as `Ruling: departs from spec — "<the spec's line, quoted>"
+→ <what the code does instead> — <why> — <what it costs if wrong>`, so it
+is collected with every other ruling and whoever updates the spec later
+knows which line.
 
 Four things stop you, and only these: an irreversible or destructive
 operation; a security-sensitive action; a side effect outside this worktree
