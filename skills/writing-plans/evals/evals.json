@@ -77,6 +77,26 @@
         "Response ends by asking for plan review and offering execution options (two outside Herdr) with a one-sentence recommendation drawn from the plan, rather than starting implementation",
         "No build, test, or run command is executed while planning, in the repo or in a scratch copy; the plan is checked by reading the spec and the codebase"
       ]
+    },
+    {
+      "id": 4,
+      "name": "shared-conventions-spendlog",
+      "prompt": "The design for spendlog is approved and lives at docs/superpowers/specs/2026-09-26-spendlog-design.md (in the input files). Write the implementation plan and save it under docs/superpowers/plans/. It will be executed with subagent-driven-development, one fresh implementer per task.",
+      "expected_output": "A plan whose Global Constraints section carries, besides the spec's verbatim values (Python 3.12, zero runtime dependencies, exit codes 0/1/2, PRAGMA user_version = 1, NFC + casefold matching), the shared conventions the spec leaves open, stated as decisions: the error-message format on stderr and where file/line go, that main() converts every ConfigError/ParseError/sqlite3.Error/OSError into the spec's exit codes with no traceback, one normalize helper (NFC + casefold, strip) and its module, and what happens when the database's user_version is not 1. Tasks then reference those conventions instead of each deciding its own. Test code complete, implementation steps as signatures, no build during planning, ends with execution options.",
+      "files": [
+        "fixtures/spendlog-design.md"
+      ],
+      "expectations": [
+        "Header block with Goal, Architecture, Tech Stack, Spec (path to the spendlog design), Global Constraints and Review Focus",
+        "Global Constraints copies the spec's values verbatim: Python 3.12, zero runtime dependencies, exit codes 0/1/2, PRAGMA user_version = 1, header and category matching NFC-normalized and casefolded",
+        "Global Constraints also states, as decisions rather than code, at least three shared conventions the spec leaves open: the error-message format written to stderr (prefix, file and line placement), the contract that main() turns ConfigError/ParseError/sqlite3.Error/OSError into the spec's exit codes with no traceback, the single helper that NFC-normalizes and casefolds (name and module), and the treatment of a database whose user_version is not 1",
+        "No code block appears inside the Global Constraints section",
+        "No two tasks settle the same convention differently: error messages, exit handling and normalization in every task's tests and steps agree with the Global Constraints lines, and no task defines a second normalize helper",
+        "Test steps carry complete pytest code, compilable as written, with the spec's exact values (85.5 rejected, `Tổng cộng` footer cross-check, `tcb:<Reference>` fingerprint, `No transactions for 2026-09.`); a commented outline is a failure",
+        "Implementation steps name the exact signature and file; implementation-code lines are a small minority of the plan",
+        "No build, test, or run command is executed while planning, in the repo or in a scratch copy",
+        "Response ends by asking for plan review and offering execution options (two outside Herdr) with a one-sentence recommendation drawn from the plan"
+      ]
     }
   ]
 }

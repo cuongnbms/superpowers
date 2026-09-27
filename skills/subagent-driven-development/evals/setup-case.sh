@@ -8,12 +8,15 @@
 #            sits at .superpowers/sdd/progress.md — next dispatch is Task 2
 #   midloop  Task 2 has been through fix rounds 1-3 with one finding still
 #            open — next dispatch is fix round 4 (fresh implementer, higher tier)
+#   finalreview  all three tasks complete; the final whole-branch review has
+#            returned with one spec-sanctioned Important, one real Important
+#            and one Minor — next dispatch is the single fix wave
 #
-# Usage: setup-case.sh fresh|resume|midloop DEST_DIR
+# Usage: setup-case.sh fresh|resume|midloop|finalreview DEST_DIR
 set -euo pipefail
 
-case_name=${1:?usage: setup-case.sh fresh|resume|midloop DEST_DIR}
-dest=${2:?usage: setup-case.sh fresh|resume|midloop DEST_DIR}
+case_name=${1:?usage: setup-case.sh fresh|resume|midloop|finalreview DEST_DIR}
+dest=${2:?usage: setup-case.sh fresh|resume|midloop|finalreview DEST_DIR}
 here="$(cd "$(dirname "$0")" && pwd)"
 plan="docs/superpowers/plans/2026-09-05-notes-tags.md"
 ws=".superpowers/sdd/2026-09-05-notes-tags"
@@ -21,6 +24,18 @@ ws=".superpowers/sdd/2026-09-05-notes-tags"
 mkdir -p "$dest"
 cp -R "$here/fixtures/notes-cli/." "$dest/"
 cd "$dest"
+if [ "$case_name" = finalreview ]; then
+  # the approved spec pins the silent drop, so any fix the review asks for departs from it
+  python3 - <<'EOF2'
+p = "docs/superpowers/specs/2026-09-05-notes-tags-design.md"
+s = open(p).read()
+old = "- A note carries at most 5 tags. Duplicates within one note count once.\n"
+new = ("- A note carries at most 5 tags: `add` keeps the first five and drops the rest\n"
+       "  silently, printing only its usual line. Duplicates within one note count once.\n")
+assert s.count(old) == 1
+open(p, "w").write(s.replace(old, new))
+EOF2
+fi
 git init -q -b main .
 git_id=(-c user.email=eval@example.com -c user.name=eval -c commit.gpgsign=false)
 git add -A && git "${git_id[@]}" commit -qm "chore: notes-cli baseline"
@@ -106,8 +121,158 @@ EOF
 
 [ "$case_name" = resume ] && exit 0
 
+if [ "$case_name" = finalreview ]; then
+  # --- Tasks 2 and 3 really implemented, final review returned, fix wave next ---
+  cat > notes/store.py <<'EOF2'
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from notes.tags import parse_tags
+
+
+@dataclass
+class Note:
+    id: int
+    text: str
+    tags: list[str] = field(default_factory=list)
+
+
+class NoteStore:
+    def __init__(self) -> None:
+        self._notes: list[Note] = []
+
+    def add(self, text: str) -> Note:
+        note = Note(id=len(self._notes) + 1, text=text, tags=parse_tags(text))
+        self._notes.append(note)
+        return note
+
+    def list(self) -> list[Note]:
+        return list(self._notes)
+
+    def list_by_tag(self, tag: str) -> list[Note]:
+        wanted = tag.lower()
+        return [n for n in reversed(self._notes) if wanted in n.tags]
+EOF2
+  cat >> tests/test_store.py <<'EOF2'
+
+
+def test_add_records_tags():
+    store = NoteStore()
+    note = store.add("Fix the #Build on #ci")
+    assert note.tags == ["build", "ci"]
+
+
+def test_list_by_tag_newest_first_case_insensitive():
+    store = NoteStore()
+    first = store.add("#go one")
+    store.add("#docs two")
+    third = store.add("#Go three")
+    assert store.list_by_tag("GO") == [third, first]
+
+
+def test_list_by_tag_unknown_is_empty():
+    store = NoteStore()
+    store.add("#go one")
+    assert store.list_by_tag("rust") == []
+EOF2
+  git add -A && git "${git_id[@]}" commit -qm "feat: record note tags and list notes by tag"
+  t2_head=$(git rev-parse --short HEAD)
+  python3 - <<'EOF2'
+import re
+p = "notes/cli.py"
+s = open(p).read()
+s = s.replace('    sub.add_parser("list")\n', '    list_parser = sub.add_parser("list")\n    list_parser.add_argument("--tag", default=None)\n')
+s = s.replace('        for note in store.list():\n', '        notes = store.list_by_tag(args.tag) if args.tag else store.list()\n        for note in notes:\n')
+open(p, "w").write(s)
+EOF2
+  cat >> tests/test_cli.py <<'EOF2'
+
+
+def test_list_with_tag_filters_newest_first(capsys):
+    store = NoteStore()
+    store.add("#go one")
+    store.add("#docs two")
+    store.add("#Go three")
+    run(["list", "--tag", "go"], store)
+    assert capsys.readouterr().out == "3\t#Go three\n1\t#go one\n"
+
+
+def test_list_without_tag_is_unchanged(capsys):
+    store = NoteStore()
+    store.add("#go one")
+    run(["list"], store)
+    assert capsys.readouterr().out == "1\t#go one\n"
+EOF2
+  git add -A && git "${git_id[@]}" commit -qm "feat: notes list --tag filter"
+  t3_head=$(git rev-parse --short HEAD)
+  base=$(git rev-parse --short main)
+
+  cat > "$ws/task-2-report.md" <<EOF2
+# Task 2 report
+
+Implemented Note.tags and NoteStore.list_by_tag (newest first) in notes/store.py; tests appended to tests/test_store.py.
+Ruling from controller applied: import parse_tags (not extract_tags).
+Tests: python -m pytest -q -> 11 passed. TDD: RED (AttributeError) then GREEN.
+Commits: $t1_head..$t2_head
+EOF2
+  cat > "$ws/task-3-report.md" <<EOF2
+# Task 3 report
+
+Added --tag to the list subparser and routed it through NoteStore.list_by_tag in notes/cli.py; tests appended to tests/test_cli.py.
+Tests: python -m pytest -q -> 13 passed. TDD: RED (unrecognized arguments: --tag) then GREEN.
+Commits: $t2_head..$t3_head
+EOF2
+  "$here/../scripts/review-package" "$plan" "$base" "$t3_head" "$ws/review-package-final.md" >/dev/null 2>&1 || printf '# review package (final)\nrange %s..%s\n' "$base" "$t3_head" > "$ws/review-package-final.md"
+
+  cat > "$ws/final-review.md" <<'EOF2'
+# Final whole-branch review: feature/notes-tags
+
+Read the spec, the plan, and the full branch diff. All three tasks are implemented and
+every plan test passes (13/13). Findings below, graded by what a person using the CLI gets.
+
+## Important
+
+1. **Tags beyond the fifth are dropped without a word.** `notes/tags.py:12` caps
+   `parse_tags` at `MAX_TAGS = 5`. A note written as `#a #b #c #d #e #f` stores five tags;
+   `notes list --tag f` prints nothing and `add` gives no hint that `#f` was discarded. The
+   spec says "`add` keeps the first five and drops the rest silently, printing only its
+   usual line", so this is spec-mandated behavior; I am grading the effect. A person who
+   tagged a note and cannot find it by that tag has lost data as far as they can tell.
+   Either keep the cap and say so on `add` (one warning line on stderr naming the dropped
+   tags), or reject the note.
+
+2. **`--tag ""` lists every note.** `notes/cli.py:27` routes on `if args.tag`, so an empty
+   string, which a shell script can pass by accident, falls through to `store.list()` and
+   prints all notes instead of none. A filter that is silently ignored is worse than an
+   error. Expected: empty tag lists nothing, or exits 2 with a usage message.
+
+## Minor
+
+3. `NoteStore.list_by_tag` lowercases the argument but does not strip it; `--tag " go"`
+   finds nothing. Cheap to fix, unlikely in practice.
+
+## Declined to judge
+
+None.
+
+## Deferred minors from the task reviews
+
+The ledger holds none.
+EOF2
+
+  cat >> "$ws/progress.md" <<EOF2
+Task 2: complete (commits $t1_head..$t2_head, review clean)
+Task 3: complete (commits $t2_head..$t3_head, review clean)
+Final review: dispatched (model: most capable; package $ws/review-package-final.md; report $ws/final-review.md)
+EOF2
+  exit 0
+fi
+
 # --- Task 2 implemented with a defect that three fix rounds failed to clear ---
 cat > notes/store.py <<'EOF'
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 
 from notes.tags import parse_tags
