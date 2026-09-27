@@ -63,9 +63,11 @@ two-thirds of all wait calls were short polls that timed out.
 
 Every `spawn_agent` you issue — including when you are yourself a
 spawned child running a fan-out — sets `model` AND `reasoning_effort`
-explicitly, per the Model Selection rules of the skill you are
-executing. Setting `model` alone is a trap: the child's effort
-silently resets to that model's default, not to yours.
+explicitly, per the harness table in the Model Selection section of the
+skill you are executing. That table names model lines (`terra` mid-tier,
+`sol` high-tier), not versions: use the newest version of the line in
+your current spawn allowlist. Setting `model` alone is a trap: the
+child's effort silently resets to that model's default, not to yours.
 
 Ask your human partner to add a machine-level backstop to
 `~/.codex/config.toml` so any spawn that slips through still routes to
@@ -74,7 +76,7 @@ expensive model:
 
 ```toml
 [agents]
-default_subagent_model = "<a mid-tier model from your spawn allowlist>"
+default_subagent_model = "<the newest terra in your spawn allowlist>"
 default_subagent_reasoning_effort = "medium"
 ```
 

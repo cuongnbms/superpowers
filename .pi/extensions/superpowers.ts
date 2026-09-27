@@ -61,7 +61,7 @@ ${TOOL_MAPPING_MARKER}
 
 | Action skills request | Pi equivalent |
 | --- | --- |
-| Dispatch \`Subagent (general-purpose):\` template | \`Agent\` with \`subagent_type: "general-purpose"\`, a self-contained \`prompt\`, a 3–5 word \`description\`, and an explicit \`model\` when required |
+| Dispatch \`Subagent (general-purpose):\` template | \`Agent\` with \`subagent_type: "general-purpose"\`, a self-contained \`prompt\`, a 3–5 word \`description\`, and explicit \`model\` and \`thinking\` per the harness table in the executing skill's Model Selection |
 | Explore a codebase read-only | \`Agent\` with \`subagent_type: "Explore"\` |
 | Dispatch independent agents in parallel | Emit multiple \`Agent\` calls in one response |
 | Retrieve a background agent's full result | \`get_subagent_result\` |
