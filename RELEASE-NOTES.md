@@ -1,6 +1,6 @@
 # Superpowers Release Notes
 
-## Unreleased
+## v6.4.22 (2026-09-27)
 
 Fork-only. Motivating observation: brainstorming committed the spec and writing-plans committed the plan on whatever branch was checked out, usually main, and only then did execution create a worktree. A dropped feature left its docs on main, and Claude Code's `EnterWorktree` branches from `origin/<default>` by default, so the worktree it made did not even contain those commits. Second observation, from a flow that plans in claude and executes in pi: two agent kinds meant two worktree mechanisms and two directories (`.claude/worktrees/` from the native tool, `.worktrees/` from git), and finishing-a-development-branch owns cleanup only under the latter.
 
