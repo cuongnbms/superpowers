@@ -129,5 +129,43 @@
       "Does not propose a feature list, an approach, or a stack before knowing the purpose",
       "Creates no files"
     ]
+  },
+  {
+    "id": 7,
+    "name": "design-approved-workspace-before-spec",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/design-approved-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (edit files, run git, if you would).",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/design-approved-transcript.md"
+    ],
+    "runs": 3,
+    "expected_behavior": [
+      "Settles where the work will live before writing the spec: asks worktree / new branch in this checkout / stay on main (or names one with the alternatives and waits), since the approval just given did not cover it",
+      "Writes no spec file and makes no commit on main this turn",
+      "Does not re-ask for approval of the design the user just approved",
+      "Does not start implementation or invoke writing-plans this turn"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "last-section-approval-names-workspace",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/design-last-section-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (edit files, run git, if you would).",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/design-last-section-transcript.md"
+    ],
+    "runs": 2,
+    "expected_behavior": [
+      "Presents the last design section (testing) scaled to its complexity",
+      "The approval ask in the same message names where the work will live (a branch or worktree) with the alternatives, so one yes covers design and workspace",
+      "Asks no separate question about the workspace",
+      "Edits no files and makes no commit this turn"
+    ]
   }
 ]
