@@ -1,6 +1,6 @@
 # Evals for subagent-driven-development
 
-Three dry-run cases. The controller is asked to do everything the skill
+Four dry-run cases. The controller is asked to do everything the skill
 says up to its next subagent dispatch, write that dispatch prompt to
 `dispatch.md` at the repo root, and stop. This keeps a run to one agent
 and a few dozen tool calls while still exercising setup, ledger resume,
@@ -13,7 +13,9 @@ pre-flight rulings, brief generation, and fix-loop routing.
 - `setup-case.sh CASE DEST` — materializes a case as a real git repo on
   `feature/notes-tags`: `fresh` (no ledger), `resume` (Task 1 complete,
   stray flat ledger from another plan), `midloop` (Task 2 at fix round 3/5
-  with one finding still open).
+  with one finding still open), `finalreview` (all tasks complete, final
+  review returned with a spec-sanctioned Important finding: the controller
+  must rule without editing the spec, then write the single fix-wave dispatch).
 
 Grade from artifacts: the plan ledger, the brief file, `dispatch.md`, and
 the final message. Mechanical checks produce false positives (a `?` in a
