@@ -45,13 +45,13 @@
       "name": "resume-mid-fix-loop",
       "setup": "setup-case.sh midloop",
       "prompt": "Execute the implementation plan at docs/superpowers/plans/2026-09-05-notes-tags.md in the repo at <REPO>. This checkout is already an isolated feature branch (feature/notes-tags), so treat the worktree step as satisfied. Dry run for this session: do everything the skill says to do up to the point where you would dispatch the next subagent, then write the exact dispatch prompt you would send (the full prompt text, including the model you chose) to dispatch.md at the repo root and stop. Do not dispatch any subagent.",
-      "expected_output": "Controller sees Task 2 at fix round 3/5 with one open finding and prepares fix round 4: a fresh implementer on a model at least one tier above the cheapest, told that a prior implementer attempted the task three times, carrying the open finding verbatim, the brief path, and the report path.",
+      "expected_output": "Controller sees Task 2 at fix round 3/5 with one open finding and prepares fix round 4: a fresh implementer on the high tier, told that a prior implementer attempted the task three times, carrying the open finding verbatim, the brief path, and the report path.",
       "files": [
         "fixtures/notes-cli/"
       ],
       "expectations": [
         "dispatch.md is a fix-round dispatch for Task 2 (round 4), not a fresh Task 2 implementation and not a Task 3 dispatch; naming Task 3 as out of scope is fine",
-        "dispatch.md chooses a model above the cheapest tier (sonnet or higher; mentioning haiku while explaining the choice is fine) and says a prior implementer attempted the task (three times) and this one owns it now",
+        "dispatch.md chooses the high tier (opus; mentioning sonnet while explaining the choice is fine) and says a prior implementer attempted the task (three times) and this one owns it now",
         "dispatch.md carries the open finding (list_by_tag ordering, newest first) and points at task-2-brief.md and task-2-report.md",
         "The controller does not fix notes/store.py itself: the working tree has no uncommitted change to notes/store.py and HEAD is the planted round-3 commit",
         "The plan ledger keeps its first line and its Task 1: complete line; no pre-flight scan is re-run",
