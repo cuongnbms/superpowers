@@ -264,7 +264,7 @@ EOF2
   cat >> "$ws/progress.md" <<EOF2
 Task 2: complete (commits $t1_head..$t2_head, review clean)
 Task 3: complete (commits $t2_head..$t3_head, review clean)
-Final review: dispatched (model: most capable; package $ws/review-package-final.md; report $ws/final-review.md)
+Final review: dispatched (model: high tier / opus; package $ws/review-package-final.md; report $ws/final-review.md)
 EOF2
   exit 0
 fi
@@ -349,7 +349,7 @@ Finding: still open. Changed: added note explaining ordering. Tests: 4 passed.
 EOF
 
 cat >> "$ws/progress.md" <<EOF
-Task 2: dispatched (implementer model: cheapest tier / haiku; base $t2_base; brief $ws/task-2-brief.md; report $ws/task-2-report.md)
+Task 2: dispatched (implementer model: mid tier / sonnet; base $t2_base; brief $ws/task-2-brief.md; report $ws/task-2-report.md)
 Task 2: fix round 1/5 (0 addressed, 1 open — list_by_tag returns oldest first, brief and spec require newest first (notes/store.py:24); commits $t2_impl..${fix_sha[0]})
 Task 2: fix round 2/5 (0 addressed, 1 open — list_by_tag ordering unchanged (notes/store.py:24); commits ${fix_sha[0]}..${fix_sha[1]})
 Task 2: fix round 3/5 (0 addressed, 1 open — list_by_tag ordering unchanged (notes/store.py:24); commits ${fix_sha[1]}..${fix_sha[2]})
