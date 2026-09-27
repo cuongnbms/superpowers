@@ -1,5 +1,20 @@
 # Superpowers Release Notes
 
+## v6.4.23 (2026-09-27)
+
+Fork-only. Motivating observation: subagent-driven-development's Model Selection table had seven rows over three tiers, and two of them no longer matched the fork. The "cheapest" row assumed a brief that carries the complete code to transcribe, but writing-plans now strips transcribable bodies from plans (its Proportion check), so the row was dead; in the 2026-09-27 eval the old skill still chose haiku for a Task 1 whose brief carries a signature and tests. The reviewer row asked the controller to scale the model to the diff's risk at every dispatch, a judgment call that in practice always resolved upward. And "most capable" on an account with a tier above Opus means dispatching that tier for every review, which is neither needed nor affordable. The per-harness model mapping lived in a hand-maintained `~/.pi/agent/AGENTS.md` that had already drifted from the skill's wording.
+
+### Subagent-Driven Development
+
+- **Two tiers, chosen by role.** Mid-tier: the implementer's first dispatch and fix rounds 1-3 (a resumed agent keeps its model), and the scoped re-review of a fix diff (verdicts listed findings on a small diff: checklist work). High-tier: fix rounds 4-5 as a fresh dispatch, the re-dispatch after BLOCKED for more reasoning, the task review, the final whole-branch review, and the fix wave after the final review. Mid-tier is the floor even for a one-line mechanical fix; an implementer that would need design judgment beyond the brief has found a plan gap, which the BLOCKED path escalates. High-tier is also a ceiling: a session on a model above it still dispatches the high-tier model.
+- **A harness table under the roles.** Claude Code `sonnet` / `opus`; pi `alias/mid-model` thinking `medium` / `alias/high-model` thinking `high`; Codex the newest `terra` effort `medium` / newest `sol` effort `high`; any other harness takes the pair its own `AGENTS.md` names, or rules on the closest two once at Setup and ledgers it as `Ruling: model tiers — mid = X, high = Y — <why>`. No entry is a versioned model id: aliases resolve in the harness, and Codex names model lines with "newest", so a model release changes `~/.pi/agent/model-alias.json` or the allowlist, not the skill. The reasoning setting is fixed per tier rather than chosen per dispatch, for the same reason the risk-scaled reviewer row went.
+- **Always specify the model** now also says to pass the reasoning setting where the dispatch tool takes one; an omitted value inherits the session's, not the tier's.
+- Eval (9 Opus dry-run controllers, `evals/setup-case.sh fresh|midloop|finalreview`, model read from `dispatch.md`): new skill chose sonnet 2/2 for Task 1, opus 2/2 for fix round 4, opus 2/2 for the fix wave after the final review; old skill chose haiku, opus, sonnet. `evals.json` case 2 now expects the high tier at round 4 and the fixture ledger says the stuck implementer was mid-tier.
+
+### Executing Plans, Writing Plans, Pi extension, Codex reference
+
+- "Most capable" replaced by "high-tier" wherever the final review's model is named; executing-plans points at subagent-driven-development's table. The pi extension's tool mapping asks for explicit `model` and `thinking` per that table. `codex-tools.md`'s model-routing section names the model lines and the newest-version rule, and its config backstop example no longer hardcodes a version.
+
 ## v6.4.22 (2026-09-27)
 
 Fork-only. Motivating observation: brainstorming committed the spec and writing-plans committed the plan on whatever branch was checked out, usually main, and only then did execution create a worktree. A dropped feature left its docs on main, and Claude Code's `EnterWorktree` branches from `origin/<default>` by default, so the worktree it made did not even contain those commits. Second observation, from a flow that plans in claude and executes in pi: two agent kinds meant two worktree mechanisms and two directories (`.claude/worktrees/` from the native tool, `.worktrees/` from git), and finishing-a-development-branch owns cleanup only under the latter.
