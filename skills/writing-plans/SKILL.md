@@ -241,7 +241,7 @@ the other two.
 
 **2. Subagent-Driven in new session** - same subagent-driven process, run by a fresh `claude` or `pi` agent in a sibling Herdr pane; this session stays free for other work
 
-**3. Inline Execution** - I implement every task myself in this session using executing-plans, without pausing between tasks, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well on a mid-tier session model, and is the option for harnesses without subagents
+**3. Inline Execution** - I implement every task myself in this session using executing-plans, without pausing between tasks, then one fresh reviewer on the high-tier model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well on a mid-tier session model, and is the option for harnesses without subagents
 
 **For this plan I recommend <one option>, because <one sentence drawn from the plan: how much the tasks depend on each other's interfaces, how many there are, what a shipped mistake would cost>. Does the plan capture what you want, and which approach should we use?"**
 

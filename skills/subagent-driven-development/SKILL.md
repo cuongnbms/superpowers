@@ -120,26 +120,38 @@ net for conflicts that only emerge from implementation.
 
 ## Model Selection
 
-Use the least powerful model that can handle each role to conserve cost and
-increase speed. Turn count beats token price: wall-clock and context cost
-scale with how many turns a subagent takes, and the cheapest models
-routinely take 2-3× the turns on multi-step work — costing more overall. So
-the cheapest tier is for transcription, and a mid-tier model is the floor
-for anything that needs judgment.
+Two tiers, chosen by role: mid-tier and high-tier. Mid-tier is the floor,
+even for a one-line mechanical fix. An implementer that would need design judgment beyond the
+brief has found a plan gap, which the BLOCKED path escalates — it is not a
+reason to pick a bigger model up front.
 
 | Role | Tier |
 |------|------|
-| Implementer whose brief contains the complete code to write (transcription plus testing); single-file mechanical fix | Cheapest |
-| Implementer working from a signature, the spec's values and a complete test, which is what writing-plans produces: they write the body themselves. Also multi-file coordination, pattern matching, debugging | Mid |
-| Implementer needing design judgment or broad codebase understanding | Most capable |
-| Task reviewer | Scaled to the diff's size, complexity, and risk: mid for a small mechanical diff, most capable for a subtle concurrency change |
-| Scoped re-review of a small fix diff | Cheap-to-mid |
-| Fix-loop implementer, rounds 4-5 | At least one tier above the implementer that got stuck |
-| Final whole-branch review | Most capable, not the session default |
+| Implementer: first dispatch, and fix rounds 1-3 (a resumed agent keeps its model) | Mid-tier |
+| Fix-loop implementer, rounds 4-5 (fresh dispatch) | High-tier |
+| Re-dispatch after BLOCKED because the task needs more reasoning | High-tier |
+| Task reviewer, final whole-branch review | High-tier |
+| Fix wave after the final review (one subagent, whole findings list) | High-tier |
+| Scoped re-review of a fix diff (verdicts listed findings on a small diff: checklist work) | Mid-tier |
 
-**Always specify the model explicitly when dispatching a subagent.** An
-omitted model inherits your session's model — often the most capable and
-most expensive — which silently defeats this section.
+What each tier is on each harness, and the reasoning setting that goes
+with it where the dispatch tool takes one. No entry is a versioned model
+id: Claude Code and pi names are aliases the harness resolves, and the
+Codex names are model lines — pick the newest version of that line in
+your spawn allowlist.
+
+| Harness (dispatch tool) | Mid-tier | High-tier |
+|---|---|---|
+| Claude Code (`Agent`, `model`) | `sonnet` | `opus` |
+| pi (`Agent`, `model` + `thinking`) | `alias/mid-model`, thinking `medium` | `alias/high-model`, thinking `high` |
+| Codex (`spawn_agent`, `model` + `reasoning_effort`) | newest `terra`, effort `medium` | newest `sol`, effort `high` |
+| Any other harness | the models its own instructions (`AGENTS.md` or equivalent) name for mid-tier and high-tier; if they name none, the closest two its dispatch tool offers — rule on the pair once at Setup, ledger it as `Ruling: model tiers — mid = X, high = Y — <why>`, and use it for the whole run | |
+
+**Always specify the model explicitly when dispatching a subagent,** and
+the reasoning setting alongside it on harnesses that take one; an omitted
+value inherits the session's, not the tier's. High-tier is also a ceiling:
+a session running on a model above it still dispatches the high-tier
+model, never its own.
 
 ## The Task Loop
 
@@ -220,7 +232,7 @@ Implementer subagents report one of four statuses. Handle each appropriately:
 
 **BLOCKED:** The implementer cannot complete the task. Assess the blocker:
 1. If it's a context problem, provide more context and re-dispatch with the same model
-2. If the task requires more reasoning, re-dispatch with a more capable model
+2. If the task requires more reasoning, re-dispatch on the high tier (per Model Selection)
 3. If the task is too large, break it into smaller pieces
 4. If the plan itself is wrong, rule on the correction, ledger it, and re-dispatch with the ruling carried in the dispatch
 
@@ -304,7 +316,7 @@ choices. If your harness cannot send another message to a live subagent,
 dispatch a fresh implementer carrying the brief path, the report-file path,
 and the findings — the report file is the persistent memory either way.
 
-**Rounds 4-5 — dispatch a fresh implementer on a more capable model** (per
+**Rounds 4-5 — dispatch a fresh implementer on the high tier** (per
 Model Selection), with the brief path, the report-file path, the open
 findings, and this framing: "A prior implementer attempted this task
 [N] times; you own it now. Read the report file for what was tried." A loop
@@ -375,14 +387,14 @@ The final whole-branch review gets a package too: run
 branch started from, e.g. `git merge-base main HEAD`) and include the
 printed path in the final review dispatch, so the final reviewer reads
 one file instead of re-deriving the branch diff with git commands. Dispatch
-on the most capable available model (see Model Selection), using
+on the high tier (see Model Selection), using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md). Point it at
 the ledger's deferred-minor and parked lines so it can triage which must be
 fixed before merge.
 
 If the final whole-branch review returns findings, dispatch ONE fix subagent
-with the complete findings list — not one fixer per finding.
+on the high tier with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
 Then run exactly one scoped re-review of the fix wave
@@ -492,7 +504,7 @@ Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
 ...
 
 [After all tasks]
-[Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer, most capable model]
+[Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer, high-tier model]
 Final reviewer: All requirements met. Deferred minors triaged: none block merge.
 
 [Delete this plan's workspace — the record now lives in git]

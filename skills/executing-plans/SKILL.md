@@ -65,8 +65,8 @@ those, stop and ask.
 
 A plan from writing-plans gives each task its signature, the spec's values
 and a complete test; inline execution writes the bodies and runs the tests.
-That runs well on a mid-tier session model, and the one place the most
-capable model earns its cost is the final review, which this skill
+That runs well on a mid-tier session model, and the one place the
+high-tier model earns its cost is the final review, which this skill
 dispatches separately. Tell your human partner so when they choose inline.
 
 Prefer superpowers:subagent-driven-development when your human partner
@@ -251,8 +251,9 @@ Run `bash ../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_
 (MERGE_BASE = the commit the branch started from, e.g.
 `git merge-base main HEAD`) and review from the file it prints.
 
-**With a subagent tool:** dispatch the reviewer on the most capable
-available model — the whole-branch review is a judgment task — using
+**With a subagent tool:** dispatch the reviewer on the high-tier model
+(subagent-driven-development's Model Selection names it) — the
+whole-branch review is a judgment task — using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md), with the
 package path, the plan and spec paths, the plan's Review Focus section
@@ -261,7 +262,7 @@ tests do not exercise — the reviewer checks each deliberately), and a
 pointer to the ledger's `Ruling:` lines so it can weigh the calls you
 made. Specify the model
 explicitly; an omitted model inherits the session's, which may not be the
-most capable. This is the one fresh context the whole run buys. Do not
+high tier. This is the one fresh context the whole run buys. Do not
 skip it, and do not replace it with your own read of the diff.
 
 **Without a subagent tool:** read code-reviewer.md and perform that review
@@ -371,7 +372,7 @@ Task 2: Recovery modes
 
 ...
 
-[After all tasks: review-package plan MERGE_BASE HEAD; dispatch code-reviewer, most capable model]
+[After all tasks: review-package plan MERGE_BASE HEAD; dispatch code-reviewer, high-tier model]
 Reviewer: One Important finding — progress reporting interval hardcoded. Two Minor.
 [Re-grade: Important stands; minors → ledger as deferred]
 [Fix pass: test_progress_interval_configurable RED → extract PROGRESS_INTERVAL → GREEN; suite 12/12; commit]
