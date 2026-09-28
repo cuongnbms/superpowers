@@ -9,8 +9,6 @@ Execute a plan by dispatching a fresh implementer subagent per task, a task revi
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
-**Core principle:** Fresh subagent per task + task review (spec + quality) + broad final review = high quality, fast iteration
-
 **Narration:** between tool calls, narrate at most one short line — the
 ledger and the tool results carry the record.
 
@@ -40,19 +38,6 @@ operation; a security-sensitive action; a side effect outside this worktree
 that norms say you ask about first (a merge, a push to a shared branch, a
 publish, implementing directly on main/master); and a plan so broken that
 every path forward is a guess. For those, stop and ask.
-
-## When to Use
-
-This skill needs a written implementation plan (superpowers:writing-plans
-produces one) and a harness that can dispatch subagents. Without a plan,
-brainstorm and plan first. When your human partner chose inline execution,
-or the harness has no subagent tool, use superpowers:executing-plans: it
-runs every task in this session on the same workspace and ledger, without
-pausing between tasks, and gets one whole-branch review at the end instead
-of a review per task. To run the plan in a separate agent so this session
-stays free, use superpowers:sdd-in-new-session. Task coupling is not a
-reason to avoid this skill: tasks are dispatched one at a time, in plan
-order.
 
 ## The Process
 
@@ -167,15 +152,12 @@ Everything you paste into a dispatch prompt — and everything a subagent
 prints back — stays resident in your context for the rest of the session
 and is re-read on every later turn. Hand artifacts over as files.
 
-**Waiting on dispatched subagents:** never poll a wait interface with
-short timeouts, and never sit in one silent, open-ended wait either.
-While you have local work — ledger updates, packaging the next review,
-reading reports — keep working; child results arrive on their own.
-When you are genuinely idle, wait in bounded stretches (five to ten
-minutes, where your platform allows), and between stretches post one
-line of status and reconcile your live children: list them, and chase
-any that finished without reporting. A bounded stretch keeps nearly
-all of a long wait's efficiency while guaranteeing a stuck or lost
+**Waiting on dispatched subagents:** never poll with short timeouts, and
+never sit in one silent, open-ended wait. Keep doing local work (ledger
+updates, the next review package) while children run — results arrive on
+their own. When genuinely idle, wait in bounded stretches of five to ten
+minutes; between stretches post one status line and reconcile your live
+children, chasing any that finished without reporting, so a stuck or lost
 child is noticed within minutes, not at the end of the session.
 
 ### 1. Dispatch the implementer
@@ -207,11 +189,8 @@ and fix-round diffs need it.
   was pasted history. A fresh subagent needs its task, the interfaces it
   touches, and the global constraints. Nothing else.
 - The dispatch carries the no-subagents contract (it is in the
-  implementer template): the implementer never dispatches subagents —
-  not helpers, and never a reviewer. Review arrives from you, after the
-  report. In real sessions, every reviewer a worker spawned duplicated
-  the task review the controller dispatched anyway — a full extra
-  review seat per task.
+  implementer template): the implementer never dispatches helpers or a
+  reviewer. Review arrives from you, after the report.
 - If an earlier task parked a finding in the area this task touches, carry
   a pointer to that ledger entry in the dispatch.
 - Record the implementer's agent identity from the dispatch result —
@@ -382,12 +361,9 @@ parked-with-ruling at the cap.
 
 ## Final Review
 
-The final whole-branch review gets a package too: run
-`bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
-branch started from, e.g. `git merge-base main HEAD`) and include the
-printed path in the final review dispatch, so the final reviewer reads
-one file instead of re-deriving the branch diff with git commands. Dispatch
-on the high tier (see Model Selection), using
+Package the whole branch: `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD`
+(MERGE_BASE = the commit the branch started from, e.g. `git merge-base main HEAD`)
+and pass the printed path in the dispatch. Dispatch on the high tier (see Model Selection), using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md). Point it at
 the ledger's deferred-minor and parked lines so it can triage which must be
@@ -397,10 +373,8 @@ If the final whole-branch review returns findings, dispatch ONE fix subagent
 on the high tier with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
-Then run exactly one scoped re-review of the fix wave
-(`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
-[re-review-prompt.md](re-review-prompt.md)).
-Adjudicate any residual findings as in the task loop's breaker: park with
+Then run exactly one scoped re-review of the fix wave, packaged and
+dispatched as in the task loop. Adjudicate any residual findings as in the task loop's breaker: park with
 rulings, or rule on the load-bearing ones and ledger what you decided. Only
 the four classes above stop you here. There is no second fix wave —
 residual load-bearing findings surface to your human partner when
@@ -442,6 +416,7 @@ Use superpowers:finishing-a-development-branch.
 | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
 | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
 | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
+| "These tasks are too coupled for separate subagents" | Tasks are dispatched one at a time, in plan order; the dispatch carries the interfaces earlier tasks settled. Coupling changes nothing. |
 
 ## Example Workflow
 
