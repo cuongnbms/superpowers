@@ -191,6 +191,62 @@ PLAN
         fail "missing constraints are noted on stderr"
     fi
 
+    # --- the task number is matched whole and literally ---
+    cat > "$TEST_ROOT/ids.md" <<'PLAN'
+# Suffixed plan
+
+### Task 6: Six
+
+Six body.
+
+### Task 6b: Six-b
+
+Six-b body.
+
+### Task 6.1: Six-one
+
+Six-one body.
+
+### Task 8b: Eight-b only
+
+Eight-b body.
+PLAN
+    local i6 i6b i61
+    i6="$(brief "$TEST_ROOT/ids.md" 6)"
+    i6b="$(brief "$TEST_ROOT/ids.md" 6b)"
+    i61="$(brief "$TEST_ROOT/ids.md" 6.1)"
+    if [[ "$i6" == *"Six body."* && "$i6" != *"Six-b body."* && "$i6" != *"Six-one body."* ]]; then
+        pass "Task 6 does not pull in Task 6b or Task 6.1"
+    else
+        fail "Task 6 does not pull in Task 6b or Task 6.1"
+        echo "    got: $i6"
+    fi
+    if [[ "$i6b" == *"Six-b body."* && "$i6b" != *"Six body."* && "$i61" == *"Six-one body."* && "$i61" != *"Six body."* ]]; then
+        pass "suffixed task numbers are addressable on their own"
+    else
+        fail "suffixed task numbers are addressable on their own"
+        echo "    6b: $i6b"
+        echo "    6.1: $i61"
+    fi
+
+    rc=0
+    "$TASK_BRIEF" "$TEST_ROOT/ids.md" 8 "$TEST_ROOT/brief-8.md" >/dev/null 2>&1 || rc=$?
+    if [[ "$rc" -eq 3 && ! -e "$TEST_ROOT/brief-8.md" ]]; then
+        pass "Task 8 with only Task 8b in the plan exits 3"
+    else
+        fail "Task 8 with only Task 8b in the plan exits 3"
+        echo "    exit: $rc"
+    fi
+
+    rc=0
+    "$TASK_BRIEF" "$TEST_ROOT/ids.md" . "$TEST_ROOT/brief-dot.md" >/dev/null 2>&1 || rc=$?
+    if [[ "$rc" -eq 3 && ! -e "$TEST_ROOT/brief-dot.md" ]]; then
+        pass "regex characters in the task number match nothing"
+    else
+        fail "regex characters in the task number match nothing"
+        echo "    exit: $rc"
+    fi
+
     echo ""
     if [[ "$FAILURES" -ne 0 ]]; then
         echo "FAILED: $FAILURES assertion(s)."
