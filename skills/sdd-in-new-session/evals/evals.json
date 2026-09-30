@@ -61,6 +61,23 @@
         "The prompt file contains the absolute plan path <REPO>/docs/superpowers/plans/2026-09-05-add-tag-based-filtering-and-search-to-notes-cli.md and no unfilled placeholder",
         "The prompt was not sent twice (`.herdr-shim/prompt_count` is 1) and the final message reports the final agent name and pane id"
       ]
+    },
+    {
+      "id": 3,
+      "name": "pane-layout-from-env",
+      "setup": "setup-case.sh pane",
+      "prompt": "I'm in Herdr. Hand the plan at docs/superpowers/plans/2026-09-05-notes-tags.md (repo at <REPO>) to a new session so this one stays free.",
+      "expected_output": "SUPERPOWERS_SDD_LAYOUT=pane is set in the environment, so the worker opens in a split of this pane (right, since the pane is 220x50) instead of a new tab; everything else matches the worktree case.",
+      "files": [
+        "fixtures/repo/",
+        "fixtures/bin/herdr"
+      ],
+      "expectations": [
+        "herdr-calls.log has exactly one `pane split` call with `--direction right`, `--cwd <REPO>` and `--no-focus`, and no `tab create` call",
+        "herdr-calls.log has exactly one `agent start` call with `--kind claude` and `--pane w1:p2`, and one `agent prompt` with `--until working`",
+        "The prompt file contains the absolute plan path, `subagent-driven-development` and `worktree`",
+        "The final message reports the pane id and agent name and a check-in command"
+      ]
     }
   ]
 }

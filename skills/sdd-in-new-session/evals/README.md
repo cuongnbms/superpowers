@@ -6,7 +6,7 @@ JSON shaped like the real socket API. No Herdr server is involved.
 
 ## Files
 
-- `evals.json` — three cases with prompts and expectations
+- `evals.json` — four cases with prompts and expectations
 - `fixtures/repo/` — a small Python project with a committed plan
 - `fixtures/bin/herdr` — the test double; knobs are documented at its top
 - `setup-case.sh <case> DEST` — materializes a case: git repo, shim on PATH,
@@ -33,6 +33,7 @@ Artifacts to read by hand: `DEST/herdr-calls.log`,
 |---|---|---|---|
 | worktree | 220x50 | none | new tab, claude, worktree prompt, `--until working`, return at once |
 | branch-pi | 80x60 | `--branch --pi` | new tab, pi on `alias/mid-model` thinking `medium`, one-line no-worktree prompt naming the checkout, shared-tree warning |
+| pane | 220x50 | none; `SUPERPOWERS_SDD_LAYOUT=pane` in env | split right instead of a tab, otherwise as worktree |
 | collision | 220x50 | none, 52-char slug | first `agent start` rejected as `agent_name_taken`; retry name must still fit 32 chars; tab and pane relabeled |
 
 Waits that would block until the agent's turn ends (bare `--wait`, `agent wait`,

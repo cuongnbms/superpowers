@@ -7,9 +7,10 @@ Fork-only. Motivating observation (2026-09-30, a real handoff of two plans): eac
 ### SDD In New Session
 
 - **A new named tab per worker, not a pane split.** `herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$CWD" --label "$NAME"` replaces the layout probe and `pane split`; the root pane is still renamed to the agent name, and a name collision renames both the tab and the pane. The tab opens unfocused, so the user's view stays on the orchestrator.
+- **Layout is configurable**: `--tab` / `--pane` per call, else `$SUPERPOWERS_SDD_LAYOUT`, else `tab`. `pane` keeps the previous behavior (layout probe, split right or down). Tab is the default because several long-running workers are the common case; a split suits one short worker watched beside the orchestrator.
 - **pi starts on the mid tier explicitly**: `herdr agent start … --kind pi -- --model alias/mid-model --thinking medium`, the controller's tier from subagent-driven-development's harness table, instead of whatever model pi comes up on.
 - **pi gets a one-line prompt**: newlines are joined before `agent prompt`, because pi submits on Enter and a multi-line paste stays in its input.
-- Evals: the herdr test double implements `tab create` and `tab rename`; `grade.sh` checks one `tab create` and no `pane split`, the tab label, and for `branch-pi` the pi model arguments and a newline-free prompt. Sonnet executors, one run per case: new skill 14/14, 17/17, 14/14; old skill fails exactly the new checks (2, 4 and 2 failures).
+- Evals: the herdr test double implements `tab create` and `tab rename`; `grade.sh` checks one `tab create` and no `pane split`, the tab label, and for `branch-pi` the pi model arguments and a newline-free prompt. New case `pane` sets `SUPERPOWERS_SDD_LAYOUT=pane` and expects one split right and no tab. Sonnet executors, one run per case: worktree 14/14, branch-pi 17/17, pane 13/13, collision 14/14; the previous skill fails exactly the tab and pi checks (2, 4 and 2 failures on the first three cases).
 
 ## v6.4.23 (2026-09-27)
 

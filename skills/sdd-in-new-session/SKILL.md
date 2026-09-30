@@ -1,11 +1,11 @@
 ---
 name: sdd-in-new-session
-description: Hands a written implementation plan to a fresh claude or pi coding agent in a new Herdr tab, where it runs subagent-driven-development in its own context while this session stays free for other work. Use when running inside Herdr (HERDR_ENV=1) and the user picks the new-session option after writing-plans, or asks to execute a plan in a separate tab, pane or agent.
+description: Hands a written implementation plan to a fresh claude or pi coding agent in a new Herdr tab (or a split pane), where it runs subagent-driven-development in its own context while this session stays free for other work. Use when running inside Herdr (HERDR_ENV=1) and the user picks the new-session option after writing-plans, or asks to execute a plan in a separate tab, pane or agent.
 ---
 
 # SDD In New Session
 
-Hand a plan to a fresh agent in a new Herdr tab named after it, confirm the handoff, and return. This session never waits for the plan to finish. Reached from the Execution Handoff in superpowers:writing-plans, or directly as `/sdd-in-new-session [PLAN_PATH] [--branch] [--pi]`.
+Hand a plan to a fresh agent in a new Herdr tab named after it (or a split of this pane), confirm the handoff, and return. This session never waits for the plan to finish. Reached from the Execution Handoff in superpowers:writing-plans, or directly as `/sdd-in-new-session [PLAN_PATH] [--branch] [--pi]`.
 
 The `herdr` skill (installed, or printed by `herdr --skill`) is the reference for CLI syntax, JSON shapes, and safety rules. Two of its defaults are overridden here on purpose:
 
@@ -19,6 +19,7 @@ The `herdr` skill (installed, or printed by `herdr --skill`) is the reference fo
 | `PLAN_PATH` | plan written in this conversation; else newest file in `docs/superpowers/plans/` | Plan to execute |
 | `--branch` | off → worktree | Spawned agent works in THIS checkout, on the plan's branch when there is one, else on a new branch from HEAD. The working tree is then shared with this session. |
 | `--pi` | off → `claude` | Start `--kind pi` on the mid-tier model instead of `--kind claude` |
+| `--tab` / `--pane` | `$SUPERPOWERS_SDD_LAYOUT`, else `tab` | Open the worker in a new named tab, or in a split of this session's pane |
 
 ## Preflight
 
@@ -29,7 +30,8 @@ The `herdr` skill (installed, or printed by `herdr --skill`) is the reference fo
    ```bash
    NAME="sdd-$(basename "$PLAN" .md | sed -E 's/^[0-9]{4}-[0-9]{2}-[0-9]{2}-//; s/[^a-z0-9_-]/-/g' | cut -c1-26 | sed 's/-$//')"
    ```
-5. Detect where the plan lives (next section) and set `CWD`, `PLAN`, `ISOLATION`.
+5. `LAYOUT` = `tab` or `pane` from the flag, else `${SUPERPOWERS_SDD_LAYOUT:-tab}`. The variable lets a user who prefers splits set it once in their shell profile.
+6. Detect where the plan lives (next section) and set `CWD`, `PLAN`, `ISOLATION`.
 
 ## Where the plan lives
 
@@ -66,8 +68,14 @@ PLAN="$WT/$REL"; CWD="$WT"
 ## Steps
 
 ```bash
-# A tab per worker keeps this session's tab uncluttered and gives the worker a full screen and a named sidebar entry.
-PANE=$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$CWD" --label "$NAME" | jq -r '.result.root_pane.pane_id')
+if [ "$LAYOUT" = pane ]; then
+  # Terminal cells are about twice as tall as wide, so width >= 2*height is a visually square-or-wider pane: split right; else down.
+  DIR=$(herdr pane layout --pane "$HERDR_PANE_ID" | jq -r --arg p "$HERDR_PANE_ID" \
+    '.result.layout.panes[] | select(.pane_id == $p) | .rect | if .width >= 2 * .height then "right" else "down" end')
+  PANE=$(herdr pane split --current --direction "$DIR" --cwd "$CWD" --no-focus | jq -r '.result.pane.pane_id')
+else
+  PANE=$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$CWD" --label "$NAME" | jq -r '.result.root_pane.pane_id')
+fi
 herdr pane rename "$PANE" "$NAME"                            # the agent list shows pane labels
 herdr agent start "$NAME" --kind claude --pane "$PANE"
 # --pi instead: herdr agent start "$NAME" --kind pi --pane "$PANE" -- --model alias/mid-model --thinking medium
@@ -75,13 +83,12 @@ herdr agent start "$NAME" --kind claude --pane "$PANE"
 herdr agent prompt "$NAME" "$PROMPT" --wait --until working --timeout 15000
 ```
 
-- `tab create` opens the tab without focusing it, so the user's view stays on this session.
+- Both open without focus, so the user's view stays on this session. A tab (the default) gives the worker a full screen and its own sidebar entry, which matters once several workers run at once; a split keeps a single short worker in view beside this session.
 - With `--pi`, name the model at start. pi launched without `--model` has come up on a model other than its settings default (observed: `xai/grok-4.7` instead of `alias/main`), and the controller then runs, and bills, on whatever that was. The SDD controller takes the mid tier from subagent-driven-development's harness table.
 ```
 
 - No permission-bypass agent flags: the user sits beside the pane and approves interactively.
 - Do not use `herdr worktree create`; the workspace is either the plan's existing one or the git worktree made above.
-- The worker gets its own tab, not a split of this one: a split shares this session's screen and sidebar entry.
 - `--until working` is the handoff check. Bare `--wait`, `agent wait --until done`, and `pane wait-output` all wait for the agent's turn to end, which here is the plan.
 
 ## Prompt template
@@ -122,7 +129,7 @@ Leave the tab open; never close a tab or pane hosting a live agent.
 
 | Result | Do |
 |---|---|
-| Name taken on `agent start` | Append `-2`, `-3`, … to `$NAME`, rename the tab (`herdr tab rename`) and the pane to match, retry `agent start`. |
+| Name taken on `agent start` | Append `-2`, `-3`, … to `$NAME`, rename the pane (and, in tab layout, the tab with `herdr tab rename`) to match, retry `agent start`. |
 | `agent_not_ready` on start | `herdr agent read NAME` — usually a trust or permission dialog. Tell the user; do not resend. |
 | `agent_blocked` on prompt | Read the pane, surface the dialog, ask the user before answering it. |
 | `agent_prompt_stalled` / timeout on `--until working` | `herdr agent get NAME`. If already `working`, handoff succeeded. Otherwise report the pane state; never resend the prompt. |

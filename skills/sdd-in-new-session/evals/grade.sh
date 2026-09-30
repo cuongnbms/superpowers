@@ -4,11 +4,11 @@
 # evidence line. Judgment calls (the final message's wording) are left to the
 # reader; this only covers what is grep-able in the call log and prompt file.
 #
-# Usage: grade.sh worktree|branch-pi|collision CASE_DIR [FINAL_MESSAGE_FILE]
+# Usage: grade.sh worktree|branch-pi|pane|collision CASE_DIR [FINAL_MESSAGE_FILE]
 set -uo pipefail
 
-case_name=${1:?usage: grade.sh worktree|branch-pi|collision CASE_DIR [FINAL_MESSAGE]}
-case_dir=${2:?usage: grade.sh worktree|branch-pi|collision CASE_DIR [FINAL_MESSAGE]}
+case_name=${1:?usage: grade.sh worktree|branch-pi|pane|collision CASE_DIR [FINAL_MESSAGE]}
+case_dir=${2:?usage: grade.sh worktree|branch-pi|pane|collision CASE_DIR [FINAL_MESSAGE]}
 final=${3:-}
 log="$case_dir/herdr-calls.log"
 state="$case_dir/.herdr-shim"
@@ -28,8 +28,14 @@ tabs=$(count '^herdr tab create ')
 splits=$(count '^herdr pane split ')
 tab_line=$(line '^herdr tab create ')
 case "$case_name" in branch-pi) want_kind=pi ;; *) want_kind=claude ;; esac
-[ "$tabs" = 1 ] && [ "$splits" = 0 ] && grep -q -- "--cwd $repo\( \|$\)" <<<"$tab_line" && grep -q -- "--label sdd-" <<<"$tab_line" && ! grep -q -- "--focus" <<<"$tab_line"
-check "one tab create (no pane split), --cwd <repo>, --label sdd-…, not focused" $? "tabs=$tabs splits=$splits :: $tab_line"
+if [ "$case_name" = pane ]; then
+  split_line=$(line '^herdr pane split ')
+  [ "$splits" = 1 ] && [ "$tabs" = 0 ] && grep -q -- "--direction right" <<<"$split_line" && grep -q -- "--cwd $repo\( \|$\)" <<<"$split_line" && grep -q -- "--no-focus" <<<"$split_line"
+  check "SUPERPOWERS_SDD_LAYOUT=pane: one pane split right (no tab create), --cwd <repo>, --no-focus" $? "tabs=$tabs splits=$splits :: $split_line"
+else
+  [ "$tabs" = 1 ] && [ "$splits" = 0 ] && grep -q -- "--cwd $repo\( \|$\)" <<<"$tab_line" && grep -q -- "--label sdd-" <<<"$tab_line" && ! grep -q -- "--focus" <<<"$tab_line"
+  check "one tab create (no pane split), --cwd <repo>, --label sdd-…, not focused" $? "tabs=$tabs splits=$splits :: $tab_line"
+fi
 
 started_name=$(tail -1 "$state/agents" 2>/dev/null | cut -f1)
 starts=$(count '^herdr agent start ')
@@ -50,9 +56,11 @@ start_line=$(line '^herdr agent start ' 9 | tail -1)
 grep -q -- "--kind $want_kind" <<<"$start_line" && grep -q -- "--pane w1:p2" <<<"$start_line" && ! grep -q -i -E 'dangerously|skip-permissions|--yes|auto-approve|yolo' <<<"$start_line"
 check "agent start --kind $want_kind --pane w1:p2, no permission-bypass flag" $? "$start_line"
 
-tab_label=$(tail -1 "$state/tab_labels" 2>/dev/null | cut -f2)
-[ -n "$tab_label" ] && [ "$tab_label" = "$started_name" ]
-check "last tab label equals the started agent name" $? "tab_label=$tab_label started=$started_name"
+if [ "$case_name" != pane ]; then
+  tab_label=$(tail -1 "$state/tab_labels" 2>/dev/null | cut -f2)
+  [ -n "$tab_label" ] && [ "$tab_label" = "$started_name" ]
+  check "last tab label equals the started agent name" $? "tab_label=$tab_label started=$started_name"
+fi
 
 renames=$(grep -E '^herdr pane rename w1:p2 ' "$log" | tail -1 | awk '{print $5}')
 [ -n "$renames" ] && [ "$renames" = "$started_name" ]

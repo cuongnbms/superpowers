@@ -5,13 +5,14 @@
 #
 #   worktree   wide pane, plan 2026-09-05-notes-tags.md, no flags
 #   branch-pi  tall pane, same plan, invoked with --branch --pi
+#   pane       wide pane, same plan, SUPERPOWERS_SDD_LAYOUT=pane in the env
 #   collision  wide pane, long plan slug, first `agent start` is rejected as
 #              name_taken so the caller must retry with a suffix that still fits
 #
-# Usage: setup-case.sh worktree|branch-pi|collision DEST_DIR
+# Usage: setup-case.sh worktree|branch-pi|pane|collision DEST_DIR
 set -euo pipefail
 
-case_name=${1:?usage: setup-case.sh worktree|branch-pi|collision DEST_DIR}
+case_name=${1:?usage: setup-case.sh worktree|branch-pi|pane|collision DEST_DIR}
 dest=${2:?usage: setup-case.sh worktree|branch-pi|collision DEST_DIR}
 here="$(cd "$(dirname "$0")" && pwd)"
 
@@ -22,10 +23,12 @@ chmod +x "$dest/bin/herdr"
 
 layout=wide
 reject_first=0
+layout_env=
 plan="docs/superpowers/plans/2026-09-05-notes-tags.md"
 case "$case_name" in
   worktree) ;;
   branch-pi) layout=tall ;;
+  pane) layout_env='export SUPERPOWERS_SDD_LAYOUT=pane' ;;
   collision)
     reject_first=1
     long="docs/superpowers/plans/2026-09-05-add-tag-based-filtering-and-search-to-notes-cli.md"
@@ -52,6 +55,7 @@ export HERDR_SHIM_LOG="$dest_abs/herdr-calls.log"
 export HERDR_SHIM_STATE="$dest_abs/.herdr-shim"
 export HERDR_SHIM_LAYOUT=$layout
 export HERDR_SHIM_REJECT_FIRST_START=$reject_first
+$layout_env
 EOF
 : > "$dest_abs/herdr-calls.log"
 printf '%s\n' "$plan" > "$dest_abs/plan-path.txt"
