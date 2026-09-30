@@ -35,7 +35,7 @@ positional() { # nth positional after the two subcommand words, skipping --flag 
   local n=$1; shift; local i=0
   while [ $# -gt 0 ]; do
     case "$1" in
-      --wait|--no-focus|--current|--json|--verbose) shift ;;
+      --wait|--no-focus|--focus|--current|--json|--verbose) shift ;;
       --*) shift 2 ;;
       *) i=$((i+1)); if [ $i -eq $n ]; then printf '%s' "$1"; return 0; fi; shift ;;
     esac
@@ -73,6 +73,23 @@ case "$group $sub" in
     printf '%s\n' "$new" >> "$state/panes"
     cwd=$(flag_val --cwd "$@" || printf '%s' "$PWD")
     ok "{\"id\":\"cli:pane:split\",\"result\":{\"type\":\"pane_split\",\"pane\":{\"pane_id\":\"$new\",\"workspace_id\":\"$ws\",\"tab_id\":\"$tab\",\"cwd\":\"$cwd\",\"direction\":\"$dir\"}}}" ;;
+
+  "tab create")
+    n=$(( $(cat "$state/pane_counter" 2>/dev/null || echo 1) + 1 )); echo "$n" > "$state/pane_counter"
+    t=$(( $(cat "$state/tab_counter" 2>/dev/null || echo 1) + 1 )); echo "$t" > "$state/tab_counter"
+    new="$ws:p$n"; newtab="$ws:t$t"
+    printf '%s\n' "$new" >> "$state/panes"
+    cwd=$(flag_val --cwd "$@" || printf '%s' "$PWD")
+    label=$(flag_val --label "$@" || true)
+    printf '%s\t%s\n' "$newtab" "$label" >> "$state/tab_labels"
+    focused=false; has_flag --focus "$@" && focused=true
+    ok "{\"id\":\"cli:tab:create\",\"result\":{\"type\":\"tab_created\",\"tab\":{\"tab_id\":\"$newtab\",\"workspace_id\":\"$ws\",\"label\":\"$label\",\"focused\":$focused,\"pane_count\":1},\"root_pane\":{\"pane_id\":\"$new\",\"workspace_id\":\"$ws\",\"tab_id\":\"$newtab\",\"cwd\":\"$cwd\",\"focused\":$focused}}}" ;;
+
+  "tab rename")
+    t=$(positional 1 "$@") || err tab:rename invalid_params "tab id required"
+    label=$(positional 2 "$@" || true)
+    printf '%s\t%s\n' "$t" "$label" >> "$state/tab_labels"
+    ok "{\"id\":\"cli:tab:rename\",\"result\":{\"type\":\"tab_renamed\",\"tab\":{\"tab_id\":\"$t\",\"label\":\"$label\"}}}" ;;
 
   "pane rename")
     p=$(positional 1 "$@") || err pane:rename invalid_params "pane id required"

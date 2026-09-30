@@ -1,16 +1,16 @@
 ---
 name: sdd-in-new-session
-description: Hands a written implementation plan to a fresh claude or pi coding agent in a sibling Herdr pane, where it runs subagent-driven-development in its own context while this session stays free for other work. Use when running inside Herdr (HERDR_ENV=1) and the user picks the new-session option after writing-plans, or asks to execute a plan in a separate pane or agent.
+description: Hands a written implementation plan to a fresh claude or pi coding agent in a new Herdr tab, where it runs subagent-driven-development in its own context while this session stays free for other work. Use when running inside Herdr (HERDR_ENV=1) and the user picks the new-session option after writing-plans, or asks to execute a plan in a separate tab, pane or agent.
 ---
 
 # SDD In New Session
 
-Hand a plan to a fresh agent in a sibling Herdr pane, confirm the handoff, and return. This session never waits for the plan to finish. Reached from the Execution Handoff in superpowers:writing-plans, or directly as `/sdd-in-new-session [PLAN_PATH] [--branch] [--pi]`.
+Hand a plan to a fresh agent in a new Herdr tab named after it, confirm the handoff, and return. This session never waits for the plan to finish. Reached from the Execution Handoff in superpowers:writing-plans, or directly as `/sdd-in-new-session [PLAN_PATH] [--branch] [--pi]`.
 
 The `herdr` skill (installed, or printed by `herdr --skill`) is the reference for CLI syntax, JSON shapes, and safety rules. Two of its defaults are overridden here on purpose:
 
 - It waits on a prompt with bare `--wait`, which returns at the first settled `idle`/`done`/`blocked`. Here that is the end of the agent's turn, potentially the whole plan, so the wait is `--until working`: the moment the agent picks the prompt up.
-- It keeps the caller's `$PWD` and never creates a worktree. Here the pane opens in the plan's workspace, and who creates that workspace depends on where the plan already lives (see "Where the plan lives"). The point of the option is that this session stays free, so the two sessions must not share a working tree unless `--branch` asks for exactly that.
+- It keeps the caller's `$PWD` and never creates a worktree. Here the tab opens in the plan's workspace, and who creates that workspace depends on where the plan already lives (see "Where the plan lives"). The point of the option is that this session stays free, so the two sessions must not share a working tree unless `--branch` asks for exactly that.
 
 ## Arguments
 
@@ -18,7 +18,7 @@ The `herdr` skill (installed, or printed by `herdr --skill`) is the reference fo
 |---|---|---|
 | `PLAN_PATH` | plan written in this conversation; else newest file in `docs/superpowers/plans/` | Plan to execute |
 | `--branch` | off → worktree | Spawned agent works in THIS checkout, on the plan's branch when there is one, else on a new branch from HEAD. The working tree is then shared with this session. |
-| `--pi` | off → `claude` | Start `--kind pi` instead of `--kind claude` |
+| `--pi` | off → `claude` | Start `--kind pi` on the mid-tier model instead of `--kind claude` |
 
 ## Preflight
 
@@ -66,18 +66,22 @@ PLAN="$WT/$REL"; CWD="$WT"
 ## Steps
 
 ```bash
-# Terminal cells are about twice as tall as wide, so width >= 2*height is a visually square-or-wider pane: split right; else down.
-DIR=$(herdr pane layout --pane "$HERDR_PANE_ID" | jq -r --arg p "$HERDR_PANE_ID" \
-  '.result.layout.panes[] | select(.pane_id == $p) | .rect | if .width >= 2 * .height then "right" else "down" end')
-PANE=$(herdr pane split --current --direction "$DIR" --cwd "$CWD" --no-focus | jq -r '.result.pane.pane_id')
-herdr pane rename "$PANE" "$NAME"                            # label the pane so it is findable in the sidebar
-herdr agent start "$NAME" --kind claude --pane "$PANE"       # --kind pi when --pi
+# A tab per worker keeps this session's tab uncluttered and gives the worker a full screen and a named sidebar entry.
+PANE=$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$CWD" --label "$NAME" | jq -r '.result.root_pane.pane_id')
+herdr pane rename "$PANE" "$NAME"                            # the agent list shows pane labels
+herdr agent start "$NAME" --kind claude --pane "$PANE"
+# --pi instead: herdr agent start "$NAME" --kind pi --pane "$PANE" -- --model alias/mid-model --thinking medium
 # 15000 ms: herdr reports agent_prompt_stalled itself after 5 s with no lifecycle change, so 15 s is ample and a hung wait still returns.
 herdr agent prompt "$NAME" "$PROMPT" --wait --until working --timeout 15000
 ```
 
+- `tab create` opens the tab without focusing it, so the user's view stays on this session.
+- With `--pi`, name the model at start. pi launched without `--model` has come up on a model other than its settings default (observed: `xai/grok-4.7` instead of `alias/main`), and the controller then runs, and bills, on whatever that was. The SDD controller takes the mid tier from subagent-driven-development's harness table.
+```
+
 - No permission-bypass agent flags: the user sits beside the pane and approves interactively.
 - Do not use `herdr worktree create`; the workspace is either the plan's existing one or the git worktree made above.
+- The worker gets its own tab, not a split of this one: a split shares this session's screen and sidebar entry.
 - `--until working` is the handoff check. Bare `--wait`, `agent wait --until done`, and `pane wait-output` all wait for the agent's turn to end, which here is the plan.
 
 ## Prompt template
@@ -101,24 +105,24 @@ EOF
 - *agent creates worktree* (C default): `ISOLATION="create a new git worktree via superpowers:using-git-worktrees and do all work inside it."`
 - *agent creates branch* (C with `--branch`): `ISOLATION="do NOT create a worktree. Create a new branch from the current HEAD in this checkout ($CWD) and do all work on that branch."`
 
-With `--pi`, the prompt still names the superpowers skills; the plan header's "REQUIRED SUB-SKILL" line is the fallback if pi lacks them.
+With `--pi`, join the prompt into one line before sending it: `PROMPT=$(printf '%s' "$PROMPT" | tr '\n' ' ')`. pi submits on Enter, and a multi-line prompt pasted into its input stays there unsubmitted (`agent_prompt_stalled`). The prompt still names the superpowers skills; the plan header's "REQUIRED SUB-SKILL" line is the fallback if pi lacks them.
 
 ## After handoff
 
 Return immediately — no polling, no `agent wait`, no reading the transcript. Report:
 
-- pane id and label, agent name, plan path, workspace (worktree `<path>` | branch `<name>` in this checkout) and who created it
+- tab id, pane id and label, agent name, plan path, workspace (worktree `<path>` | branch `<name>` in this checkout) and who created it
 - in state A: that this session left the worktree and where it now is
 - check-in commands: `herdr agent get NAME`, `herdr agent read NAME --source recent-unwrapped --lines 80`
 - with `--branch`: the working tree is shared — editing files here before the agent finishes will collide
 
-Leave the pane open; never close a pane hosting a live agent.
+Leave the tab open; never close a tab or pane hosting a live agent.
 
 ## Failures
 
 | Result | Do |
 |---|---|
-| Name taken on `agent start` | Append `-2`, `-3`, … to `$NAME`, rename the pane to match, retry `agent start`. |
+| Name taken on `agent start` | Append `-2`, `-3`, … to `$NAME`, rename the tab (`herdr tab rename`) and the pane to match, retry `agent start`. |
 | `agent_not_ready` on start | `herdr agent read NAME` — usually a trust or permission dialog. Tell the user; do not resend. |
 | `agent_blocked` on prompt | Read the pane, surface the dialog, ask the user before answering it. |
 | `agent_prompt_stalled` / timeout on `--until working` | `herdr agent get NAME`. If already `working`, handoff succeeded. Otherwise report the pane state; never resend the prompt. |
