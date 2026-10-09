@@ -19,7 +19,10 @@
     given = parse_qs(query).get("key", [None])[0]
     given = given or cookie_value(req, "show_me_key")
     return hmac.compare_digest(given or "", KEY)</code></pre>
-<pre data-start="57" data-hl="3" data-why="Sorting by modification time makes the file written last the newest screen, even when its name sorts earlier."><code class="language-python">def list_screens(root):
+<pre data-start="57" data-hl="6" data-why="Sorting by modification time makes the file written last the newest screen, even when its name sorts earlier."><code class="language-python">def list_screens(root):
+    """Screens are the .html files in root.
+    Hidden files are skipped, and the newest
+    modification time sorts last."""
     files = [p for p in root.glob("*.html") if not p.name.startswith(".")]
     files.sort(key=lambda p: (p.stat().st_mtime, p.name))
     return [{"name": p.name, "mtime": p.stat().st_mtime} for p in files]</code></pre>
