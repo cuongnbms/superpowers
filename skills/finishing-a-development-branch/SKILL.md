@@ -7,7 +7,7 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 ## Overview
 
-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
+**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up → Name the next feature (epics only).
 
 **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
 
@@ -49,6 +49,12 @@ The base branch is whatever this work forked from — usually named in the
 plan, the conversation, or the branch's upstream. If it is not already
 known, ask: "This branch split from <your best guess> - is that correct?"
 Confirm before merging: merging into the wrong base is expensive to undo.
+
+Also find the spec this branch implements: the plan's `**Spec:**` header
+when the plan is known, else the spec file among
+`git diff --name-only <base>...HEAD`. If it carries a
+`> **Epic:** <epic path> § <letter>` line, note the path and letter now.
+Option 1 deletes the branch, so Step 7 cannot read them afterward.
 
 ## Step 4: Present Options
 
@@ -205,6 +211,48 @@ Carry out the choice, then remove the worktree.
 **Otherwise:** The host environment owns this workspace — leave it in
 place. If your platform provides a workspace-exit tool, use it.
 
+## Step 7: Name the Next Feature
+
+**Runs only when the spec had an `Epic:` line (Step 3) and the work was
+not discarded**, after options 1, 2, and 3. Run it from the main repo
+root: Option 1 removed the worktree, and the refs the command reads are
+shared by every worktree. State is judged against the base branch from
+Step 3, the branch that carries the epic:
+
+```bash
+EPIC=<epic path>
+git grep -n "Epic:.*$(basename "$EPIC")" $(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes) -- '*.md'
+```
+
+Hits under `origin:` (that is, `origin/HEAD`) duplicate the remote's
+default branch and are ignored.
+
+A feature is `not started` when no spec names it, `on <branch>` when a
+spec names it only on unmerged branches, and `on <base>` when a spec
+naming it is on the base; the base wins over the same letter elsewhere.
+The next feature is the first `not started` one in the epic's order,
+skipping letters the epic marks dropped or folded. Print the first line
+that matches the option taken, then the rest:
+
+```
+Feature <letter> of <epic path> is merged into <base>.   (option 1)
+Feature <letter> of <epic path> is in PR <url>.          (option 2)
+Feature <letter> of <epic path> stays on <branch>.       (option 3)
+Next: <letter>. <name>: <one-line scope from the epic>.
+Start it in a new session with:
+
+  Brainstorm feature <letter> of <epic path>
+```
+
+When a letter in the next feature's `Depends on` is not `on <base>` yet,
+add one line saying so. After options 2 and 3, add one line saying the
+checkout is still on `<branch>` and the next feature starts from
+`<base>`. When every feature not dropped or folded has a spec, list
+where each one is and print no prompt.
+
+Stop after printing. This session's context belongs to the finished
+feature, so the next brainstorm starts in a new session.
+
 ## Quick Reference
 
 | Option | Merge | Push | Keep Worktree | Cleanup Branch |
@@ -213,6 +261,9 @@ place. If your platform provides a workspace-exit tool, use it.
 | 2. Create PR | - | yes | yes | - |
 | 3. Keep as-is | - | - | yes | - |
 | Discard (explicit request only) | - | - | - | yes (force) |
+
+Step 7 follows options 1, 2, and 3 for a feature of an epic, never a
+discard.
 
 ## Common Rationalizations
 
