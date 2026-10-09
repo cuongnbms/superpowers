@@ -190,5 +190,6 @@ Rules that keep diagrams readable:
 
 - Keep labels short, two or three words. Move detail to the caption.
 - Quote a label that holds punctuation or brackets: `A["parse(query)"]`.
+- Do not start an edge or node label with a number and a period (`1. đọc`) or with a dash or asterisk and a space. Mermaid reads it as a markdown list and draws "Unsupported markdown: list". Write `đọc (1)` or `bước 1: đọc` instead.
 - To mark the one node that matters, add `class X accent` as the last line. It turns the node amber, and it works in `flowchart` and `graph` only; other diagram types ignore it.
 - Do not set colors with `style` or `classDef`. The frame themes every diagram for light and dark.
