@@ -15,14 +15,22 @@ from urllib.parse import unquote, urlsplit, parse_qs
 POLL_SCRIPT = """<script data-show-me-poll>
 (function () {
   var newest = __SM_NEWEST__;
+  var fails = 0;
+  function next() { setTimeout(poll, Math.min(1000 + 1000 * fails, 5000)); }
   function poll() {
     fetch("/api/screens", { credentials: "same-origin", cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (d.newest !== newest) { location.href = "/"; return; }
-        setTimeout(poll, 1000);
+      .then(function (r) {
+        if (!r.ok) { throw new Error("poll failed"); }
+        return r.json();
       })
-      .catch(function () { setTimeout(poll, 1000); });
+      .then(function (d) {
+        var recovered = fails > 0;
+        fails = 0;
+        if (d.newest !== newest) { location.href = "/"; return; }
+        if (recovered) { location.reload(); return; }
+        next();
+      })
+      .catch(function () { fails += 1; next(); });
   }
   setTimeout(poll, 1000);
 })();
@@ -166,7 +174,7 @@ def make_server(screen_dir: Path, key: str, bind_host: str, port: int, url_host:
             content = ""
             if name is not None:
                 try:
-                    content = (screen_dir / name).read_text(encoding="utf-8")
+                    content = (screen_dir / name).read_text(encoding="utf-8", errors="replace")
                 except OSError:
                     self._text(404, "not found", extra)
                     return

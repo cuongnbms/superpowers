@@ -174,3 +174,9 @@ class AppTest(unittest.TestCase):
         port = self.serve("a</script>b")
         body = self.authed("/", port=port).body
         self.assertEqual(boot_of(body)["project"], "a</script>b")
+
+    def test_non_utf8_screen_is_still_served(self):
+        (self.screens / "bad.html").write_bytes(b"<h1>Bad</h1>\xff\xfe<p>x</p>")
+        r = self.authed("/")
+        self.assertEqual(r.status, 200)
+        self.assertIn("<h1>Bad</h1>", r.body)
