@@ -118,9 +118,10 @@ button { font: inherit; color: inherit; }
 code { font: 400 .88em/1.4 var(--font-code); background: var(--code-bg); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
 pre { font: 400 13px/1.65 var(--font-code); }
 pre > code { background: none; border: 0; padding: 0; font-size: inherit; line-height: inherit; }
-#sm-content > pre, #sm-content section > pre {
+/* :where keeps this at class weight, so .trace pre (later) overrides it */
+:where(#sm-content) pre:not(.mermaid) {
   background: var(--code-bg); border: 1px solid var(--rule); border-radius: var(--r);
-  padding: 14px 18px; overflow-x: auto; margin: 0 0 18px;
+  padding: 14px 18px; overflow-x: auto; margin: 0 0 18px; max-width: 100%;
 }
 #sm-content table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 0 0 18px; font-size: 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r); }
 #sm-content th, #sm-content td { text-align: left; padding: 9px 14px; border-top: 1px solid var(--rule); vertical-align: top; }
@@ -235,7 +236,7 @@ pre > code { background: none; border: 0; padding: 0; font-size: inherit; line-h
 .trace-nav .file { font-family: var(--font-code); margin-right: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .trace-nav button { border: 1px solid var(--rule); background: var(--surface); border-radius: var(--r-sm); padding: 4px 10px; cursor: pointer; }
 .trace-nav button:disabled { opacity: .4; cursor: default; }
-.trace pre { margin: 0; flex: 1; padding: 12px 0; background: var(--code-bg); overflow-x: auto; }
+.trace pre { margin: 0; flex: 1; padding: 12px 0; background: var(--code-bg); border: 0; border-radius: 0; overflow-x: auto; }
 .trace pre[hidden] { display: none; }
 .ln { display: block; padding: 0 18px 0 0; white-space: pre; min-width: max-content; }
 .ln::before { content: attr(data-n); display: inline-block; width: 46px; padding-right: 14px; text-align: right; color: var(--ink-soft); opacity: .7; }
@@ -270,7 +271,7 @@ pre > code { background: none; border: 0; padding: 0; font-size: inherit; line-h
   <span id="sm-project"></span>
   <button id="sm-theme" type="button"></button>
 </footer>
-<div id="sm-banner" role="status" hidden>Server stopped. This tab reconnects when your agent starts it again.</div>
+<div id="sm-banner" role="status" hidden>Server stopped. This tab usually reconnects when your agent starts it again.</div>
 <script id="sm-boot" type="application/json">{{BOOT}}</script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script type="module">
@@ -454,7 +455,7 @@ let rendering = Promise.resolve();
 const diagrams = [...document.querySelectorAll("#sm-content pre.mermaid")];
 diagrams.forEach((el) => { el.dataset.smSrc = el.textContent; });
 function renderDiagrams() {
-  rendering = rendering.then(doRender);
+  rendering = rendering.then(doRender, doRender);
   return rendering;
 }
 async function doRender() {
