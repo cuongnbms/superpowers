@@ -1,0 +1,25 @@
+<h1>What the server remembers between runs</h1>
+<p>The start script writes <code>server.json</code> when the server comes up. The next <code>start</code> reads it to reuse the running server, or to reopen the same port so open tabs reconnect.</p>
+
+<h2>server.json</h2>
+<div class="tree">
+  <div class="tree-head"><span>.superpowers/show-me/server.json</span><span>6 fields</span></div>
+  <div class="row"><span class="k">pid</span><span class="t">int</span><span class="v">48213</span><span class="n">lets stop know which process to end</span></div>
+  <div class="row"><span class="k">port</span><span class="t">int</span><span class="v">52341</span><span class="n">kept across restarts so tabs reconnect</span></div>
+  <div class="row"><span class="k">host</span><span class="t">str</span><span class="v">0.0.0.0</span><span class="n">bound on SSH sessions, loopback otherwise</span></div>
+  <div class="row"><span class="k">url</span><span class="t">str</span><span class="v">http://10.0.0.5:52341/?key=f3a9c1…</span><span class="n">host comes from SSH_CONNECTION</span></div>
+  <div class="row"><span class="k">key</span><span class="t">str</span><span class="v">"f3a9c1…"</span><span class="n">stored in a cookie after the first open</span></div>
+  <div class="row"><span class="k">started_at</span><span class="t">str</span><span class="v">2026-10-09T15:42:10+07:00</span><span class="n">when this run began</span></div>
+</div>
+
+<h2>The session directory</h2>
+<div class="tree">
+  <div class="tree-head"><span>.superpowers/show-me/</span><span>git-ignored</span></div>
+  <div class="row" data-depth="0"><span class="k">show-me/</span><span class="t">dir</span><span class="v"></span><span class="n">everything the skill writes</span></div>
+  <div class="row" data-depth="1"><span class="k">screens/</span><span class="t">dir</span><span class="v"></span><span class="n">one .html fragment per screen</span></div>
+  <div class="row" data-depth="2"><span class="k">1-flow.html</span><span class="t">file</span><span class="v">2.1 KB</span><span class="n">older, still has a tab</span></div>
+  <div class="row" data-depth="2"><span class="k">2-layouts.html</span><span class="t">file</span><span class="v">3.4 KB</span><span class="n">newest, so the tab opens on it</span></div>
+  <div class="row" data-depth="1"><span class="k">server.json</span><span class="t">file</span><span class="v">212 B</span><span class="n">pid, port, key</span></div>
+  <div class="row" data-depth="1"><span class="k">server.log</span><span class="t">file</span><span class="v">1.0 KB</span><span class="n">start, exit, tracebacks</span></div>
+  <div class="row" data-depth="1"><span class="k">.gitignore</span><span class="t">file</span><span class="v">*</span><span class="n">keeps all of this out of commits</span></div>
+</div>
