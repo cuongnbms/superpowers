@@ -56,8 +56,13 @@ EPIC=<epic path>
 git grep -n "Epic:.*$(basename "$EPIC")" $(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes) -- '*.md'
 ```
 
-Per feature letter, against the branch that carries the epic (the current branch in
-brainstorming):
+Hits under `origin:` (that is, `origin/HEAD`) duplicate the remote's default branch and are
+ignored.
+
+The base is the branch the features branch from. That is the current branch, unless the
+current branch is a feature's own branch: its HEAD has a spec of this epic, and the branch it
+was cut from has the epic but not that spec. Then the base is the branch it was cut from. Per
+feature letter, against the base:
 
 - `not started`: no spec on any branch names it.
 - `on <branch>`: a spec names it only on unmerged branches; list them.
@@ -68,8 +73,9 @@ brainstorming):
 Under a "stay on main" workspace the spec reaches the base before the code does, so report
 `spec on <base>`, not done.
 
-The next feature is the first `not started` one in epic order. When a letter in its
-`Depends on` is not on the base yet, say so alongside it.
+The next feature is the first `not started` one in epic order, skipping letters the epic marks
+dropped or folded. When a letter in its `Depends on` is not on the base yet, say so alongside
+it.
 
 ## Editing during a later feature
 

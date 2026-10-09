@@ -169,26 +169,30 @@ is an answer, not a model.
 An epic records a split so the features after the first are not lost when this conversation
 ends. Its format is in `epic-format.md`.
 
-**Writing one.** The split approval ask names the epic path and the current branch in the same
-sentence, so one yes covers both:
+**Writing one.** The split approval ask names the epic path and the base branch in the same
+sentence, so one yes covers both. The base is the branch each feature branches from: normally
+the current branch; on a feature branch (a split found after Isolate), the branch it was cut
+from.
 
 > "...If this split looks right I'll commit it as an epic at
 > `docs/superpowers/epics/2026-10-08-handoff.md` on `dev` and start brainstorming A."
 
 Your human partner may name another branch; use that one. On yes, read `epic-format.md`, write
-the epic, `git add` only that file, and commit. The epic is the only write before Isolate: it
-belongs to no single feature, so dropping feature A must not drop it, and feature B started
-before A merges must see it. Write nothing before the yes. Then brainstorm feature A as usual;
-its workspace is chosen at A's design approval, from a HEAD that carries the epic.
+the epic, `git add` only that file, and commit it on that branch. The epic is the only write
+before Isolate: it belongs to no single feature, so dropping feature A must not drop it, and
+feature B started before A merges must see it. Write nothing before the yes. Then brainstorm
+feature A as usual; its workspace is chosen at A's design approval, from a HEAD that carries
+the epic.
 
 **Continuing one.** Only when the request carries an epic path; do not go looking for epics
 otherwise, and treat a request without one as an ordinary brainstorm. Read `epic-format.md`,
 read the epic, derive state, and report it in one line ("Epic handoff: A on `dev`, B on
 `feat/shell-theme-b`, next is C"). Take the next feature, or the one the request names, and
-warn if its dependencies are not on the base yet. Its Scope, its Decide when brainstormed
-items, and the Shared decisions are the starting brief; write them back and invite correction
-as for any brief. Do not re-split and do not redo what Findings records: read only the code
-this feature touches, then ask your first question.
+warn if its dependencies are not on the base yet. Its workspace starts from the base, not from
+the current branch when that is another feature's; give the base as the start point at Isolate.
+Its Scope, its Decide when brainstormed items, and the Shared decisions are the starting brief;
+write them back and invite correction as for any brief. Do not re-split and do not redo what
+Findings records: read only the code this feature touches, then ask your first question.
 
 ## Exploring approaches (architectural)
 

@@ -215,19 +215,24 @@ place. If your platform provides a workspace-exit tool, use it.
 
 **Runs only when the spec had an `Epic:` line (Step 3) and the work was
 not discarded**, after options 1, 2, and 3. Run it from the main repo
-root, since Option 1 removed the worktree. State is judged against the
-base branch from Step 3, the branch that carries the epic:
+root: Option 1 removed the worktree, and the refs the command reads are
+shared by every worktree. State is judged against the base branch from
+Step 3, the branch that carries the epic:
 
 ```bash
 EPIC=<epic path>
 git grep -n "Epic:.*$(basename "$EPIC")" $(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes) -- '*.md'
 ```
 
+Hits under `origin:` (that is, `origin/HEAD`) duplicate the remote's
+default branch and are ignored.
+
 A feature is `not started` when no spec names it, `on <branch>` when a
 spec names it only on unmerged branches, and `on <base>` when a spec
 naming it is on the base; the base wins over the same letter elsewhere.
-The next feature is the first `not started` one in the epic's order. Print
-the first line that matches the option taken, then the rest:
+The next feature is the first `not started` one in the epic's order,
+skipping letters the epic marks dropped or folded. Print the first line
+that matches the option taken, then the rest:
 
 ```
 Feature <letter> of <epic path> is merged into <base>.   (option 1)
@@ -240,8 +245,10 @@ Start it in a new session with:
 ```
 
 When a letter in the next feature's `Depends on` is not `on <base>` yet,
-add one line saying so. When every feature has a spec, list where each
-one is and print no prompt.
+add one line saying so. After options 2 and 3, add one line saying the
+checkout is still on `<branch>` and the next feature starts from
+`<base>`. When every feature not dropped or folded has a spec, list
+where each one is and print no prompt.
 
 Stop after printing. This session's context belongs to the finished
 feature, so the next brainstorm starts in a new session.
