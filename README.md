@@ -260,7 +260,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 ## The Basic Workflow
 
-1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
+1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document. When a request holds several features, writes the split as an epic and continues it from the epic's path.
 
 2. **using-git-worktrees** - Activates after design approval, before the spec is written. Asks once where the work lives (worktree, new branch in this checkout, or the current branch) so the spec, plan, and code ride one branch; at execution setup it runs project setup and verifies a clean test baseline.
 
@@ -272,7 +272,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
 
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
+7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree. For a feature of an epic, names the next feature and the prompt that starts it.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
 
