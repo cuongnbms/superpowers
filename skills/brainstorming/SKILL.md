@@ -94,9 +94,11 @@ Announce the path, create a task per item, complete them in order.
 5. Present the design in sections scaled to their complexity; get approval after each section.
    The last section's approval ask also names where the work will live (see "Workspace")
 6. Set up the chosen workspace with superpowers:using-git-worktrees (Isolate) before writing
-   any file
+   any file of this feature; an epic, when there is one, is already committed (see "Epics")
 7. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, together with the
-   glossary terms and ADRs resolved along the way, and commit it
+   glossary terms and ADRs resolved along the way, and commit it. A feature of an epic starts
+   with `> **Epic:** <epic path> § <letter>` directly under the title, and its Non-goals name
+   other features by letter instead of restating their scope
 8. Self-review the spec (below) and fix inline
 9. Ask the user to review the written spec; wait for approval
 10. Invoke the writing-plans skill. It is the only skill that follows an architectural
@@ -108,11 +110,12 @@ upfront.
 ## Workspace
 
 The first write to the repository is the spec on the architectural path and the first code
-edit on the bounded path. Everything after it (plan, code, fixes) belongs to the same feature,
-and finishing-a-development-branch merges or discards them as one unit. So the workspace is
-chosen before that first write, not at execution time: a spec committed on main stays on main
-if the feature is dropped, and the branch or worktree made later has to be created from a
-HEAD that already carries it.
+edit on the bounded path. The one exception is an epic (see "Epics"): it belongs to no single
+feature, so it is written and committed before Isolate. Everything after the first write
+(plan, code, fixes) belongs to the same feature, and finishing-a-development-branch merges or
+discards them as one unit. So the workspace is chosen before that first write, not at
+execution time: a spec committed on main stays on main if the feature is dropped, and the
+branch or worktree made later has to be created from a HEAD that already carries it.
 
 Do not add a separate question for it. Name your choice inside the approval ask you are
 already making, with the alternatives in the same sentence, so a one-word yes covers both:
@@ -149,7 +152,8 @@ is an answer, not a model.
 - Assess scope before detailed questions. If the request describes several independent
   subsystems ("a platform with chat, file storage, billing, and analytics"), say so and help
   decompose: what the independent pieces are, how they relate, what order to build them. Then
-  brainstorm the first sub-project; each gets its own spec, plan, and implementation cycle.
+  brainstorm the first feature; each gets its own spec, plan, and implementation cycle (see
+  "Epics").
 - Find out why before proposing what. Knowing the genre of app does not tell you why your
   human partner wants it: who it is for, what they will do with it, what success looks like.
   When the request and context do not say, ask one focused question about purpose before
@@ -159,6 +163,36 @@ is an answer, not a model.
   The corrected note is the brief the design is checked against.
 - One question per message. Prefer multiple choice when the options are known; open-ended is
   fine. Focus on purpose, constraints, and success criteria.
+
+## Epics
+
+An epic records a split so the features after the first are not lost when this conversation
+ends. Its format is in `epic-format.md`.
+
+**Writing one.** The split approval ask names the epic path and the base branch in the same
+sentence, so one yes covers both. The base is the branch each feature branches from: normally
+the current branch; on a feature branch (a split found after Isolate), the branch it was cut
+from.
+
+> "...If this split looks right I'll commit it as an epic at
+> `docs/superpowers/epics/2026-10-08-handoff.md` on `dev` and start brainstorming A."
+
+Your human partner may name another branch; use that one. On yes, read `epic-format.md`, write
+the epic, `git add` only that file, and commit it on that branch. The epic is the only write
+before Isolate: it belongs to no single feature, so dropping feature A must not drop it, and
+feature B started before A merges must see it. Write nothing before the yes. Then brainstorm
+feature A as usual; its workspace is chosen at A's design approval, from a HEAD that carries
+the epic.
+
+**Continuing one.** Only when the request carries an epic path; do not go looking for epics
+otherwise, and treat a request without one as an ordinary brainstorm. Read `epic-format.md`,
+read the epic, derive state, and report it in one line ("Epic handoff: A on `dev`, B on
+`feat/shell-theme-b`, next is C"). Take the next feature, or the one the request names, and
+warn if its dependencies are not on the base yet. Its workspace starts from the base, not from
+the current branch when that is another feature's; give the base as the start point at Isolate.
+Its Scope, its Decide when brainstormed items, and the Shared decisions are the starting brief;
+write them back and invite correction as for any brief. Do not re-split and do not redo what
+Findings records: read only the code this feature touches, then ask your first question.
 
 ## Exploring approaches (architectural)
 
@@ -190,7 +224,7 @@ domain-modeling resolved during the conversation in the same pass, then commit i
 
 1. Placeholders: any "TBD", "TODO", incomplete sections, or vague requirements?
 2. Consistency: do sections contradict each other? Does the architecture match the features?
-3. Scope: focused enough for a single implementation plan, or does it need decomposition?
+3. Scope: focused enough for a single implementation plan, or does it hold several features (see "Epics")?
 4. Ambiguity: could a requirement be read two ways? Pick one and make it explicit.
 
 **User review.** Then:

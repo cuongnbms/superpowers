@@ -1,0 +1,23 @@
+[
+  {
+    "id": 0,
+    "name": "merge-names-next-feature",
+    "skills": [
+      "finishing-a-development-branch"
+    ],
+    "query": "You are in the todo-cli repo at <repo> on branch feat/a. The implementation of docs/superpowers/plans/2026-10-02-sync.md is complete and reviewed. Finish the branch. When you reach the options menu, your human partner's answer is already: 1 (merge locally into main). Carry out the whole session, then end with your final message to your human partner. Set up <repo> with: setup-case.sh epic-a <repo>",
+    "files": [
+      "fixtures/todo-cli",
+      "setup-case.sh",
+      "../../brainstorming/evals/fixtures/epic-todo-everywhere.md"
+    ],
+    "runs": 2,
+    "expected_behavior": [
+      "Runs the test suite (python3 -m unittest) before the menu",
+      "Merges feat/a into main and deletes feat/a after the merged result passes",
+      "The final message names B (Sharing) as the next feature, with its scope taken from the epic",
+      "The final message contains the line: Brainstorm feature B of docs/superpowers/epics/2026-10-01-todo-everywhere.md",
+      "Does not start brainstorming B: no Skill call for brainstorming, no new spec or branch"
+    ]
+  }
+]
