@@ -111,11 +111,11 @@ upfront.
 
 The first write to the repository is the spec on the architectural path and the first code
 edit on the bounded path. The one exception is an epic (see "Epics"): it belongs to no single
-feature, so it is written and committed before Isolate. Everything after the first write (plan, code, fixes) belongs to the same feature,
-and finishing-a-development-branch merges or discards them as one unit. So the workspace is
-chosen before that first write, not at execution time: a spec committed on main stays on main
-if the feature is dropped, and the branch or worktree made later has to be created from a
-HEAD that already carries it.
+feature, so it is written and committed before Isolate. Everything after the first write
+(plan, code, fixes) belongs to the same feature, and finishing-a-development-branch merges or
+discards them as one unit. So the workspace is chosen before that first write, not at
+execution time: a spec committed on main stays on main if the feature is dropped, and the
+branch or worktree made later has to be created from a HEAD that already carries it.
 
 Do not add a separate question for it. Name your choice inside the approval ask you are
 already making, with the alternatives in the same sentence, so a one-word yes covers both:
