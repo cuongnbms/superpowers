@@ -22,11 +22,19 @@ Fork-only. Motivating observation: a real session (`bmx-marine-web`, "mô tả d
 - **Dropped or folded letters and `origin:` hits**, in Step 7 and `epic-format.md`. The next feature skips letters the epic marks dropped or folded, and the "every feature has a spec" case ignores them: such a letter never gets a spec, so it would otherwise be named next and keep the no-prompt case from firing. In a real clone `refs/remotes/origin/HEAD` shortens to `origin`, so the derivation also prints `origin:` hits; one sentence after the command says they duplicate the remote's default branch and are ignored. The command itself is unchanged.
 - Eval (`skills/finishing-a-development-branch/evals`, fixture `todo-cli`, `setup-case.sh`; case 0 merge-names-next-feature): old 3/5, new 5/5 and 5/5. Old merges, tests, deletes `feat/a`, and ends with a merge/test/cleanup summary; it never mentions the epic, names B, or prints the prompt.
 
-### Writing Plans, Using Git Worktrees, README, CONTEXT.md
+### Writing Plans, Using Git Worktrees, README, GLOSSARY.md
 
 - **Writing Plans** Scope Check: "broken into sub-project specs during brainstorming" becomes "split into the features of an epic during brainstorming". **Using Git Worktrees**: one sentence in the Isolate entry point saying the epic is committed on the current branch before Isolate. **README**: the brainstorming and finishing lines in The Basic Workflow mention the epic. No eval.
-- **Terms** (root `CONTEXT.md`): **Epic** (avoid: roadmap, program, breakdown) and **Feature** (avoid: sub-project, story). Azure DevOps ordering Epic > Feature > User Story > Task; Feature rather than Story because a story is sprint-sized while a feature here spans a spec and a multi-task plan, and brainstorming's Workspace section already calls the unit on one branch "the feature".
+- **Terms** (root `GLOSSARY.md`): **Epic** (avoid: roadmap, program, breakdown) and **Feature** (avoid: sub-project, story). Azure DevOps ordering Epic > Feature > User Story > Task; Feature rather than Story because a story is sprint-sized while a feature here spans a spec and a multi-task plan, and brainstorming's Workspace section already calls the unit on one branch "the feature".
 - **Departure from upstream, re-apply on each sync.** Upstream says "sub-project" at the decomposition bullet in `skills/brainstorming/SKILL.md` and in `skills/writing-plans/SKILL.md`'s Scope Check; the fork says "feature" there. A wholesale upstream sync also drops these in-file edits, so re-apply each: in `skills/brainstorming/SKILL.md`, the Epics section, architectural checklist steps 6 and 7 (step 7 carries the spec header), the Workspace section's epic exception sentence, and self-review item 3; in `skills/finishing-a-development-branch/SKILL.md`, Step 3's spec lookup, Step 7, the core-principle line, and the Quick Reference note; the one-liners in writing-plans, using-git-worktrees, and README above. `skills/brainstorming/epic-format.md` is fork-only; keep it.
+
+### Breaking: visual companion removed
+
+- **Brainstorming no longer offers the browser visual companion.** The "Visual companion" section, `visual-companion.md`, the server scripts under `skills/brainstorming/scripts/`, the `tests/brainstorm-server/` suite, and the README telemetry section are gone; the eval assertion that checked the companion was not offered is dropped. Upstream still ships it; do not re-take it on sync.
+
+### Breaking: glossary file renamed to GLOSSARY.md
+
+- **domain-modeling writes `GLOSSARY.md` instead of `CONTEXT.md`**, and its format doc is `GLOSSARY-FORMAT.md`. `CONTEXT-MAP.md` keeps its name because it maps bounded contexts. Skills, evals, fixtures, README and this repo's root glossary follow the rename; older release notes and dated plans/specs keep the old name as history. Projects with an existing `CONTEXT.md` should rename it. Departure from upstream, re-apply on each sync.
 
 ## v6.4.23 (2026-09-27)
 
