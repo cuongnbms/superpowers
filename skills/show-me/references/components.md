@@ -136,6 +136,7 @@ Use it to walk through how code runs. Write one `li` per step in `trace-steps`, 
 The attributes on each `pre`:
 
 - `data-start` is the file line number of the block's first line, so the gutter matches the file.
+- A step's `loc` line is the line its `pre` starts on, the same number as `data-start`, and a step for a function starts its block at the `def` line. The label and the line numbers in the code should agree.
 - `data-hl` is the highlighted lines, counted from 1 within the block, not the file line. `4` is the fourth line of the block. Use commas and ranges for several: `2,5-6`.
 - `data-why` is the sentence shown when the step is selected. Say why the step matters, not what the line does.
 
