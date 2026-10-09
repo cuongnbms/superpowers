@@ -148,7 +148,7 @@ Use it for a point your human partner should not miss. `callout warn` is amber a
 
 ```html
 <div class="callout">
-  <p><strong>Tabs survive restarts.</strong> The server reopens on its old port with its old key.</p>
+  <p><strong>Tabs survive restarts.</strong> The server keeps its key, and its port when that port is still free.</p>
 </div>
 <div class="callout warn">
   <p><strong>Idle shutdown is now four hours.</strong> Open tabs do not count as activity.</p>
@@ -192,5 +192,5 @@ Rules that keep diagrams readable:
 - Keep labels short, two or three words. Move detail to the caption.
 - Quote a label that holds punctuation or brackets: `A["parse(query)"]`.
 - Do not start an edge or node label with a number and a period (`1. đọc`) or with a dash or asterisk and a space. Mermaid reads it as a markdown list and draws "Unsupported markdown: list". Write `đọc (1)` or `bước 1: đọc` instead.
-- To mark the one node that matters, add `class X accent` as the last line. It turns the node amber, and it works in `flowchart` and `graph` only; other diagram types ignore it.
+- To mark the one node that matters, add `class X accent` as the last line. It turns the node amber. Use it only in `flowchart` and `graph`: in other types the line breaks the diagram (a `sequenceDiagram` fails to render, an `erDiagram` draws `class` and `accent` as extra boxes).
 - Do not set colors with `style` or `classDef`. The frame themes every diagram for light and dark.

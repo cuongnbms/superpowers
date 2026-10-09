@@ -19,7 +19,7 @@ python3 <this skill's dir>/scripts/server.py start
 
 When the shell is in a different directory, add `--project-dir <that project's root>`. The session lives in that project, so the screens and the URL stay with the work they describe.
 
-It prints one JSON line. Read `url` and `screen_dir` from it. Running `start` again reuses the live server and returns the same URL, so run it whenever you are unsure the server is up. A stopped server (idle shutdown, or a restart of the machine) comes back the same way, on the same port and key, so the open tab reconnects.
+It prints one JSON line. Read `url` and `screen_dir` from it. Running `start` again reuses the live server and returns the same URL, so run it whenever you are unsure the server is up. A stopped server (idle shutdown, or a restart of the machine) comes back the same way. It keeps its key, and it keeps its port when that port is still free, so the open tab usually reconnects; when the port moved, give your human partner the new URL.
 
 Codex reaps detached processes, so there add `--foreground` and run the command with the harness's background mechanism. Then read the JSON line from the process output.
 
