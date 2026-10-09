@@ -15,7 +15,7 @@ Make sure work lands where your human partner wants it, and make that decision o
 
 ## Two entry points
 
-- **Isolate (Steps 0 and 1):** run right before the first write to the repository. On the architectural path that is the spec file (brainstorming, after the design is approved); on the bounded path it is the first code edit; when a plan arrives from elsewhere it is the plan file. From then on the spec, the plan, and the code ride one branch, and finishing-a-development-branch merges or discards them together. Isolating later leaves the spec and plan committed on the branch you started from, usually main, whether or not the feature ships.
+- **Isolate (Steps 0 and 1):** run right before the first write to the repository. On the architectural path that is the spec file (brainstorming, after the design is approved); on the bounded path it is the first code edit; when a plan arrives from elsewhere it is the plan file. From then on the spec, the plan, and the code ride one branch, and finishing-a-development-branch merges or discards them together. Isolating later leaves the spec and plan committed on the branch you started from, usually main, whether or not the feature ships. When brainstorming splits a request into features, the epic is committed on the current branch before Isolate, since it belongs to no single feature.
 - **Prepare (Steps 2 and 3):** run at execution setup (subagent-driven-development, executing-plans). Installing dependencies and running the baseline suite pays off when code is about to be written, not while the design is still being discussed.
 
 A caller that reaches Prepare without an Isolate decision in this conversation runs Steps 0 and 1 first.
