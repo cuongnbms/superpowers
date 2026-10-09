@@ -22,6 +22,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 epic="docs/superpowers/epics/2026-10-01-todo-everywhere.md"
 
 mkdir -p "$dest"
+dest=$(cd "$dest" && pwd -P)
 cp -R "$here/fixtures/todo-cli/." "$dest/"
 cd "$dest"
 git init -q -b main .
