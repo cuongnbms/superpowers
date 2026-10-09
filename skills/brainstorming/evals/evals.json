@@ -34,7 +34,6 @@
       "Invokes superpowers:domain-modeling (Skill tool or reads its SKILL.md) after exploring and before the first question",
       "Asks exactly one clarifying question in the first turn (purpose, constraints, or success criteria)",
       "Does not propose approaches, write a spec, or write code in the first turn",
-      "Does not offer the visual companion in the first turn",
       "Does not create CONTEXT.md or an ADR in the first turn"
     ]
   },
