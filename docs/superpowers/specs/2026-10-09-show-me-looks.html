@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="vi" data-look="workbench" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>show-me looks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+/* ---------- tokens: one block per look x mode ---------- */
+html[data-look=whiteboard][data-mode=light]{--bg:#FBFBF8;--surface:#FFFFFF;--node:#FFFFFF;--ink:#23262B;--ink-soft:#5D626A;--line:#2B2F36;--rule:#D6D7D1;--accent:#1F5FBF;--accent-2:#CF3A2F;--ok:#2B8A57;--mark:rgba(255,222,64,.55);--code-bg:#F4F5F1}
+html[data-look=whiteboard][data-mode=dark]{--bg:#21302A;--surface:#26372F;--node:#26372F;--ink:#EEEDE3;--ink-soft:#B2BAAE;--line:#E6E4D8;--rule:#3E5047;--accent:#9EC6F7;--accent-2:#F3A19C;--ok:#A3DCB1;--mark:rgba(245,224,138,.28);--code-bg:#1B2722}
+html[data-look=drafting][data-mode=light]{--bg:#DFE4E0;--surface:#F2F4F1;--node:#F2F4F1;--ink:#1B2836;--ink-soft:#56636E;--line:#2B3B4E;--rule:#C3CCC6;--grid:#DCE2DD;--accent:#2D53C4;--accent-2:#C23B2E;--ok:#2D7A55;--mark:rgba(45,83,196,.11);--code-bg:#E9EDEA}
+html[data-look=drafting][data-mode=dark]{--bg:#0B223C;--surface:#103053;--node:#103053;--ink:#E2EBF6;--ink-soft:#9DB2CA;--line:#CCDBEC;--rule:#2C4C72;--grid:rgba(204,219,236,.08);--accent:#8DBFFF;--accent-2:#FF9D87;--ok:#9BE0B4;--mark:rgba(141,191,255,.15);--code-bg:#0D2846}
+html[data-look=workbench][data-mode=light]{--bg:#E9ECF0;--surface:#FFFFFF;--node:#FFFFFF;--ink:#1D232B;--ink-soft:#5E6772;--line:#4A525E;--rule:#D3D8DE;--accent:#A35F00;--accent-2:#2C6BD3;--ok:#2E7D4F;--mark:rgba(240,181,74,.24);--code-bg:#F6F7F9;--chrome:#DCE0E6}
+html[data-look=workbench][data-mode=dark]{--bg:#1B1E23;--surface:#23272E;--node:#2A2F37;--ink:#D8DDE5;--ink-soft:#8B94A2;--line:#AAB3C0;--rule:#343A44;--accent:#F0B54A;--accent-2:#71A5F7;--ok:#8FD19E;--mark:rgba(240,181,74,.15);--code-bg:#1E2228;--chrome:#16191D}
+
+html[data-look=whiteboard]{--font-head:'Kalam',cursive;--font-body:'Atkinson Hyperlegible',system-ui,sans-serif;--font-code:'JetBrains Mono',ui-monospace,monospace;--diagram-font:'Kalam',cursive;--r:255px 14px 225px 14px/14px 225px 14px 255px;--r-sm:120px 8px 110px 8px/8px 110px 8px 120px;--stroke:2px}
+html[data-look=drafting]{--font-head:'Barlow Condensed',sans-serif;--font-body:'Barlow',system-ui,sans-serif;--font-code:'JetBrains Mono',ui-monospace,monospace;--diagram-font:'Barlow',sans-serif;--r:0;--r-sm:0;--stroke:1px}
+html[data-look=workbench]{--font-head:'Geist',system-ui,sans-serif;--font-body:'Geist',system-ui,sans-serif;--font-code:'Geist Mono',ui-monospace,monospace;--diagram-font:'Geist',sans-serif;--r:10px;--r-sm:6px;--stroke:1px}
+html{color-scheme:light}
+html[data-mode=dark]{color-scheme:dark}
+
+/* ---------- base ---------- */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-body);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2{font-family:var(--font-head);margin:0}
+code,pre{font-family:var(--font-code)}
+
+/* ---------- sampler bar (not part of the template) ---------- */
+.sampler{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:10px 16px;background:#3b3f46;color:#f2f3f5;font:13px/1.3 system-ui,sans-serif}
+.sampler strong{font-weight:600}
+.sampler .grp{display:flex;gap:4px;flex-wrap:wrap}
+.sampler button{border:1px solid #6b717b;background:transparent;border-radius:6px;padding:5px 10px;cursor:pointer;color:#f2f3f5}
+.sampler button[aria-pressed=true]{background:#f2f3f5;color:#25282d;border-color:#f2f3f5}
+.sampler .hint{color:#b9bec7}
+
+/* ---------- chrome per look ---------- */
+.chrome,.statusbar,.titleblock,.zones{display:none}
+html[data-look=whiteboard] .chrome-whiteboard{display:flex}
+html[data-look=workbench] .chrome-workbench,html[data-look=workbench] .statusbar{display:flex}
+html[data-look=drafting] .titleblock,html[data-look=drafting] .zones{display:grid}
+
+.live{display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);font-size:13px}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 var(--ok);animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+html.offline .live::before{background:var(--accent-2);animation:none}
+
+.chrome-whiteboard{align-items:baseline;gap:14px;max-width:1120px;margin:0 auto;padding:22px 24px 0}
+.chrome-whiteboard .brand{font:700 26px/1 var(--font-head);color:var(--accent)}
+.chrome-whiteboard .proj{color:var(--ink-soft)}
+.chrome-whiteboard .spacer{flex:1}
+.chrome-whiteboard select{font:inherit;color:var(--ink);background:transparent;border:var(--stroke) solid var(--line);border-radius:var(--r-sm);padding:3px 8px}
+
+.chrome-workbench{background:var(--chrome);border-bottom:1px solid var(--rule);padding:0 12px;overflow-x:auto}
+.chrome-workbench a{display:flex;align-items:center;gap:8px;padding:10px 14px;font:13px/1 var(--font-code);color:var(--ink-soft);text-decoration:none;border-right:1px solid var(--rule);white-space:nowrap}
+.chrome-workbench a.on{background:var(--bg);color:var(--ink);box-shadow:inset 0 2px 0 var(--accent)}
+.statusbar{position:sticky;bottom:0;gap:20px;align-items:center;padding:5px 14px;background:var(--chrome);border-top:1px solid var(--rule);font:12px/1.4 var(--font-code);color:var(--ink-soft);flex-wrap:wrap}
+.statusbar .live{font-size:12px}
+
+/* ---------- sheet ---------- */
+.sheet{position:relative;max-width:1120px;margin:0 auto;padding:28px 24px 64px}
+html[data-look=drafting] .sheet{margin:28px auto;background-color:var(--surface);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;border:1px solid var(--line);outline:1px solid var(--line);outline-offset:-10px;padding:48px 48px 40px}
+.zones{position:absolute;inset:0;pointer-events:none;font:500 11px/1 var(--font-head);color:var(--ink-soft)}
+.zones span{position:absolute}
+.zones .t{top:-1px;transform:translate(-50%,0);padding:0 4px}
+.zones .l{left:-1px;transform:translate(0,-50%);padding:4px 1px}
+
+/* ---------- screen content ---------- */
+.screen h1{font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.01em;max-width:22ch}
+html[data-look=whiteboard] .screen h1{font-weight:700;letter-spacing:0}
+html[data-look=drafting] .screen h1{font-weight:600}
+html[data-look=workbench] .screen h1{font-weight:600;font-size:clamp(24px,3vw,30px);letter-spacing:-.02em}
+.lede{margin:12px 0 0;max-width:62ch;color:var(--ink-soft);font-size:17px}
+.block{margin-top:52px}
+.block>h2{font-size:22px;line-height:1.2;margin-bottom:16px}
+html[data-look=whiteboard] .block>h2{font-weight:700;color:var(--accent);font-size:25px}
+html[data-look=drafting] .block>h2{font-weight:600;display:flex;align-items:baseline;gap:12px}
+html[data-look=drafting] .block>h2 .ref{font:500 13px/1 var(--font-head);color:var(--accent-2);border:1px solid currentColor;padding:3px 6px}
+html[data-look=workbench] .block>h2{font-size:16px;font-weight:600}
+.ref{display:none}
+html[data-look=drafting] .ref{display:inline-block}
+.block>.sub{margin:-8px 0 18px;color:var(--ink-soft);max-width:62ch}
+
+/* ---------- diagram ---------- */
+.diagram{margin:0;padding:22px;overflow-x:auto;border-radius:var(--r)}
+html[data-look=whiteboard] .diagram{padding:6px 0}
+html[data-look=drafting] .diagram{border:1px solid var(--line);background:var(--surface)}
+html[data-look=workbench] .diagram{border:1px solid var(--rule);background:var(--surface)}
+.diagram .mermaid-src{display:none}
+.diagram.failed .mermaid-src{display:block;white-space:pre;font-size:13px;color:var(--ink-soft)}
+.diagram .mermaid-out svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.diagram .node.accent :is(rect,path,polygon){stroke:var(--accent)!important;stroke-width:2.5px!important}
+.diagram .node.accent .nodeLabel{color:var(--accent)!important}
+.diagram figcaption{margin-top:12px;font-size:14px;color:var(--ink-soft)}
+
+/* ---------- compare + mock ---------- */
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:32px}
+.option{margin:0}
+.option figcaption{display:flex;align-items:center;gap:10px;font:600 18px/1.2 var(--font-head);margin-bottom:12px}
+.letter{display:inline-grid;place-items:center;width:28px;height:28px;border:var(--stroke) solid var(--line);border-radius:var(--r-sm);font-size:15px}
+html[data-look=workbench] .letter{border-radius:6px;background:var(--ink);color:var(--surface);border:0;font-size:13px}
+html[data-look=drafting] .letter{border-radius:50%}
+.option .note{margin:12px 0 0;color:var(--ink-soft);font-size:15px;max-width:52ch}
+
+.mock{position:relative;overflow:hidden;border:var(--stroke) solid var(--line);border-radius:var(--r);background:var(--surface);font-size:13px}
+html[data-look=whiteboard] .mock{font-family:var(--font-head);font-size:15px}
+html[data-look=workbench] .mock{border-color:var(--rule)}
+.mock-bar{display:flex;gap:6px;align-items:center;padding:8px 10px;border-bottom:var(--stroke) solid var(--line)}
+html[data-look=workbench] .mock-bar{border-color:var(--rule)}
+.mock-bar i{width:9px;height:9px;border-radius:50%;border:var(--stroke) solid var(--line)}
+.mock-url{margin-left:8px;flex:1;border:1px solid var(--rule);border-radius:999px;padding:2px 10px;color:var(--ink-soft);font-size:12px;font-family:var(--font-code)}
+.mock-body{display:grid;grid-template-columns:140px 1fr;min-height:262px}
+.mock-nav{border-right:var(--stroke) solid var(--rule);padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.mock-nav span{position:relative;padding:6px 8px;border-radius:var(--r-sm);color:var(--ink-soft)}
+.mock-nav .on{background:var(--mark);color:var(--ink);font-weight:700}
+.mock-main{display:flex;flex-direction:column}
+.mock-tabs{display:flex;border-bottom:var(--stroke) solid var(--rule);padding:0 10px}
+.mock-tabs span{position:relative;padding:9px 9px 8px;color:var(--ink-soft);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.mock-tabs .on{color:var(--ink);border-bottom-color:var(--accent);font-weight:700}
+.mock-form{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:3px}
+html[data-look=whiteboard] .field label{font-size:14px}
+.input{height:30px;border:var(--stroke) solid var(--rule);border-radius:var(--r-sm);padding:5px 8px;color:var(--ink)}
+html[data-look=whiteboard] .input{border-color:var(--line)}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.toggle{flex:none;width:34px;height:18px;border-radius:999px;background:var(--accent);position:relative}
+.toggle::after{content:"";position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--surface)}
+.mock-actions{display:flex;justify-content:flex-end;padding:10px 16px;border-top:var(--stroke) solid var(--rule)}
+.btn{position:relative;background:var(--accent);color:var(--surface);border-radius:var(--r-sm);padding:6px 12px;font-weight:700;font-size:13px}
+html[data-look=whiteboard] .btn{font-size:15px}
+
+.pin{position:absolute;z-index:2;display:grid;place-items:center;width:22px;height:22px;font:700 12px/1 var(--font-body);color:var(--surface);background:var(--accent-2);border-radius:50%}
+html[data-look=whiteboard] .pin{background:transparent;color:var(--accent-2);border:2px solid var(--accent-2);border-radius:var(--r-sm);font:700 14px/1 var(--font-head);width:23px;height:23px}
+html[data-look=drafting] .pin{background:var(--surface);color:var(--accent-2);border:1px solid var(--accent-2);font-family:var(--font-head)}
+.pin.r{right:-13px;top:-12px}
+.legend{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:8px;max-width:62ch}
+.legend li{display:flex;gap:10px;align-items:baseline}
+.legend .pin{position:static;flex:none}
+
+/* ---------- data tree ---------- */
+.tree{border:var(--stroke) solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+html[data-look=workbench] .tree{border-color:var(--rule)}
+.tree-head{display:flex;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:var(--stroke) solid var(--line);font:500 14px/1.3 var(--font-code)}
+html[data-look=workbench] .tree-head{border-color:var(--rule);background:var(--code-bg)}
+html[data-look=whiteboard] .tree-head{font-family:var(--font-head);font-size:18px;font-weight:700}
+.tree-head span:last-child{color:var(--ink-soft);font-family:var(--font-body);font-weight:400;font-size:13px}
+.row{display:grid;grid-template-columns:minmax(90px,140px) 56px minmax(0,1.3fr) minmax(0,1fr);gap:14px;align-items:baseline;padding:9px 16px;border-top:1px solid var(--rule)}
+.row:first-of-type{border-top:0}
+.row .k{font:500 14px/1.4 var(--font-code)}
+.row .k::before{content:"├─ ";color:var(--ink-soft)}
+.row:last-child .k::before{content:"└─ "}
+.row .t{font:500 11px/1 var(--font-code);color:var(--accent);border:1px solid currentColor;border-radius:4px;padding:3px 5px;justify-self:start}
+.row .v{font:13px/1.4 var(--font-code);overflow-wrap:anywhere}
+.row .n{color:var(--ink-soft);font-size:14px}
+html[data-look=whiteboard] .row .n{font-family:var(--font-head);color:var(--accent-2);font-size:16px}
+@media (max-width:680px){.row{grid-template-columns:1fr auto}.row .v,.row .n{grid-column:1/-1}}
+
+/* ---------- code trace ---------- */
+.trace{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);border:var(--stroke) solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+html[data-look=workbench] .trace{border-color:var(--rule)}
+@media (max-width:760px){.trace{grid-template-columns:1fr}}
+.trace-steps{list-style:none;margin:0;padding:8px;border-right:var(--stroke) solid var(--rule);counter-reset:s}
+@media (max-width:760px){.trace-steps{border-right:0;border-bottom:var(--stroke) solid var(--rule)}}
+.trace-steps button{counter-increment:s;display:grid;grid-template-columns:24px 1fr;gap:2px 10px;width:100%;text-align:left;background:transparent;border:0;border-radius:var(--r-sm);padding:9px 10px;cursor:pointer}
+.trace-steps button::before{content:counter(s);grid-row:span 2;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);font:600 12px/1 var(--font-body);color:var(--ink-soft)}
+.trace-steps .fn{font:500 14px/1.3 var(--font-code)}
+.trace-steps .loc{font:12px/1.3 var(--font-code);color:var(--ink-soft)}
+.trace-steps button[aria-current=step]{background:var(--mark)}
+.trace-steps button[aria-current=step]::before{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+html[data-look=whiteboard] .trace-steps button[aria-current=step]::before{border-radius:var(--r-sm)}
+.trace-main{display:flex;flex-direction:column;min-width:0}
+.trace-why{padding:14px 18px 12px;border-bottom:1px solid var(--rule);min-height:64px}
+html[data-look=whiteboard] .trace-why{font-family:var(--font-head);font-size:18px}
+.trace-nav{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-soft)}
+.trace-nav .file{font-family:var(--font-code);margin-right:auto}
+.trace-nav button{border:1px solid var(--rule);background:var(--surface);border-radius:var(--r-sm);padding:4px 10px;cursor:pointer}
+.trace-nav button:disabled{opacity:.4;cursor:default}
+.trace pre{margin:0;flex:1;padding:12px 0;background:var(--code-bg);overflow-x:auto;font-size:13px;line-height:1.65}
+.trace pre[hidden]{display:none}
+.ln{display:block;padding:0 18px 0 0;white-space:pre}
+.ln::before{content:attr(data-n);display:inline-block;width:46px;padding-right:14px;text-align:right;color:var(--ink-soft);opacity:.6}
+.ln.hl{background:var(--mark);box-shadow:inset 3px 0 0 var(--accent)}
+.hljs-keyword,.hljs-built_in,.hljs-literal{color:var(--accent-2)}
+.hljs-string{color:var(--ok)}
+.hljs-title{color:var(--accent)}
+.hljs-number{color:var(--accent-2)}
+.hljs-comment{color:var(--ink-soft);font-style:italic}
+
+/* ---------- drafting title block ---------- */
+.titleblock{margin:56px 0 0 auto;width:min(100%,420px);grid-template-columns:auto 1fr;border:1px solid var(--line);background:var(--surface);font-size:13px}
+.titleblock>*{padding:7px 10px;border-top:1px solid var(--line)}
+.titleblock>:nth-child(-n+2){border-top:0}
+.titleblock dt{border-right:1px solid var(--line);color:var(--ink-soft);font:500 12px/1.3 var(--font-head)}
+.titleblock dd{margin:0;font-family:var(--font-code);font-size:12.5px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.titleblock dd.big{font:600 20px/1.15 var(--font-head)}
+.titleblock a{color:var(--accent)}
+
+/* ---------- offline banner ---------- */
+.offline-banner{display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:30;padding:10px 16px;border-radius:var(--r-sm);background:var(--ink);color:var(--surface);font-size:14px;max-width:calc(100% - 32px)}
+html.offline .offline-banner{display:block}
+
+@media (max-width:600px){
+  .sheet{padding:20px 16px 56px}
+  html[data-look=drafting] .sheet{margin:12px;padding:32px 22px 28px}
+  .mock-body{grid-template-columns:1fr}
+  .mock-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:var(--stroke) solid var(--rule)}
+  .chrome-whiteboard{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){.live::before{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="sampler" role="region" aria-label="Bộ chọn mẫu, không thuộc template">
+  <strong>Mẫu giao diện show-me</strong>
+  <div class="grp" id="looks" role="group" aria-label="Hướng giao diện">
+    <button data-look="whiteboard">A. Bảng trắng</button>
+    <button data-look="drafting">B. Bản vẽ kỹ thuật</button>
+    <button data-look="workbench">C. Bàn làm việc</button>
+  </div>
+  <div class="grp" id="modes" role="group" aria-label="Chế độ màu">
+    <button data-mode="light">Sáng</button>
+    <button data-mode="dark">Tối</button>
+  </div>
+  <button id="offline" aria-pressed="false">Giả lập server dừng</button>
+  <span class="hint">Màn hình thật thường chỉ có một trong bốn phần dưới đây.</span>
+</div>
+
+<header class="chrome chrome-whiteboard">
+  <span class="brand">show-me</span>
+  <span class="proj">superpowers</span>
+  <span class="spacer"></span>
+  <select aria-label="Màn hình">
+    <option>settings-layout.html</option>
+    <option>settings-layout-v2.html</option>
+    <option selected>cach-man-hinh-den-tab.html</option>
+  </select>
+  <span class="live">live</span>
+</header>
+
+<header class="chrome chrome-workbench">
+  <a href="#">settings-layout.html</a>
+  <a href="#">settings-layout-v2.html</a>
+  <a href="#" class="on" aria-current="page">cach-man-hinh-den-tab.html</a>
+</header>
+
+<div class="sheet">
+  <div class="zones" aria-hidden="true">
+    <span class="t" style="left:20%">1</span><span class="t" style="left:40%">2</span><span class="t" style="left:60%">3</span><span class="t" style="left:80%">4</span>
+    <span class="l" style="top:20%">A</span><span class="l" style="top:45%">B</span><span class="l" style="top:70%">C</span><span class="l" style="top:92%">D</span>
+  </div>
+
+  <main class="screen">
+    <h1>Cách một màn hình đến được tab của bạn</h1>
+    <p class="lede">Agent ghi một file vào <code>screens/</code>. Tab đang mở hỏi server mỗi giây và tự chuyển sang màn hình mới, bạn không phải bấm gì.</p>
+
+    <section class="block">
+      <h2><span class="ref">Chi tiết 1</span>Luồng đẩy màn hình</h2>
+      <figure class="diagram">
+<pre class="mermaid-src">flowchart LR
+  A[Agent] -->|ghi fragment| S[(screens/)]
+  S -->|liệt kê theo mtime| V[server.py]
+  T[Tab trình duyệt] -->|GET /api/screens mỗi 1s| V
+  V -->|có màn hình mới| T
+  T -->|reload| F[Frame + fragment]
+  class T accent</pre>
+        <div class="mermaid-out"></div>
+      </figure>
+    </section>
+
+    <section class="block">
+      <h2><span class="ref">Chi tiết 2</span>Trang cài đặt: sidebar hay tab ngang?</h2>
+      <div class="compare">
+        <figure class="option">
+          <figcaption><span class="letter">A</span>Sidebar bên trái</figcaption>
+          <div class="mock">
+            <div class="mock-bar"><i></i><i></i><i></i><span class="mock-url">app.local/settings/profile</span></div>
+            <div class="mock-body">
+              <nav class="mock-nav">
+                <span class="on">Hồ sơ<b class="pin r">1</b></span><span>Bảo mật</span><span>Thông báo</span><span>Thanh toán</span><span>Nhóm</span><span>API</span>
+              </nav>
+              <div class="mock-main">
+                <div class="mock-form">
+                  <div class="field"><label>Tên hiển thị</label><div class="input">Cường Nguyễn</div></div>
+                  <div class="field"><label>Email</label><div class="input">cuong@example.com</div></div>
+                  <div class="toggle-row"><span>Nhận email tóm tắt hằng tuần</span><span class="toggle"></span></div>
+                </div>
+                <div class="mock-actions"><span class="btn">Lưu thay đổi<b class="pin r">2</b></span></div>
+              </div>
+            </div>
+          </div>
+          <p class="note">Hợp khi có hơn 6 mục và người dùng hay nhảy qua lại. Tốn khoảng 140px chiều ngang.</p>
+        </figure>
+        <figure class="option">
+          <figcaption><span class="letter">B</span>Tab ngang</figcaption>
+          <div class="mock">
+            <div class="mock-bar"><i></i><i></i><i></i><span class="mock-url">app.local/settings/profile</span></div>
+            <div class="mock-main" style="min-height:262px">
+              <div class="mock-tabs"><span class="on">Hồ sơ<b class="pin r">1</b></span><span>Bảo mật</span><span>Thông báo</span><span>Thanh toán</span><span>Nhóm</span></div>
+              <div class="mock-form">
+                <div class="field"><label>Tên hiển thị</label><div class="input">Cường Nguyễn</div></div>
+                <div class="field"><label>Email</label><div class="input">cuong@example.com</div></div>
+                <div class="toggle-row"><span>Nhận email tóm tắt hằng tuần</span><span class="toggle"></span></div>
+              </div>
+              <div class="mock-actions"><span class="btn">Lưu thay đổi<b class="pin r">2</b></span></div>
+            </div>
+          </div>
+          <p class="note">Gọn trên màn hẹp, nhưng quá 5 tab thì phải cuộn ngang và mục cuối bị che.</p>
+        </figure>
+      </div>
+      <ol class="legend">
+        <li><b class="pin">1</b>Mục đang chọn luôn nhìn thấy, kể cả khi danh sách dài.</li>
+        <li><b class="pin">2</b>Nút lưu dính ở đáy form, không trôi theo nội dung.</li>
+      </ol>
+    </section>
+
+    <section class="block">
+      <h2><span class="ref">Chi tiết 3</span>server.json</h2>
+      <p class="sub">Script ghi file này khi khởi động server; lần <code>start</code> sau đọc lại để dùng chung server hoặc mở lại đúng port cũ.</p>
+      <div class="tree">
+        <div class="tree-head"><span>.superpowers/show-me/server.json</span><span>5 trường</span></div>
+        <div class="row"><span class="k">pid</span><span class="t">int</span><span class="v">48213</span><span class="n">để lệnh stop biết tắt process nào</span></div>
+        <div class="row"><span class="k">port</span><span class="t">int</span><span class="v">52341</span><span class="n">giữ lại khi restart, tab tự nối lại</span></div>
+        <div class="row"><span class="k">url</span><span class="t">str</span><span class="v">http://192.168.1.89:52341/?key=f3a9…</span><span class="n">host lấy từ SSH_CONNECTION</span></div>
+        <div class="row"><span class="k">key</span><span class="t">str</span><span class="v">"f3a9c1…"</span><span class="n">trình duyệt lưu vào cookie sau lần mở đầu</span></div>
+        <div class="row"><span class="k">started_at</span><span class="t">str</span><span class="v">2026-10-09T15:42:10+07:00</span><span class="n">mốc tính 4 giờ tự tắt</span></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2><span class="ref">Chi tiết 4</span>GET /api/screens đi qua đâu</h2>
+      <div class="trace" id="trace">
+        <ol class="trace-steps">
+          <li><button data-i="0"><span class="fn">do_GET</span><span class="loc">server.py:88</span></button></li>
+          <li><button data-i="1"><span class="fn">check_key</span><span class="loc">server.py:41</span></button></li>
+          <li><button data-i="2"><span class="fn">list_screens</span><span class="loc">server.py:57</span></button></li>
+          <li><button data-i="3"><span class="fn">send_json</span><span class="loc">server.py:102</span></button></li>
+        </ol>
+        <div class="trace-main">
+          <div class="trace-why" aria-live="polite"></div>
+<pre data-i="0" data-start="88" data-hl="4" data-why="Request vào handler. Mọi đường dẫn đều phải qua kiểm tra key trước khi được phân luồng."><code>def do_GET(self):
+    path, _, query = self.path.partition("?")
+    if not check_key(self, query):
+        return self.send_error(403)
+    if path == "/api/screens":
+        return send_json(self, list_screens(SCREENS))</code></pre>
+<pre data-i="1" data-start="41" data-hl="3" data-why="Key lấy từ query trước, không có thì đọc cookie. So sánh hằng thời gian để không lộ key qua độ trễ."><code>def check_key(req, query):
+    given = parse_qs(query).get("key", [None])[0]
+    given = given or cookie_value(req, "show_me_key")
+    return hmac.compare_digest(given or "", KEY)</code></pre>
+<pre data-i="2" data-start="57" data-hl="3" data-why="Sắp xếp theo thời điểm sửa, nên file ghi sau cùng luôn là màn hình mới nhất, kể cả khi tên trùng thứ tự chữ cái."><code>def list_screens(root):
+    files = [p for p in root.glob("*.html") if not p.name.startswith(".")]
+    files.sort(key=lambda p: p.stat().st_mtime)
+    return [{"name": p.name, "mtime": p.stat().st_mtime} for p in files]</code></pre>
+<pre data-i="3" data-start="102" data-hl="2" data-why="Tab so sánh trường newest với màn hình đang hiển thị. Khác thì reload."><code>def send_json(req, screens):
+    newest = screens[-1]["name"] if screens else None
+    body = json.dumps({"screens": screens, "newest": newest})
+    req.send_response(200)
+    req.send_header("Content-Type", "application/json")
+    req.end_headers()
+    req.wfile.write(body.encode())</code></pre>
+          <div class="trace-nav">
+            <span class="file">server.py</span>
+            <button data-move="-1">Bước trước</button>
+            <span class="count"></span>
+            <button data-move="1">Bước sau</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dl class="titleblock">
+    <dt>Dự án</dt><dd>superpowers</dd>
+    <dt>Màn hình</dt><dd class="big">Cách một màn hình đến được tab của bạn</dd>
+    <dt>File</dt><dd>cach-man-hinh-den-tab.html</dd>
+    <dt>Bản</dt><dd><span>3 / 3</span><a href="#">← bản trước</a></dd>
+    <dt>Trạng thái</dt><dd><span class="live">đang theo dõi</span><span>15:42</span></dd>
+  </dl>
+</div>
+
+<footer class="statusbar">
+  <span class="live">Live</span>
+  <span>192.168.1.89:52341</span>
+  <span>3 màn hình</span>
+  <span>superpowers</span>
+</footer>
+
+<div class="offline-banner" role="status">Server đã dừng. Tab sẽ tự nối lại khi agent chạy <code>start</code>.</div>
+
+<script>
+// trace stepping + syntax highlight
+(function(){
+  const trace=document.getElementById('trace');
+  const pres=[...trace.querySelectorAll('pre')];
+  pres.forEach(pre=>{
+    const code=pre.querySelector('code');
+    const src=code.textContent;
+    const html=window.hljs?hljs.highlight(src,{language:'python'}).value:src.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const start=+pre.dataset.start, hl=+pre.dataset.hl;
+    code.innerHTML=html.split('\n').map((l,i)=>`<span class="ln${i+1===hl?' hl':''}" data-n="${start+i}">${l||' '}</span>`).join('');
+  });
+  const steps=[...trace.querySelectorAll('.trace-steps button')];
+  const why=trace.querySelector('.trace-why'), count=trace.querySelector('.count');
+  const [prev,next]=trace.querySelectorAll('.trace-nav button');
+  let cur=0;
+  function show(i){
+    cur=Math.max(0,Math.min(steps.length-1,i));
+    steps.forEach((b,j)=>{ if(j===cur) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); });
+    pres.forEach((p,j)=>p.hidden=j!==cur);
+    why.textContent=pres[cur].dataset.why;
+    count.textContent=`${cur+1} / ${steps.length}`;
+    prev.disabled=cur===0; next.disabled=cur===steps.length-1;
+  }
+  steps.forEach((b,j)=>b.addEventListener('click',()=>show(j)));
+  trace.querySelectorAll('[data-move]').forEach(b=>b.addEventListener('click',()=>show(cur+ +b.dataset.move)));
+  trace.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'||e.key==='ArrowDown'){show(cur+1);e.preventDefault()} if(e.key==='ArrowLeft'||e.key==='ArrowUp'){show(cur-1);e.preventDefault()} });
+  show(0);
+})();
+</script>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs';
+const root=document.documentElement;
+async function renderDiagrams(){
+  const cs=getComputedStyle(root), v=n=>cs.getPropertyValue(n).trim();
+  const font=v('--diagram-font');
+  mermaid.initialize({startOnLoad:false,theme:'base',look:root.dataset.look==='whiteboard'?'handDrawn':'classic',handDrawnSeed:7,fontFamily:font,
+    flowchart:{curve:root.dataset.look==='drafting'?'linear':'basis',padding:14,nodeSpacing:44,rankSpacing:54},
+    themeVariables:{fontFamily:font,fontSize:root.dataset.look==='whiteboard'?'18px':'15px',background:v('--surface'),primaryColor:v('--node'),primaryTextColor:v('--ink'),primaryBorderColor:v('--line'),lineColor:v('--line'),secondaryColor:v('--node'),tertiaryColor:v('--node'),edgeLabelBackground:v('--bg'),nodeTextColor:v('--ink'),textColor:v('--ink')}});
+  for(const fig of document.querySelectorAll('.diagram')){
+    const src=fig.querySelector('.mermaid-src').textContent;
+    try{const {svg}=await mermaid.render('d'+Math.random().toString(36).slice(2),src);fig.querySelector('.mermaid-out').innerHTML=svg;fig.classList.remove('failed')}
+    catch(e){console.error(e);fig.classList.add('failed')}
+  }
+}
+function sync(){
+  document.querySelectorAll('#looks button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.look===root.dataset.look));
+  document.querySelectorAll('#modes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===root.dataset.mode));
+}
+const params=new URLSearchParams(location.search);
+root.dataset.look=params.get('look')||'workbench';
+root.dataset.mode=params.get('mode')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+sync();
+document.querySelectorAll('#looks button').forEach(b=>b.addEventListener('click',()=>{root.dataset.look=b.dataset.look;sync();renderDiagrams()}));
+document.querySelectorAll('#modes button').forEach(b=>b.addEventListener('click',()=>{root.dataset.mode=b.dataset.mode;sync();renderDiagrams()}));
+const off=document.getElementById('offline');
+off.addEventListener('click',()=>{const on=root.classList.toggle('offline');off.setAttribute('aria-pressed',on)});
+await document.fonts.ready;
+renderDiagrams();
+</script>
+</body>
+</html>
