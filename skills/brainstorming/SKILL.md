@@ -104,9 +104,6 @@ Announce the path, create a task per item, complete them in order.
 10. Invoke the writing-plans skill. It is the only skill that follows an architectural
     brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
 
-The visual companion (last section) is offered just-in-time on the architectural path, never
-upfront.
-
 ## Workspace
 
 The first write to the repository is the spec on the architectural path and the first code
@@ -234,28 +231,3 @@ domain-modeling resolved during the conversation in the same pass, then commit i
 
 Wait. If they request changes, make them and re-run the self-review. Once approved, invoke
 writing-plans.
-
-## Visual companion
-
-A browser-based tool for mockups, diagrams, and side-by-side visual options. It is a tool, not
-a mode: accepting it means it is available for questions that benefit from being shown.
-
-**Offer it just-in-time, never upfront.** The first time a question would be clearer shown than
-described (a real mockup, layout, or diagram question, not merely a UI topic), offer it in its
-own message with nothing else in it, and wait:
-
-> "This next part might be easier if I show you — I can put together mockups, diagrams, and
-> comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to?
-> I'll open it for you."
-
-If they decline, continue text-only and do not offer again unless they raise it. If no visual
-question ever arises, never offer it.
-
-**Per question, decide browser or terminal.** The test: would the user understand this better
-by seeing it than reading it? Mockups, wireframes, layout comparisons, and architecture
-diagrams go to the browser. Requirements, conceptual choices, trade-off lists, and scope
-decisions stay in the terminal. "Which wizard layout works better?" is visual; "what does
-personality mean here?" is not.
-
-If they accept, read `visual-companion.md` in this skill's directory for the server workflow,
-screen authoring, and feedback collection, then start the server with `--open`.
