@@ -264,7 +264,11 @@ def _read_info(session: Path) -> Optional[Dict[str, Any]]:
 
 def _write_info(session: Path, info: Dict[str, Any]) -> None:
     tmp = session / ("server.json.%d.tmp" % os.getpid())
-    tmp.write_text(json.dumps(info), encoding="utf-8")
+    # The file holds the key, so only the owner may read it (devtuf is shared).
+    fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write(json.dumps(info))
+    os.chmod(str(tmp), 0o600)
     os.replace(str(tmp), str(session / "server.json"))
 
 
@@ -383,12 +387,16 @@ def _serve(args: argparse.Namespace, foreground: bool) -> int:
             interval = min(30.0, max(0.2, idle_seconds / 4))
             while True:
                 time.sleep(interval)
-                screens_now = list_screens(screens)
-                last = max([started] + [s["mtime"] for s in screens_now])
-                if time.time() - last >= idle_seconds:
-                    _log(session, "idle for %.1f minutes, stopping" % (args.idle_minutes,))
-                    httpd.shutdown()
-                    return
+                try:
+                    screens_now = list_screens(screens)
+                    last = max([started] + [s["mtime"] for s in screens_now])
+                    if time.time() - last >= idle_seconds:
+                        _log(session, "idle for %.1f minutes, stopping" % (args.idle_minutes,))
+                        httpd.shutdown()
+                        return
+                except Exception:
+                    # A dead watcher would leave the server running forever, so log and keep watching.
+                    _log(session, traceback.format_exc())
         threading.Thread(target=watch, daemon=True).start()
 
     try:

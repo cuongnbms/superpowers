@@ -77,6 +77,10 @@ class CliTest(unittest.TestCase):
         self.assertEqual(out["url"], "http://localhost:%d/?key=%s" % (out["port"], info["key"]))
         self.assertEqual(fetch(out["url"]), 200)
 
+    def test_server_json_is_private_to_its_owner(self):
+        self.start()
+        self.assertEqual((self.session / "server.json").stat().st_mode & 0o777, 0o600)
+
     def test_start_twice_reuses_the_running_server(self):
         first = self.start()
         second = self.start()
