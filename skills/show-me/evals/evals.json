@@ -1,0 +1,94 @@
+[
+  {
+    "id": 0,
+    "name": "draw-architecture",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Vẽ ra cho tôi xem todo-cli ở <repo> được tổ chức thế nào: các lệnh, các hàm và file todo.json liên quan với nhau ra sao.",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Runs `scripts/server.py start` before writing the screen",
+      "The session dir start reported is `<repo>/.superpowers/show-me/`",
+      "Writes one new `.html` file with a descriptive name in the `screen_dir` that start reported",
+      "The file is a fragment (no `<!doctype`/`<html`) with a `figure.diagram` containing `pre.mermaid`",
+      "The diagram names `add`, `list`, `done`, `load`, `save` and `todo.json`",
+      "The reply contains the full URL including `?key=`, and that URL returns 200 with the screen",
+      "The reply describes the screen in at most two sentences and ends the turn without further questions",
+      "`git status` in `<repo>` is clean"
+    ]
+  },
+  {
+    "id": 1,
+    "name": "mock-two-layouts",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Mock up 2 layout cho một trang web xem danh sách todo của todo-cli ở <repo>: một kiểu bảng, một kiểu thẻ. Cho tôi xem.",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Runs start before writing",
+      "The session dir start reported is `<repo>/.superpowers/show-me/`",
+      "One fragment with `div.compare` holding two `figure.option`, letters A and B",
+      "Each option uses mock kit classes (`mock` plus at least two of `mock-bar`, `mock-body`, `mock-nav`, `mock-tabs`, `mock-form`, `btn`)",
+      "Uses item fields from `todo.py` (`text`, `done`, `#id`) rather than lorem ipsum",
+      "Full URL with `?key=` in the reply, URL returns 200",
+      "Ends the turn",
+      "`git status` clean"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "trace-done",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Vẽ cho tôi xem lệnh todo done 3 chạy qua những hàm nào trong todo-cli ở <repo>.",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Runs start before writing",
+      "The session dir start reported is `<repo>/.superpowers/show-me/`",
+      "One fragment with `div.trace` whose `ol.trace-steps` lists `main`, `cmd_done`, `load`, `save` in call order",
+      "Each step has a `pre` with `data-start` equal to that function's first line in `todo.py`, a `data-hl` inside the block, a `data-why`, and code copied from `todo.py`",
+      "Full URL with `?key=`, URL returns 200",
+      "Ends the turn",
+      "`git status` clean"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "no-trigger-design-question",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Nếu làm trang web cho todo-cli ở <repo>, trang settings nên dùng sidebar hay tab ngang?",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Answers in text",
+      "Does not load show-me (no Skill call for it, no `server.py` run, no `.superpowers/show-me` dir)"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "no-trigger-excalidraw-file",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Vẽ sơ đồ kiến trúc của todo-cli ở <repo> rồi lưu thành file todo-architecture.excalidraw.",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli"
+    ],
+    "expected_behavior": [
+      "Does not load show-me",
+      "Does not run `server.py`"
+    ]
+  }
+]
