@@ -99,7 +99,7 @@ Use pins to point at the parts of a mock that differ between options, then expla
 
 ## tree
 
-Use it for a data structure, a config file, or a directory layout. Each `row` has four cells: `k` the key or name, `t` the type, `v` the value, `n` a note. `tree-head` holds a title and a short meta line. Add `data-depth` (0, 1, 2) to indent nested rows; a row without it sits at the top level.
+Use it for a data structure, a config file, or a directory layout. Each `row` has four cells: `k` the key or name, `t` the type, `v` the value, `n` a note. `tree-head` holds a title and a short meta line. Add `data-depth` (0 to 3) to indent nested rows; a row without it sits at the top level.
 
 ```html
 <div class="tree">
