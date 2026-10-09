@@ -167,5 +167,70 @@
       "Asks no separate question about the workspace",
       "Edits no files and makes no commit this turn"
     ]
+  },
+  {
+    "id": 9,
+    "name": "decompose-names-epic",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/split-proposal-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (edit files, run git, if you would). Set up <repo> with: setup-epic-case.sh split <repo>",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/split-proposal-transcript.md",
+      "setup-epic-case.sh"
+    ],
+    "runs": 2,
+    "expected_behavior": [
+      "Proposes splitting the request into separate features (sync, sharing, phone page or equivalent), with an order or dependencies",
+      "The approval ask names an epic file under docs/superpowers/epics/ and the branch main it will be committed on, in the same ask",
+      "Writes no file and makes no commit this turn",
+      "Asks no question besides the approval of the split"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "decompose-approved-writes-epic",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/split-approved-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (edit files, run git, if you would). Set up <repo> with: setup-epic-case.sh split <repo>",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/split-approved-transcript.md",
+      "setup-epic-case.sh"
+    ],
+    "runs": 2,
+    "expected_behavior": [
+      "Writes docs/superpowers/epics/2026-10-09-todo-everywhere.md with the headings ## Findings, ## Shared decisions, ## Features",
+      "Findings records the offline id collision (len(items) + 1); Shared decisions records stdlib only and UUID ids",
+      "Each of A, B, C has Scope:, Depends on:, and Decide when brainstormed: lines, carrying the transcript's deferred questions (A conflict rule; B link token or account, read-only; C served from server.py or static, LAN auth)",
+      "The epic has no dates per feature, no estimates, and no status column or status field",
+      "Exactly one new commit on main, touching only the epic file; no feature branch is created",
+      "Writes no spec file this turn",
+      "Continues feature A's brainstorm with one question"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "continue-epic",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Brainstorm the next feature of @docs/superpowers/epics/2026-10-01-todo-everywhere.md in the todo-cli repo at <repo>. Produce the next assistant turn, acting as in a real session (read files, run git, edit files if you would). Set up <repo> with: setup-epic-case.sh continue <repo>",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/epic-todo-everywhere.md",
+      "setup-epic-case.sh"
+    ],
+    "runs": 2,
+    "expected_behavior": [
+      "Reports A as on main (merged), not as on feat/a",
+      "Reports B as in progress on feat/b",
+      "Takes C (Phone web page) as the feature to brainstorm",
+      "Its starting brief carries C's deferred questions (served from server.py or a static file; LAN authentication) and the shared decisions",
+      "Does not re-split the request or redo the survey the Findings record",
+      "Asks one question; writes no file, makes no commit, creates no branch"
+    ]
   }
 ]
