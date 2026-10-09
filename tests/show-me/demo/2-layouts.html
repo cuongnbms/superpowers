@@ -1,0 +1,46 @@
+<h1>Settings page: sidebar or horizontal tabs?</h1>
+<p>Both layouts hold the same profile form. The pins mark the two things that behave differently.</p>
+
+<div class="compare">
+  <figure class="option">
+    <figcaption><span class="letter">A</span>Sidebar on the left</figcaption>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="mock-url">app.local/settings/profile</span></div>
+      <div class="mock-body">
+        <nav class="mock-nav">
+          <span class="on">Profile<b class="pin">1</b></span><span>Security</span><span>Notifications</span><span>Billing</span><span>Team</span><span>API</span>
+        </nav>
+        <div class="mock-main">
+          <div class="mock-form">
+            <div class="field"><label>Display name</label><div class="input">Linh Tran</div></div>
+            <div class="field"><label>Email</label><div class="input">linh@example.com</div></div>
+            <div><span>Send me a weekly summary</span><span class="toggle on"></span></div>
+          </div>
+          <div class="mock-actions"><span class="btn">Save changes<b class="pin">2</b></span></div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Fits more than six sections and fast jumping between them. Costs about 140px of width.</p>
+  </figure>
+  <figure class="option">
+    <figcaption><span class="letter">B</span>Horizontal tabs</figcaption>
+    <div class="mock">
+      <div class="mock-bar"><i></i><i></i><i></i><span class="mock-url">app.local/settings/profile</span></div>
+      <div class="mock-main" style="min-height:262px">
+        <div class="mock-tabs"><span class="on">Profile<b class="pin">1</b></span><span>Security</span><span>Notifications</span><span>Billing</span><span>Team</span></div>
+        <div class="mock-form">
+          <div class="field"><label>Display name</label><div class="input">Linh Tran</div></div>
+          <div class="field"><label>Email</label><div class="input">linh@example.com</div></div>
+          <div><span>Send me a weekly summary</span><span class="toggle on"></span></div>
+        </div>
+        <div class="mock-actions"><span class="btn">Save changes<b class="pin">2</b></span></div>
+      </div>
+    </div>
+    <p class="note">Compact on narrow screens. Past five tabs the last ones scroll out of sight.</p>
+  </figure>
+</div>
+
+<ol class="legend">
+  <li><b class="pin">1</b>The current section stays visible however long the list grows.</li>
+  <li><b class="pin">2</b>Save sticks to the bottom of the form instead of scrolling away.</li>
+</ol>

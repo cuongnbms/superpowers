@@ -1,0 +1,33 @@
+<h1>Where GET /api/screens goes</h1>
+<p>Step through the handler with the buttons or the arrow keys. Each step shows the code and why it matters.</p>
+
+<div class="trace">
+  <ol class="trace-steps">
+    <li><span class="fn">do_GET</span><span class="loc">server.py:88</span></li>
+    <li><span class="fn">check_key</span><span class="loc">server.py:41</span></li>
+    <li><span class="fn">list_screens</span><span class="loc">server.py:57</span></li>
+    <li><span class="fn">send_json</span><span class="loc">server.py:102</span></li>
+  </ol>
+<pre data-start="88" data-hl="4" data-why="Every request enters here. The key check runs before any routing, so an unknown visitor never reaches a handler."><code class="language-python">def do_GET(self):
+    path, _, query = self.path.partition("?")
+    path = unquote(path)
+    if not check_key(self, query):
+        return self.send_error(403)
+    if path == "/api/screens":
+        return send_json(self, list_screens(SCREENS))</code></pre>
+<pre data-start="41" data-hl="3-4" data-why="The key comes from the query first, then the cookie. compare_digest takes the same time however many characters match, so response timing leaks nothing."><code class="language-python">def check_key(req, query):
+    given = parse_qs(query).get("key", [None])[0]
+    given = given or cookie_value(req, "show_me_key")
+    return hmac.compare_digest(given or "", KEY)</code></pre>
+<pre data-start="57" data-hl="3" data-why="Sorting by modification time makes the file written last the newest screen, even when its name sorts earlier."><code class="language-python">def list_screens(root):
+    files = [p for p in root.glob("*.html") if not p.name.startswith(".")]
+    files.sort(key=lambda p: (p.stat().st_mtime, p.name))
+    return [{"name": p.name, "mtime": p.stat().st_mtime} for p in files]</code></pre>
+<pre data-start="102" data-hl="2" data-why="The tab compares newest with the screen it loaded on. When they differ, it navigates to the root."><code class="language-python">def send_json(req, screens):
+    newest = screens[-1]["name"] if screens else None
+    body = json.dumps({"screens": screens, "newest": newest})
+    req.send_response(200)
+    req.send_header("Content-Type", "application/json")
+    req.end_headers()
+    req.wfile.write(body.encode())</code></pre>
+</div>

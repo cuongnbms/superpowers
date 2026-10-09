@@ -1,0 +1,26 @@
+<h1>Release notes for the screen server</h1>
+<p>What changed in this round, and what to watch for when you upgrade.</p>
+
+<div class="callout">
+  <p><strong>Tabs survive restarts.</strong> The server reopens on its old port with its old key, so a tab you left open reconnects on its own within five seconds.</p>
+</div>
+<div class="callout warn">
+  <p><strong>Idle shutdown is now four hours.</strong> Open tabs poll the server but do not count as activity. Write a screen, or run <code>start</code>, to keep it alive.</p>
+</div>
+
+<h2>Routes</h2>
+<table>
+  <thead><tr><th>Path</th><th>Returns</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>/</code></td><td>Newest screen in the frame</td><td>Empty state when there are none</td></tr>
+    <tr><td><code>/s/&lt;name&gt;</code></td><td>One named screen</td><td>404 unless the file is listed</td></tr>
+    <tr><td><code>/api/screens</code></td><td>JSON list and newest name</td><td>What the tab polls</td></tr>
+    <tr><td><code>/files/&lt;path&gt;</code></td><td>A file inside <code>screens/</code></td><td>Paths that escape the folder get 404</td></tr>
+  </tbody>
+</table>
+
+<h2>Starting from a script</h2>
+<pre><code class="language-bash">python3 skills/show-me/scripts/server.py start --project-dir "$PWD"
+# {"url": "http://localhost:52341/?key=…", "reused": false, …}
+python3 skills/show-me/scripts/server.py status --project-dir "$PWD" &amp;&amp; echo running
+python3 skills/show-me/scripts/server.py stop --project-dir "$PWD"</code></pre>

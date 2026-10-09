@@ -1,0 +1,29 @@
+<h1>How a screen reaches your tab</h1>
+<p>The agent writes one file into <code>screens/</code>. The open tab asks the server once a second and jumps to the newest screen, so you never have to click anything.</p>
+
+<h2>The push loop</h2>
+<figure class="diagram">
+<pre class="mermaid">flowchart LR
+  A[Agent] -->|writes fragment| S[(screens/)]
+  S -->|listed by mtime| V[server.py]
+  T[Browser tab] -->|GET /api/screens every 1s| V
+  V -->|newer screen exists| T
+  T -->|navigate to /| F[Frame + fragment]
+  class T accent</pre>
+<figcaption>The amber node is the only part that runs in your browser.</figcaption>
+</figure>
+
+<h2>First open versus every later request</h2>
+<figure class="diagram">
+<pre class="mermaid">sequenceDiagram
+  participant B as Browser
+  participant S as server.py
+  B->>S: GET /?key=f3a9c1
+  S-->>B: 200 + Set-Cookie show_me_key_52341
+  loop every second
+    B->>S: GET /api/screens (cookie)
+    S-->>B: screens, newest
+  end
+  Note over B,S: newest differs from boot.newest, so the tab goes to /</pre>
+<figcaption>The key travels in the URL once. After that the cookie carries it.</figcaption>
+</figure>
