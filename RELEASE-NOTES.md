@@ -1,6 +1,6 @@
 # Superpowers Release Notes
 
-## Unreleased
+## v6.4.25 (2026-10-09)
 
 Fork-only. Motivating observation: v6.4.24 removed brainstorming's visual companion because it was tied to brainstorming; the mechanism itself was fine. The need stayed: some things are hard to picture from chat (a screen layout, how services talk, what a data structure looks like, which functions a request passes through), and your human partner wants to say "vẽ ra cho tôi xem" at any point in any task and get a page in the browser, not only while brainstorming.
 
