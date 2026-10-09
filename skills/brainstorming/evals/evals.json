@@ -15,7 +15,7 @@
       "Presents a short in-chat design (approach, files touched, testing) and stops for approval",
       "Writes no code and edits no files before approval",
       "Does not write a spec file or plan document",
-      "Does not invoke domain-modeling: the fixture has no CONTEXT.md and a flag does not change the domain model"
+      "Does not invoke domain-modeling: the fixture has no GLOSSARY.md and a flag does not change the domain model"
     ]
   },
   {
@@ -34,7 +34,7 @@
       "Invokes superpowers:domain-modeling (Skill tool or reads its SKILL.md) after exploring and before the first question",
       "Asks exactly one clarifying question in the first turn (purpose, constraints, or success criteria)",
       "Does not propose approaches, write a spec, or write code in the first turn",
-      "Does not create CONTEXT.md or an ADR in the first turn"
+      "Does not create GLOSSARY.md or an ADR in the first turn"
     ]
   },
   {
@@ -88,7 +88,7 @@
     "runs": 3,
     "expected_behavior": [
       "Acknowledges 'replica' and bidirectional 'sync' as settled terms in the reply",
-      "Creates no CONTEXT.md and no ADR before the design is approved",
+      "Creates no GLOSSARY.md and no ADR before the design is approved",
       "Edits no files in the repo this turn",
       "Continues the brainstorm: asks the next single question or moves to approaches, without restarting classification",
       "Does not present the whole design or write a spec this turn"

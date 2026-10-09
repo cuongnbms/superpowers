@@ -7,9 +7,9 @@
     "files": ["../../brainstorming/evals/fixtures/todo-cli"],
     "runs": 2,
     "expected_behavior": [
-      "Creates CONTEXT.md this turn (no prior file exists) with a 'replica' entry in the CONTEXT-FORMAT.md format",
+      "Creates GLOSSARY.md this turn (no prior file exists) with a 'replica' entry in the GLOSSARY-FORMAT.md format",
       "Does not defer the write or ask for a design approval; the glossary edit is the deliverable",
-      "Keeps implementation details out of CONTEXT.md",
+      "Keeps implementation details out of GLOSSARY.md",
       "Does not create an ADR for a naming decision"
     ]
   }

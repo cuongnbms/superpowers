@@ -22,7 +22,7 @@ judgment settles what neither answers. Record every decision in the ledger as
 going. A wrong ruling costs rework your human partner can see and undo; a
 session parked on a question costs their whole day and buys nothing.
 
-The approved design — the spec, `CONTEXT.md`, the ADRs — is read-only
+The approved design — the spec, `GLOSSARY.md`, the ADRs — is read-only
 while the plan runs. Grading a finding by its effect sets its severity;
 your ruling decides whether the code follows the spec or departs from it;
 neither rewrites the approved text. A spec edited mid-execution is a

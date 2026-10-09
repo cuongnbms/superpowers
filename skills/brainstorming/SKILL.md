@@ -133,13 +133,13 @@ Design conversations are where a project's vocabulary gets settled, and what is 
 in chat is lost. On the architectural path, invoke superpowers:domain-modeling right after
 exploring the project context and keep it active for the rest of the brainstorm: it challenges
 vague or conflicting terms, stress-tests relationships with concrete scenarios, and records the
-glossary (`CONTEXT.md`) and hard-to-reverse decisions (ADRs). Its write timing already fits
+glossary (`GLOSSARY.md`) and hard-to-reverse decisions (ADRs). Its write timing already fits
 the approval gate: terms resolved inside an unapproved design are written once the design is
 approved, alongside the spec. The trade-off chosen in step 4 is the usual ADR candidate; apply
 domain-modeling's three-part test before creating one.
 
 On the bounded path, invoke it only when the request uses a term that conflicts with an
-existing `CONTEXT.md`. A new flag or a one-file fix does not change the domain model, and
+existing `GLOSSARY.md`. A new flag or a one-file fix does not change the domain model, and
 loading the skill adds questions the task does not need. Spikes never invoke it: their output
 is an answer, not a model.
 

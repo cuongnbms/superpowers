@@ -2,7 +2,7 @@
 
 **User:** I want the todo-cli in this repo to sync between my laptop and my desktop. I'm thinking a small HTTP server I self-host plus a `todo sync` command. Let's build it.
 
-**Assistant:** This is architectural: it adds a server, a network protocol, and a new command, so I'll go the full route with questions, approaches, and a written spec before any code. I've read `todo.py`, `test_todo.py`, and the README: state is a single `todo.json` next to the script, items have `id`, `text`, `done`; there is no CONTEXT.md yet. The repo is on `main` with a clean tree.
+**Assistant:** This is architectural: it adds a server, a network protocol, and a new command, so I'll go the full route with questions, approaches, and a written spec before any code. I've read `todo.py`, `test_todo.py`, and the README: state is a single `todo.json` next to the script, items have `id`, `text`, `done`; there is no GLOSSARY.md yet. The repo is on `main` with a clean tree.
 
 First question: when both machines change the same todo while offline, what should happen on sync?
   (a) Last write wins by timestamp
