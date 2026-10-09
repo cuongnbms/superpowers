@@ -36,7 +36,7 @@ as `Ruling: <what you decided> — <why> — <what it costs if wrong>`, and keep
 going. Deviating from the plan without a ledgered ruling is a decision made
 in secret.
 
-The approved design — the spec, `CONTEXT.md`, the ADRs — is read-only
+The approved design — the spec, `GLOSSARY.md`, the ADRs — is read-only
 while the plan runs. Grading a finding by its effect sets its severity;
 your ruling decides whether the code follows the spec or departs from it;
 neither rewrites the approved text. A spec edited mid-execution is a

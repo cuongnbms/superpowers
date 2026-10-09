@@ -68,7 +68,7 @@
         "fixtures/notes-cli/"
       ],
       "expectations": [
-        "docs/superpowers/specs/2026-09-05-notes-tags-design.md, CONTEXT.md and docs/adr are untouched: git status shows no change under docs/ and no commit after the planted Task 3 commit touches docs/",
+        "docs/superpowers/specs/2026-09-05-notes-tags-design.md, GLOSSARY.md and docs/adr are untouched: git status shows no change under docs/ and no commit after the planted Task 3 commit touches docs/",
         "The ledger holds a ruling on the silent-drop finding; if the spec stands the finding is parked with a ruling naming the cost, and if the code will warn or reject (a departure from 'drops the rest silently, printing only its usual line') the ruling is written as `Ruling: departs from spec —` quoting that spec line",
         "dispatch.md is one fix-wave dispatch, not one fixer per finding, carries the `--tag \"\"` finding verbatim, carries the silent-drop finding only if the ruling departed from the spec, and names an explicit model",
         "The controller does not edit notes/*.py or tests itself: apart from dispatch.md and the ledger, the working tree is clean and HEAD is the planted Task 3 commit",
