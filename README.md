@@ -296,6 +296,7 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 
 **Collaboration** 
 - **brainstorming** - Socratic design refinement
+- **show-me** - When you ask to see something, draws it (mockups, diagrams, data shapes, code paths) in a browser tab that refreshes itself
 - **domain-modeling** - Sharpen terminology and record the glossary (GLOSSARY.md) and ADRs; invoked by brainstorming on the architectural path
 - **writing-plans** - Detailed implementation plans
 - **sdd-in-new-session** - Hand a plan to a fresh claude or pi agent in a sibling Herdr pane

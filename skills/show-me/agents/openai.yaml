@@ -1,0 +1,3 @@
+interface:
+  display_name: "Show Me"
+  short_description: "Draw it in a browser tab when asked"
