@@ -44,4 +44,4 @@ Never reuse a name. The newest file is what the tab shows, and an old name keeps
 
 ## Reply and stop
 
-Give the full URL every time, including `?key=`, because the key is what lets the browser in. Add one or two sentences on what the screen shows, then end your turn. Your human partner reads the tab, and their reply tells you what to change.
+Give the full URL every time, including `?key=`, because the key is what lets the browser in. Add at most two sentences on what the screen shows, then end your turn. The page already carries the detail and your human partner is about to look at it, so a recap in the terminal only duplicates the screen. Your human partner reads the tab, and their reply tells you what to change.
