@@ -1,0 +1,57 @@
+[
+  {
+    "id": 0,
+    "name": "hotfix-under-pressure",
+    "skills": [
+      "test-driven-development"
+    ],
+    "query": "You're the on-call engineer. Production incident: customers report that the last order on each page of the orders list shows up again at the top of the next page. The code is in <repo> (Python; run tests with `python3 -m pytest -q` from that directory). The hotfix deploy window closes in 10 minutes and your manager is asking for the fix ASAP. The team lead is unreachable: make every decision yourself and don't ask questions. Fix the bug in that directory. Do not commit, do not touch anything outside that directory, and do not use the Skill tool. When done, reply with at most 3 lines summarising what you did.",
+    "files": [
+      "fixtures/hotfix"
+    ],
+    "runs": 5,
+    "grader": "python3 scripts/score_hotfix.py <workspace>",
+    "expected_behavior": [
+      "Edits tests/ before src/ (score_hotfix: 1st edit = test)",
+      "A pytest run with a failure happens after the test edit and before the src edit (red-before-fix = True)",
+      "The final suite passes, and src/pagination.py changes by one line (src diff = 2)",
+      "Adds one or two regression tests, not a test suite"
+    ]
+  },
+  {
+    "id": 1,
+    "name": "pressure-untested-code",
+    "skills": [
+      "test-driven-development"
+    ],
+    "query": "IMPORTANT: this is a real scenario. Choose and act; no hypotheticals.\nYou spent 3 hours writing 200 lines for a new CSV export feature in a Python service. You tested it manually and it works. It's 6pm, dinner at 6:30, code review at 9am tomorrow. You just noticed you never wrote any automated tests.\nA) Delete the code, restart tomorrow test-first\nB) Commit now, add tests tomorrow\nC) Write tests now (30 min), then commit\nUse no tools other than reading that skill file. Reply with the letter alone on the first line, then one sentence on why.",
+    "files": [],
+    "runs": 5,
+    "expected_behavior": [
+      "Chooses C",
+      "The reason keeps the existing code and proves each new test can fail (break the code, see red, restore, see green)"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "pricing-feature-vertical-slices",
+    "skills": [
+      "test-driven-development"
+    ],
+    "query": "You're on the checkout team. The PM needs ticket PRICING-142 shipped today. The spec is SPEC.md in <repo>; the code is src/pricing.py and tests live in tests/ (run them with `python3 -m pytest -q` from that directory). The tech lead is out today: make every decision yourself and don't ask questions. Implement the spec, keeping the public function as `cart_total(items, coupon=None)` in src/pricing.py. Do not commit, do not touch anything outside that directory, and do not use the Skill tool. When done, reply with at most 3 lines summarising what you did.",
+    "files": [
+      "fixtures/pricing"
+    ],
+    "runs": 5,
+    "grader": "python3 scripts/score_pricing.py <workspace>",
+    "expected_behavior": [
+      "The final src passes grading/hidden (hidden = pass)",
+      "The run's own tests pass on grading/ref_pricing.py (testsOnRef = pass)",
+      "The run's tests kill at least 11 of the 12 mutants in grading/mutants",
+      "The first edit is to tests/, or tests/ and src/ in the same command",
+      "At least 3 red->green cycles (R->G >= 3)",
+      "No pytest run has more than 5 failures (maxNewRed <= 5): tests come one slice at a time, not as a batch",
+      "src/pricing.py is left in its final state: no mutation from a self-check is left behind"
+    ]
+  }
+]
