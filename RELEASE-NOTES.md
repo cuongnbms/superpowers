@@ -1,5 +1,46 @@
 # Superpowers Release Notes
 
+## v6.4.26 (2026-10-12)
+
+Fork-only. Motivating observation: a side-by-side eval on 2026-10-11 (Sonnet subagents, n=5 per arm) ran the fork's `test-driven-development` (330 lines plus the 198-line `writing-good-tests.md`) against mattpocock/skills `engineering/tdd` (38 lines plus `tests.md` and `mocking.md`, clone at `49dd158`) and no skill. Matt's skill matched the fork's on every compliance metric (test-first 5/5 and red-before-fix 5/5 on a hotfix; test-first 5/5 on a feature) with 18 to 29% fewer tokens, and it was the only arm that worked in vertical slices: on the feature, 3 of 5 runs under the fork's skill wrote 28 to 39 tests in one batch before any code. In a forced choice (3 hours of working untested code at 6pm: A delete it, B commit now, C write tests now) both skills picked A in 5 of 5 runs, citing "Delete means delete" or "red before green"; the no-skill baseline picked C in 5 of 5. Your human partner asked for the skill to be rewritten in Matt's style.
+
+### Test-Driven Development
+
+- **Rewritten from 330 lines to 54, ported from mattpocock/skills `engineering/tdd`.** Same section order as Matt's: what a good test is, seams, anti-patterns, rules of the loop. Reasons instead of capitals; leading words (red, green, slice, seam, tracer bullet) instead of restated rules. The Iron Law block, "Violating the letter...", the Common Rationalizations table, the Red Flags list, the dot diagram, the TypeScript examples, the Verification Checklist and When Stuck are gone. CLAUDE.md asks for evidence before the Red Flags and rationalization lists change; the evidence is the comparison above (they added nothing measurable over Matt's text and drove the A answer) and the evals below. The description is unchanged, so triggering is unchanged.
+- **Vertical slices with an observable check.** A slice is one pass through red, green, refactor, not a group of tests, and "each red run shows exactly one new failure: the test you just wrote". The first draft only named horizontal slicing as an anti-pattern; Sonnet then labelled its tests "Slice 1", "Slice 2" in one file append and ran them red together: in 4 of 5 runs one pytest run showed 12 to 15 failures. The observable rule fixed that.
+- **Code that already exists without tests stays.** Decision by your human partner, replacing "Delete it. Start over." For each behavior: write the test, break the code that produces it, watch red, restore, watch green. Keyed to code that existed when the work started; the change being made still starts from its own red test. The forced choice now gets C in 5 of 5. This section is exercised only by the forced choice, never in an execution eval.
+- **Seams are chosen by the agent, not confirmed with your human partner.** Matt's skill asks the user to agree seams before any test; that would stall subagent execution, where nobody answers. When working from a plan, the task's interface is the seam. Decision by your human partner.
+- **Refactor stays in the loop**, only while green, rerun after each change. Matt moves it to review; the fork has no review step that does that job. Decision by your human partner.
+- **Rules that depend on earlier rules get a slice where both apply.** Added after rounds where one-rule-per-slice tests let the same two mutants survive in every run (a coupon applied to the pre-discount amount, a per-line discount applied to the cart quantity). The sentence is generic; the mutants motivated it.
+- **Kept:** the project's whole suite defines done and every failure is reported by name (upstream #2110, from v6.4.4), and "your human partner" for the exceptions (prototypes, generated code, configuration).
+- **`writing-good-tests.md` is unchanged; its pointer narrowed** from "when writing or changing any test" (always) to adding a mock, a test double or a test-only helper, or testing a script or a document.
+- **README**: the TDD lines no longer say it deletes code written before tests.
+- **Rejected after an eval round:** a done criterion "every rule has a test that fails without it; picture a realistic mutation". On Sonnet it led to late batches of tests written to catch the pictured mutations, and one run mutated `src/pricing.py` in place with `sed`, hung on a `cp -i` overwrite prompt while restoring, and shipped code that failed the hidden acceptance tests with a "placeholder" report. On Opus that draft killed fewer mutants than no skill (54/60 against 60/60). Also rejected: "A test that passes at once is testing something that already exists; fix the test" (carried over from the old text). Without it the kill rate rose from 50/60 to 55/60 to 56/60 across rounds, because a guard test for a rule an earlier slice already satisfies passes at once and was being discarded.
+
+### Test-Driven Development evals
+
+New `skills/test-driven-development/evals/`: `evals.json` (case 0 hotfix under deadline pressure, case 1 the forced choice, case 2 a pricing feature from a spec), the two fixtures, `grading/` (hidden acceptance tests, a reference implementation, 12 mutants), and `scripts/` (`watch.py` records file-edit times, `score_hotfix.py` and `score_pricing.py` score from those and a `conftest.py` log of every pytest run). `score_pricing.py` reproduces the 2026-10-11 analyzer's numbers on its runs and adds `maxNewRed`, the largest number of failures in one pytest run. The fixtures need `pytest`; the scripts use the standard library only.
+
+Prompts tell the agent to read the skill file and follow it (Skill tool forbidden); new-skill runs say "including any file it tells you to read", old-skill runs said "and any file in its folder that it links to", which loads `writing-good-tests.md` every time; that difference is in the token numbers. "Old" and "Matt" rows on Sonnet are from 2026-10-11; everything else is 2026-10-12, n=5 per row.
+
+| Case 2, pricing | hidden pass | mutants killed | tests (mean) | red->green cycles | max failures in one run (median) | tokens (mean) | time (median) |
+|---|---|---|---|---|---|---|---|
+| Sonnet, no skill | 5/5 | 54/60 | 12 | 0-1 | 0 (rarely ran red) | 37.5k | 21s |
+| Sonnet, old skill | 5/5 | 58/60 | 35 | 1-3 | 28 | 55.3k | 56s |
+| Sonnet, Matt's tdd | 5/5 | 57/60 | 22 | 4-7 | 5 | 42.9k | 42s |
+| Sonnet, new skill | 5/5 | 56/60 | 19 | 4-6 | 6 | 44.3k | 34s |
+| Opus, no skill | 5/5 | 60/60 | 25 | 1 | 21 | 41.9k | 36s |
+| Opus, old skill | 5/5 | 60/60 | 30 | 4-14 | 16 | 57.5k | 118s |
+| Opus, new skill | 5/5 | 58/60 | 16 | 13-18 | 3 | 56.6k | 259s |
+
+- Case 0, hotfix (Sonnet): new skill test edited before src 5/5, red seen before the fix 5/5, one regression test each, 40.2k tokens (old skill 5/5, 5/5, 46.3k; no skill 1/5, 1/5, 35.6k).
+- Case 1, forced choice (Sonnet): new skill C×5 (old skill A×5, Matt's A×5, no skill C×5).
+- Expectations in `evals.json` for the new skill: case 2 "kills at least 11 of 12" 4/5 on Sonnet and 4/5 on Opus; "no pytest run with more than 5 failures" 2/5 on Sonnet (runs of 6, 7 and 7 when the composed-rule tests came as a group at the end) and 4/5 on Opus; the rest 5/5 on both.
+- **Non-discriminating:** case 0 test-first and red-before-fix pass for every skill arm; hidden-test pass is 5/5 for every arm on both models; "no pytest run with more than 5 failures" is also met by no-skill Sonnet runs that never run red.
+- **What still fails or costs more:** the new skill kills about 2 fewer mutants than the old one on both models (the two composed-rule mutants survive in some runs). On Opus it is slower than the old skill (median 259s against 118s, similar tokens) because it runs one red-green cycle per test and breaks code on purpose to see guard tests fail; no-skill Opus finished in 36s with 60/60. Opus runs of the new skill still restored the code every time (hidden 5/5).
+- Iterations (all Sonnet case 2 unless noted): draft 1, 4 of 5 runs had a pytest run with 12 to 15 failures, and the run above ended with code that failed the hidden tests; draft 2 (observable slice rule) maxNewRed median 7, 56/60; without the mutation criterion 50/60 with clean slices; plus the composed-rule sentence 55/60; minus "fix the test" 56/60 (shipped). Opus draft 1: 54/60.
+- Trigger check (`claude -p --plugin-dir`, `--max-turns 3` or 4): "Add a char_count(text) function..." loaded brainstorming first 3/3, as the bootstrap routes it; "The design is approved...: implement char_count..." loaded test-driven-development 2/3, and the third wrote the test first without loading it.
+
 ## v6.4.25 (2026-10-09)
 
 Fork-only. Motivating observation: v6.4.24 removed brainstorming's visual companion because it was tied to brainstorming; the mechanism itself was fine. The need stayed: some things are hard to picture from chat (a screen layout, how services talk, what a data structure looks like, which functions a request passes through), and your human partner wants to say "vẽ ra cho tôi xem" at any point in any task and get a page in the browser, not only while brainstorming.
