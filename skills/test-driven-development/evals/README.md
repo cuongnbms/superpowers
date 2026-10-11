@@ -24,4 +24,4 @@ The fixtures and graders need Python 3.8+ and `pytest` (the fixtures are pytest 
 ## Harness notes
 
 - `cp` aliased to `cp -i` in the agent's shell makes an in-place "break the code, then restore" loop hang on the overwrite prompt and leave mutations behind. One run did this and shipped code that failed the hidden tests; the "no mutation left behind" expectation catches it.
-- Eval 0's test-first and red-before-fix columns hit the ceiling for every skill arm; it guards against regressions, it does not discriminate between skill texts. Case 2 does.
+- Case 0's test-first and red-before-fix columns hit the ceiling for every skill arm; it guards against regressions, it does not discriminate between skill texts. Case 2 does.

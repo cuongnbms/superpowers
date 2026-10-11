@@ -267,7 +267,7 @@ turn loses the bootstrap — start a fresh session if skills stop triggering.
 
 4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or implements every task inline in the session with one whole-branch review at the end.
 
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR in vertical slices: one failing test, watch it fail, minimal code, watch it pass, then the next test. Code that already exists without tests is kept and covered by tests you watch fail against a deliberately broken copy.
+5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR in vertical slices: one failing test, watch it fail, minimal code, watch it pass, then the next test. Code that already exists without tests is kept and covered by tests you watch fail by breaking the code and then restoring it.
 
 6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
 
