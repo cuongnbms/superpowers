@@ -1,0 +1,38 @@
+[
+  {
+    "id": 0,
+    "name": "fix-from-prod-evidence",
+    "skills": [
+      "systematic-debugging"
+    ],
+    "query": "Support ticket SUP-311: \"Several customers say they were charged for their renewal without getting the reminder email first. Example: customer 1042 renews on 2026-10-15 and has had no reminder.\" The service is in <repo> (Python; run tests with `python3 -m pytest -q` from that directory). Today is 2026-10-12. The team lead is out: make every decision yourself and don't ask questions. Find the problem and fix it in that directory. Do not commit, do not touch anything outside that directory, and do not use the Skill tool. When done, reply with at most 5 lines: the cause, the fix, and how you verified it.",
+    "setup": "bash scripts/setup_reminders.sh <repo>",
+    "runs": 5,
+    "grader": "python3 scripts/score_reminders.py <workspace>",
+    "expected_behavior": [
+      "Reads the prod snapshot (ops/replica.py or the dry run) before the first app/ or migrations/ edit (data<edit > 0)",
+      "A pytest run with failures happens after the first tests/ edit and before the first app/ or migrations/ edit (red<fix = True)",
+      "The new tests fail with assertion failures on the original app/ and migrations/ (pristine = fail N)",
+      "Runs the replica dry run again after the last code edit (rerun = True)",
+      "The fix passes the 4 hidden acceptance tests (hidden = 4/4) and the run's own suite passes",
+      "The reply names the cause: Stripe sync stores current_period_end as epoch seconds, so the ISO-date window never matches"
+    ]
+  },
+  {
+    "id": 1,
+    "name": "diagnose-where-code-and-data-disagree",
+    "skills": [
+      "systematic-debugging"
+    ],
+    "query": "Support ticket SUP-311: a few customers wrote in that they haven't had their renewal reminder email, although their subscription renews later this week. The service is in <repo> (Python; run tests with `python3 -m pytest -q` from that directory). Today is 2026-10-12. Can you find out why? Don't change any code yet; I want to understand the cause first. The team lead is out: make every decision yourself and don't ask questions. Do not touch anything outside that directory, and do not use the Skill tool. Reply with at most 5 lines.",
+    "setup": "bash scripts/setup_reminders_missed.sh <repo>",
+    "runs": 5,
+    "grader": "python3 scripts/score_missed.py <workspace>, then read the reply",
+    "expected_behavior": [
+      "The reply names the cause: since 2026-10-08 the nightly job fails on customer 1003's address with a trailing space; mailer.send raises and send_due aborts the batch before its commit",
+      "The reply does not give the Stripe epoch bug as the cause (those subscriptions renew in 2027); naming it as a separate latent bug is fine",
+      "Reads the record of the failures (a query on job_runs) before answering",
+      "Changes no file under app/, migrations/ or tests/"
+    ]
+  }
+]
