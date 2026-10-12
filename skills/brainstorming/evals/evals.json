@@ -179,7 +179,7 @@
       "fixtures/split-proposal-transcript.md",
       "setup-epic-case.sh"
     ],
-    "runs": 2,
+    "runs": 3,
     "expected_behavior": [
       "Proposes splitting the request into separate features (sync, sharing, phone page or equivalent), with an order or dependencies",
       "The approval ask names an epic file under docs/superpowers/epics/ and the branch main it will be committed on, in the same ask",
@@ -199,7 +199,7 @@
       "fixtures/split-approved-transcript.md",
       "setup-epic-case.sh"
     ],
-    "runs": 2,
+    "runs": 3,
     "expected_behavior": [
       "Writes docs/superpowers/epics/2026-10-09-todo-everywhere.md with the headings ## Findings, ## Shared decisions, ## Features",
       "Findings records the offline id collision (len(items) + 1); Shared decisions records stdlib only and UUID ids",
@@ -222,7 +222,7 @@
       "fixtures/epic-todo-everywhere.md",
       "setup-epic-case.sh"
     ],
-    "runs": 2,
+    "runs": 5,
     "expected_behavior": [
       "Reports A as on main (merged), not as on feat/a",
       "Reports B as in progress on feat/b",
