@@ -1,5 +1,29 @@
 # Superpowers Release Notes
 
+## v6.4.29 (2026-10-12)
+
+Ported from upstream obra/superpowers v7.0.0 (upstream's numbering; released 2026-10-10 as a single commit, so the citations below are its PR and issue numbers). Motivating reports are upstream's: no session on this fork hit these bugs, but the code they fix was unchanged here, so the same defects were present. Before this release `hooks/run-hook.cmd`, `sdd-workspace`, `requesting-code-review/SKILL.md`, `docs/windows/polyglot-hooks.md` and the three test files matched upstream v6.4.2 exactly; `hooks/session-start` differed only by upstream's Muse branch, and `task-done` only in how it calls `sdd-workspace` (`"${BASH:-bash}"`, v6.4.4). So each fix is upstream's change applied to the fork's file, not a rewrite; nothing was merged or cherry-picked. Each fix's upstream regression test was ported with it and watched failing on the fork's code first, except where noted. `scripts/lint-shell.sh` was not run: `shellcheck` is not installed on the dev box.
+
+Not taken: the brainstorming rebuild (#2463, #2482, #2483), which inverts the fork's classify-first structure and is evaluated separately; the Antigravity manifest, logo and porting-guide changes (#2479); the Hermes skill descriptions (#2284); the systematic-debugging IDENTITY example (#2380), already gone from the fork's rewrite in v6.4.27; the visual companion `String.replace` fix (#2364), since the fork's `show-me` has no `server.cjs`; and Muse, still not part of this fork.
+
+### Hooks
+
+- **SessionStart works when the harness launches it with a broken `PATH`** (#2310, #2349; anthropics/claude-code#43127). `hooks/session-start` and the Unix half of `hooks/run-hook.cmd` called `dirname`, `cat` and `bash` through `PATH`; with `PATH=""` both exited non-zero and the bootstrap was never injected. They now split `$0` with parameter expansion (on `/` or `\`), read the skill with `$(< file)`, `exec "${BASH:-bash}"`, and pipe the JSON through `cat` only when `cat` resolves (the pipe still absorbs EPIPE on Git Bash, #1612). `tests/hooks/test-session-start.sh` gains upstream's cases: empty `PATH` for both scripts, run by bare filename, reached through a backslash path, and a `cat` stub; 5 failed before the fix.
+- **Windows: `run-hook.cmd` finds per-user Git installs, skips WSL launchers, ignores the current directory, and returns the hook's exit code** (#1863, #1864, #2365, #2393). The cmd half checks `%LOCALAPPDATA%\Programs\Git` (only when `LOCALAPPDATA` is set), finds `bash` on `PATH` through `%SystemRoot%\System32\where.exe $PATH:bash` so neither `where` nor `bash` can be planted in a repository, skips the `bash.exe` launchers in `System32`, `Sysnative` and `WindowsApps`, and runs bash outside a parenthesized block so `%ERRORLEVEL%` is the hook's. `docs/windows/polyglot-hooks.md` describes the four locations. **Not run on Windows:** the new `tests/hooks/test-run-hook-cmd-windows.sh` needs `cmd.exe` and Git Bash and skips on Linux, where this port was made.
+
+### Executing Plans
+
+- **`task-done` records a passing task whose test command prints nothing** (#2385, #2388). Under `set -euo pipefail`, the ledger line's `grep -v` over an empty log exited 1 and aborted the script without writing the line, so a finished task looked unfinished. It now records `→ (no output)`. Two cases in `test-executing-plans-scripts.sh`, both red before the fix.
+
+### Subagent-Driven Development
+
+- **`sdd-workspace` leaves a repo's own `.superpowers/sdd/.gitignore` alone** (#2161, #2399). It rewrote the file with `*` on every run, reverting a committed version (for example one that tracks `progress.md` ledgers); it now writes the default only when no file exists. New case in `test-sdd-workspace.sh`, red before the fix.
+- **Plan markers stay repo-relative on Git Bash** (found upstream while landing #2149). The repo root is resolved through `pwd -P` like the plan path, so both are spelled `/c/...` instead of `C:/...` against `/c/...`, which made every marker an absolute, machine-specific path. On Linux both spellings already agree, so no test here can fail without the fix; the tests normalize their own paths the same way.
+
+### Requesting Code Review
+
+- **The base-SHA example no longer contains `$1`** (#2311, #2361). Claude Code substitutes `$1` in a skill body with a word from the skill's arguments, turning `awk '{print $1}'` into `awk '{print <word>}'`. It is now `cut -d' ' -f1`. No other `SKILL.md` in the fork contains `$0`-`$9` or `$ARGUMENTS`. The line is an example command, not guidance, so no behaviour eval; the substitution itself was not reproduced here.
+
 ## v6.4.28 (2026-10-12)
 
 Fork-only. Motivating observation: the style comparison of 2026-10-12 (`docs/_draft/20261012_SKILL_STYLE_SUPERPOWERS_VS_MATTPOCOCK_VI.md` in the workspace root, outside this repo) asked whether `brainstorming` should get the rewrite `test-driven-development` and `systematic-debugging` got. It should not: it was already rewritten for Claude 5 in v6.4.0 and has no capitals left, and its rationalization table carries at least one row with eval evidence behind it (the 1/5 gate slip in v6.4.0). What it did have was the same rule stated in several places, grown with the Workspace, Epics and domain-modeling additions: where the work lives in five places, writing the spec in both the architectural checklist and "After the design", and the epic continuation procedure inline although it is needed only when a request carries an epic path. This release is that cleanup and nothing else; no rule changes.
