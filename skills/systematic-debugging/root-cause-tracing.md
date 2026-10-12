@@ -98,10 +98,10 @@ npm test 2>&1 | grep 'DEBUG git init'
 
 If something appears during tests but you don't know which test:
 
-Use the bisection script `find-polluter.sh` in this directory:
+Use the bisection script `find-polluter.sh` in this skill's directory. Run it from the project root (it calls `npm test <file>` for each test file):
 
 ```bash
-bash ./find-polluter.sh '.git' 'src/**/*.test.ts'
+bash <skill-dir>/find-polluter.sh '.git' 'src/**/*.test.ts'
 ```
 
 Runs tests one-by-one, stops at first polluter. See script for usage.
@@ -138,11 +138,11 @@ digraph principle {
     "Fix at source" [shape=box];
     "Add validation at each layer" [shape=box];
     "Bug impossible" [shape=doublecircle];
-    "NEVER fix just the symptom" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
+    "Fix where you are; say the source was not found" [shape=box];
 
     "Found immediate cause" -> "Can trace one level up?";
     "Can trace one level up?" -> "Trace backwards" [label="yes"];
-    "Can trace one level up?" -> "NEVER fix just the symptom" [label="no"];
+    "Can trace one level up?" -> "Fix where you are; say the source was not found" [label="no - dead end"];
     "Trace backwards" -> "Is this the source?";
     "Is this the source?" -> "Trace backwards" [label="no - keeps going"];
     "Is this the source?" -> "Fix at source" [label="yes"];
@@ -151,7 +151,7 @@ digraph principle {
 }
 ```
 
-**NEVER fix just where the error appears.** Trace back to find the original trigger.
+Fix where the error appears only when the trace dead-ends, and say so; otherwise keep tracing back to the original trigger.
 
 ## Stack Trace Tips
 
@@ -159,11 +159,3 @@ digraph principle {
 **Before operation:** Log before the dangerous operation, not after it fails
 **Include context:** Directory, cwd, environment variables, timestamps
 **Capture stack:** `new Error().stack` shows complete call chain
-
-## Real-World Impact
-
-From debugging session (2025-10-03):
-- Found root cause through 5-level trace
-- Fixed at source (getter validation)
-- Added 4 layers of defense
-- 1847 tests passed, zero pollution

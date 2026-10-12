@@ -291,7 +291,7 @@ Superpowers is built by [Jesse Vincent](https://blog.fsck.com) and the rest of t
 - **test-driven-development** - RED-GREEN-REFACTOR cycle in vertical slices (includes a mocking and test-helper reference)
 
 **Debugging**
-- **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
+- **systematic-debugging** - Evidence first: look at what happened, get a signal that shows the bug, confirm the cause against the reported cases, then fix and rerun the original scenario (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
 - **verification-before-completion** - Ensure it's actually fixed
 
 **Collaboration** 
