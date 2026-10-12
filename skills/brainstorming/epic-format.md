@@ -46,6 +46,17 @@ Decide when brainstormed: <conflicts and questions deferred to this feature>
 - Findings are facts the features share, not a plan. Each feature's design happens in its own
   brainstorm.
 
+## Continuing an epic
+
+Read the epic, derive state (next section), and report it in one line ("Epic handoff: A on
+`dev`, B on `feat/shell-theme-b`, next is C"). Take the next feature, or the one the request
+names, and warn if its dependencies are not on the base yet. Its workspace starts from the
+base, not from the current branch when that is another feature's; give the base as the start
+point at Isolate. Its Scope, its Decide when brainstormed items, and the Shared decisions are
+the starting brief; write them back and invite correction as for any brief. Do not re-split
+and do not redo what Findings records: read only the code this feature touches, then ask your
+first question.
+
 ## Deriving state
 
 Each feature's spec carries `> **Epic:** <epic path> § <letter>` under its title. Search every

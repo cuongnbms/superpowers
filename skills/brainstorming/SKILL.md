@@ -23,9 +23,7 @@ the feature scope permits writing the spec, and approving the written spec permi
 writing-plans; neither approves an artifact that does not exist yet. Resume at the earliest
 stage still missing its approval.
 
-The approval that precedes the first write also settles where the work lives (see "Workspace"
-below). Creating a branch or worktree is not implementation; it is where the spec, the plan,
-and the code will land.
+The approval that precedes the first write also settles where the work lives (see "Workspace").
 
 ## Classify first
 
@@ -68,7 +66,8 @@ approved spike.
 
 ## Path checklists
 
-Announce the path, create a task per item, complete them in order.
+Announce the path, create a task per item, complete them in order. The sections after the
+checklists hold the detail for the steps that point to them.
 
 **Spike**
 1. Explore project context, enough to frame the probe
@@ -88,18 +87,22 @@ Announce the path, create a task per item, complete them in order.
 
 **Architectural**
 1. Explore project context: files, docs, recent commits
-2. Invoke the superpowers:domain-modeling skill (see "Domain modeling" below)
-3. Ask clarifying questions, one at a time: purpose, constraints, success criteria
-4. Propose 2-3 approaches with trade-offs and your recommendation
-5. Present the design in sections scaled to their complexity; get approval after each section.
-   The last section's approval ask also names where the work will live (see "Workspace")
+2. Invoke the superpowers:domain-modeling skill (see "Domain modeling")
+3. Ask clarifying questions, one at a time: purpose, constraints, success criteria (see
+   "Understanding the idea")
+4. Propose 2-3 approaches with trade-offs, leading with your recommendation and why; YAGNI
+   ruthlessly, removing unnecessary features from every approach and from the design
+5. Present the design in sections scaled to their complexity; get approval after each section
+   (see "Presenting the design"). The last section's approval ask also names where the work
+   will live (see "Workspace")
 6. Set up the chosen workspace with superpowers:using-git-worktrees (Isolate) before writing
    any file of this feature; an epic, when there is one, is already committed (see "Epics")
-7. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, together with the
-   glossary terms and ADRs resolved along the way, and commit it. A feature of an epic starts
+7. Write the spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` (the user's
+   preferred location overrides this default), together with the glossary terms and ADRs that
+   domain-modeling resolved along the way, and commit it all. A feature of an epic starts
    with `> **Epic:** <epic path> § <letter>` directly under the title, and its Non-goals name
    other features by letter instead of restating their scope
-8. Self-review the spec (below) and fix inline
+8. Self-review the spec and fix inline (see "Spec review")
 9. Ask the user to review the written spec; wait for approval
 10. Invoke the writing-plans skill. It is the only skill that follows an architectural
     brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
@@ -112,7 +115,9 @@ feature, so it is written and committed before Isolate. Everything after the fir
 (plan, code, fixes) belongs to the same feature, and finishing-a-development-branch merges or
 discards them as one unit. So the workspace is chosen before that first write, not at
 execution time: a spec committed on main stays on main if the feature is dropped, and the
-branch or worktree made later has to be created from a HEAD that already carries it.
+branch or worktree made later has to be created from a HEAD that already carries it. Creating
+a branch or worktree is not implementation; it is where the spec, the plan, and the code will
+land.
 
 Do not add a separate question for it. Name your choice inside the approval ask you are
 already making, with the alternatives in the same sentence, so a one-word yes covers both:
@@ -145,7 +150,6 @@ is an answer, not a model.
 
 ## Understanding the idea
 
-- Check the current project state first: files, docs, recent commits.
 - Assess scope before detailed questions. If the request describes several independent
   subsystems ("a platform with chat, file storage, billing, and analytics"), say so and help
   decompose: what the independent pieces are, how they relate, what order to build them. Then
@@ -164,7 +168,7 @@ is an answer, not a model.
 ## Epics
 
 An epic records a split so the features after the first are not lost when this conversation
-ends. Its format is in `epic-format.md`.
+ends. Its format, how to derive its state, and how to continue one are in `epic-format.md`.
 
 **Writing one.** The split approval ask names the epic path and the base branch in the same
 sentence, so one yes covers both. The base is the branch each feature branches from: normally
@@ -182,19 +186,8 @@ feature A as usual; its workspace is chosen at A's design approval, from a HEAD 
 the epic.
 
 **Continuing one.** Only when the request carries an epic path; do not go looking for epics
-otherwise, and treat a request without one as an ordinary brainstorm. Read `epic-format.md`,
-read the epic, derive state, and report it in one line ("Epic handoff: A on `dev`, B on
-`feat/shell-theme-b`, next is C"). Take the next feature, or the one the request names, and
-warn if its dependencies are not on the base yet. Its workspace starts from the base, not from
-the current branch when that is another feature's; give the base as the start point at Isolate.
-Its Scope, its Decide when brainstormed items, and the Shared decisions are the starting brief;
-write them back and invite correction as for any brief. Do not re-split and do not redo what
-Findings records: read only the code this feature touches, then ask your first question.
-
-## Exploring approaches (architectural)
-
-- Propose 2-3 approaches with trade-offs. Lead with your recommendation and why.
-- YAGNI ruthlessly: remove unnecessary features from every approach and from the design.
+otherwise, and treat a request without one as an ordinary brainstorm. Read `epic-format.md`
+and follow its "Continuing an epic" section.
 
 ## Presenting the design (architectural)
 
@@ -208,14 +201,7 @@ Findings records: read only the code this feature touches, then ask your first q
   improvements in the design, the way a good developer improves code they are working in.
   Do not propose unrelated refactoring.
 
-## After the design (architectural)
-
-**Workspace.** Set up the approved workspace first with superpowers:using-git-worktrees
-(Isolate). The spec is the feature's first commit and must land on the feature's branch.
-
-**Spec.** Write the validated design to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-(the user's preferred location overrides this default). Write the glossary terms and ADRs that
-domain-modeling resolved during the conversation in the same pass, then commit it all.
+## Spec review (architectural)
 
 **Self-review.** Read the spec with fresh eyes and fix inline, no second pass:
 
