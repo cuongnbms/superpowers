@@ -102,8 +102,10 @@ checklists hold the detail for the steps that point to them.
    domain-modeling resolved along the way, and commit it all. A feature of an epic starts
    with `> **Epic:** <epic path> § <letter>` directly under the title, and its Non-goals name
    other features by letter instead of restating their scope
-8. Self-review the spec and fix inline (see "Spec review")
-9. Ask the user to review the written spec; wait for approval
+8. Self-review the spec and fix inline, then dispatch a fresh reviewer subagent, check and fix
+   what it finds, and commit (see "Spec review")
+9. Ask the user to review the written spec, with any decisions the review left for them; wait
+   for approval
 10. Invoke the writing-plans skill. It is the only skill that follows an architectural
     brainstorm; frontend-design, mcp-builder, and other implementation skills come after the plan.
 
@@ -210,10 +212,28 @@ and follow its "Continuing an epic" section.
 3. Scope: focused enough for a single implementation plan, or does it hold several features (see "Epics")?
 4. Ambiguity: could a requirement be read two ways? Pick one and make it explicit.
 
-**User review.** Then:
+**Reviewer.** The self-review catches wording. It does not catch a spec that is wrong about the
+code: at the end of a long brainstorm the author rereads what they meant, not what the code
+does. In the session that motivated this step, the self-review took fifteen seconds and missed
+every defect that later reached the fix commit; a reviewer with no stake in the design and time
+to read the code found them.
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to
-> make any changes before we start writing out the implementation plan."
+Dispatch a fresh subagent with [spec-reviewer-prompt.md](spec-reviewer-prompt.md), the spec path,
+and the repository path. While it runs, do nothing that depends on the spec. When it returns:
 
-Wait. If they request changes, make them and re-run the self-review. Once approved, invoke
-writing-plans.
+- Check each finding against the code before acting on it. Findings are leads, not patches;
+  drop the ones the source contradicts.
+- Fix the rest in the spec yourself, including the minor ones, and commit.
+- Collect the findings that need your human partner (scope, product behaviour, a trade-off
+  between goals they stated) for the user review message. Do not ask about anything the
+  brainstorm already settled.
+
+**User review.** Then, in one message:
+
+> "Spec written and committed to `<path>`. A reviewer checked it against the code; I fixed
+> <n> issues (<the ones that change what gets built, one line each>). <Decisions for you, if
+> any.> Please review it and let me know if you want to make any changes before we start
+> writing out the implementation plan."
+
+Wait. If they request changes, make them and re-run the self-review; dispatch the reviewer
+again only if the change alters the design. Once approved, invoke writing-plans.

@@ -231,5 +231,28 @@
       "Does not re-split the request or redo the survey the Findings record",
       "Asks one question; writes no file, makes no commit, creates no branch"
     ]
+  },
+  {
+    "id": 12,
+    "name": "spec-written-reviewer",
+    "skills": [
+      "brainstorming"
+    ],
+    "query": "Continue the brainstorming session in fixtures/spec-written-transcript.md: produce the next assistant turn against the todo-cli at <repo>, acting as in a real session (read files, run git, edit files, dispatch subagents if you would). Set up <repo> with: setup-spec-review-case.sh <repo>. Run it as a top-level session (claude -p from <repo>), not as a subagent: the step under test dispatches a subagent of its own.",
+    "files": [
+      "fixtures/todo-cli",
+      "fixtures/todo-sync-design.md",
+      "fixtures/spec-written-transcript.md",
+      "setup-spec-review-case.sh"
+    ],
+    "runs": 3,
+    "expected_behavior": [
+      "Dispatches a fresh subagent to review the spec against the code, with the spec path and the repository path, and waits for its report before asking the user anything",
+      "The spec handles id collisions: todo.py assigns id = len(items) + 1, so two replicas adding offline create the same id and the per-id merge overwrites one todo with another (fix such as UUID ids)",
+      "The spec handles an existing todo.json whose items lack updated_at and deleted (a default on load or a one-time upgrade)",
+      "The spec says rm does not exist in todo.py yet and is added by this work, instead of claiming rm 'now' tombstones",
+      "Commits the spec changes before asking for review",
+      "Ends the turn with one message that names what the review changed and asks the user to review the spec; writes no code and does not invoke writing-plans"
+    ]
   }
 ]
