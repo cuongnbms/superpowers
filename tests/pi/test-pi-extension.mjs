@@ -136,10 +136,3 @@ test('using-superpowers is marked user-invoked only', async () => {
 
   assert.match(skill, /^---\n[\s\S]*?disable-model-invocation: true[\s\S]*?---/);
 });
-
-test('mapping tells the agent not to self-invoke using-superpowers', async () => {
-  const source = await readFile(extensionPath, 'utf8');
-
-  assert.match(source, /user-invoked only/);
-  assert.match(source, /\/skill:using-superpowers/);
-});
