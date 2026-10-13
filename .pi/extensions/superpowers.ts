@@ -49,9 +49,8 @@ export default function superpowersPiExtension(pi: ExtensionAPI) {
 }
 
 // Pi tool mapping for Superpowers. Skills speak in actions ("dispatch a
-// subagent", "create a todo"); this is the single translation table for this
-// machine. It assumes @tintinweb/pi-subagents and @tintinweb/pi-tasks are
-// installed.
+// subagent"); this is the single translation table for this machine. It
+// assumes @tintinweb/pi-subagents is installed.
 const TOOL_MAPPING = `<superpowers-pi-tool-mapping>
 ${TOOL_MAPPING_MARKER}
 
@@ -70,21 +69,6 @@ ${TOOL_MAPPING_MARKER}
 
 \`Agent\` runs in the background by default — continue useful work and wait for completion notifications rather than polling. Prefer direct \`Agent\` calls for Superpowers implement/review/fix loops that need steering or resume.
 
-## Task lists (@tintinweb/pi-tasks)
-
-Treat older \`TodoWrite\` references and checklist actions as structured Pi tasks:
-
-| Action skills request | Pi equivalent |
-| --- | --- |
-| Create a todo/checklist item | \`TaskCreate\` once per item |
-| List current tasks / read full details | \`TaskList\` / \`TaskGet\` |
-| Mark pending/in progress/completed | \`TaskUpdate\` (\`in_progress\` before work, \`completed\` only after verification) |
-| Dependencies between todos | \`TaskUpdate\` with \`addBlocks\` / \`addBlockedBy\` |
-| Execute pending tasks that have \`agentType\` | \`TaskExecute\` |
-| Join/read a task or subagent result | \`TaskOutput\` |
-| Stop a running background task | \`TaskStop\` |
-
-Never also call \`Agent\` for a task launched by \`TaskExecute\` — that duplicates the work. Use \`TaskCreate\`/\`TaskUpdate\` for visible progress and direct \`Agent\` calls for finely controlled review loops; use \`TaskExecute\` when an explicit task DAG should be delegated automatically.
 </superpowers-pi-tool-mapping>`;
 
 function messageContainsToolMapping(message: unknown): boolean {

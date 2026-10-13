@@ -96,16 +96,10 @@ test('startup context injects the Pi tool mapping as one user message until agen
     'Agent',
     'get_subagent_result',
     'steer_subagent',
-    'TaskCreate',
-    'TaskList',
-    'TaskGet',
-    'TaskUpdate',
-    'TaskExecute',
-    'TaskOutput',
-    'TaskStop',
   ]) {
     assert.match(injectedText, new RegExp(`\\b${tool}\\b`), `mapping documents ${tool}`);
   }
+  assert.doesNotMatch(injectedText, /pi-tasks|TaskCreate|TodoWrite/);
   assert.doesNotMatch(injectedText, /If you think there is even a 1% chance/);
   assert.doesNotMatch(injectedText, /## The Rule/);
   assert.doesNotMatch(injectedText, /## Red Flags/);

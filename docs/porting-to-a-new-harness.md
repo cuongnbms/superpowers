@@ -36,8 +36,8 @@ into the harness's native tools. Three components:
 
 1. **Skills (harness-agnostic).** Everything in `skills/` is the source of
    truth, shared verbatim by every harness. Skills are written to describe
-   *actions* — "invoke a skill", "read a file", "dispatch a subagent", "create a
-   todo" — and never name a specific tool. This is what lets one skill body run
+   *actions* — "invoke a skill", "read a file", "dispatch a subagent" — and
+   never name a specific tool. This is what lets one skill body run
    on Claude Code, Codex, Gemini, pi, and the rest without edits.
 
 2. **Tool mapping (per-harness).** Each harness needs the action vocabulary
@@ -116,7 +116,6 @@ real port.
 | **File read / write / edit** | Nearly every skill manipulates files | Essential. No workaround. |
 | **Run shell commands** | TDD, verification, git workflows | Essential. |
 | **Subagent / task dispatch** | `dispatching-parallel-agents`, `subagent-driven-development` | Degradable: if unavailable, those specific skills tell the model to do the work inline or report the missing capability — *never* to invent a `Task` call. Some harnesses gate this behind a config flag (e.g. Codex needs multi-agent enabled). |
-| **Todo / task tracking** | Progress tracking in several skills | Degradable: fall back to a plan file or `TODO.md`. |
 | **Web fetch / search** | A few skills | Degradable. |
 | **Shell or polyglot script execution (Windows)** | Only for the shell-hook shape, only if you want Windows support | See Part 7. In-process-plugin harnesses sidestep this entirely. |
 
@@ -473,7 +472,6 @@ of these actions (omit only what genuinely doesn't apply):
 - fetch a URL / web search
 - **dispatch a subagent**, including how to pass the agent type — and any config
   flag needed to enable it
-- **create / update todos** (treat older `TodoWrite` references as this action)
 - **invoke a skill** — see Step 5
 
 **Get the real tool names from the harness; never invent them.** If the docs

@@ -28,7 +28,7 @@ installed, uninstall it: two skills with overlapping descriptions compete for tr
    queries.
 8. Validate frontmatter, package if distributing outside a plugin.
 
-Add a todo per step. Mechanics for steps 4 to 8 are in **references/eval-workflow.md**.
+Mechanics for steps 4 to 8 are in **references/eval-workflow.md**.
 
 Be flexible about where the user is. Someone arriving with a draft starts at step 4. Someone
 who says "just vibe with me" gets the draft and a sanity run, not a benchmark.

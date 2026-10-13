@@ -55,7 +55,7 @@ the four stops above: it needs your human partner's explicit consent, and a
 Conversation memory does not survive compaction. In real sessions,
 controllers that lost their place have re-dispatched entire completed task
 sequences — the single most expensive failure observed. Track progress in
-a ledger file, not only in todos.
+a ledger file.
 
 - Each plan owns a workspace: at skill start, run this skill's
   `bash scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
@@ -77,11 +77,11 @@ a ledger file, not only in todos.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch); if
   that happens, recover from `git log`.
 
-Read the plan once, note its context and Global Constraints, and create a
-todo per task. If the plan names a Spec, read that too: the spec is the
-authority the plan argues from, and conflicts inside the plan resolve
-against it. A plan with no reachable spec gets a ledger note saying so —
-rulings made without one are provisional.
+Read the plan once and note its context and Global Constraints. If the
+plan names a Spec, read that too: the spec is the authority the plan
+argues from, and conflicts inside the plan resolve against it. A plan with
+no reachable spec gets a ledger note saying so — rulings made without one
+are provisional.
 
 Before dispatching Task 1, scan the plan once for conflicts, writing down
 what you checked as you check it:
@@ -355,7 +355,7 @@ message as your other bookkeeping:
 - `Task <N>: complete (commits <base7>..<head7>, <K> parked)` after a
   tripped breaker
 
-Then mark the todo complete and move on. Never move to the next task while
+Then move on. Never move to the next task while
 the review has open Critical/Important issues that are neither fixed nor
 parked-with-ruling at the cap.
 
@@ -426,7 +426,6 @@ You: I'm using Subagent-Driven Development to execute this plan.
 [Setup: worktree verified]
 [Read plan file once: docs/superpowers/plans/feature-plan.md]
 [Resolve workspace: bash scripts/sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
-[Create todos for all tasks]
 
 Task 1: Hook installation script
 

@@ -224,17 +224,6 @@ else
 fi
 echo ""
 
-# Test 3: Claude Code task-tracking tool was used
-echo "Test 3: Task tracking..."
-todo_count=$(grep -cE '"name":"(TodoWrite|TaskCreate|TaskUpdate|TaskList|TaskGet)"' "$SESSION_FILE" || echo "0")
-if [ "$todo_count" -ge 1 ]; then
-    echo "  [PASS] Task tracking used $todo_count time(s)"
-else
-    echo "  [FAIL] No Claude Code task-tracking tool used"
-    FAILED=$((FAILED + 1))
-fi
-echo ""
-
 # Test 6: Implementation actually works
 echo "Test 6: Implementation verification..."
 if [ -f "$TEST_PROJECT/src/math.js" ]; then

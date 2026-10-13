@@ -89,7 +89,7 @@ digraph process {
         "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [shape=box];
         "Commit as the plan's commit steps say" [shape=box];
         "Completion contract met?" [shape=diamond];
-        "task-done: run tests, ledger the result; mark todo complete" [shape=box];
+        "task-done: run tests, ledger the result" [shape=box];
     }
 
     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" [shape=box];
@@ -107,8 +107,8 @@ digraph process {
     "Step output matches plan's Expected?" -> "Commit as the plan's commit steps say" [label="yes, last step"];
     "Commit as the plan's commit steps say" -> "Completion contract met?";
     "Completion contract met?" -> "Work the steps in order: TDD, run every verification, read every output" [label="no - finish the task"];
-    "Completion contract met?" -> "task-done: run tests, ledger the result; mark todo complete" [label="yes"];
-    "task-done: run tests, ledger the result; mark todo complete" -> "More tasks remain?";
+    "Completion contract met?" -> "task-done: run tests, ledger the result" [label="yes"];
+    "task-done: run tests, ledger the result" -> "More tasks remain?";
     "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
     "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
     "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger";
@@ -129,8 +129,7 @@ on main" answer given at that earlier choice is that consent.
 Conversation memory does not survive compaction. An inline executor that
 loses its place re-implements tasks whose commits already exist — the same
 failure as a controller re-dispatching them, paid for in your own context.
-Track progress in a ledger file, not only in todos. Harness todos are a
-live view; the ledger is the record.
+Track progress in a ledger file; the ledger is the record.
 
 The workspace and ledger are shared with superpowers:subagent-driven-development
 — same directory, same format — so a plan can change executors mid-flight
@@ -154,11 +153,11 @@ and the new one resumes from the same ledger.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch);
   if that happens, recover from `git log`.
 
-Read the plan once, note its context and Global Constraints, and create a
-todo per task. If the plan names a Spec, read that too: the spec is the
-authority the plan argues from, and conflicts inside the plan resolve
-against it. A plan with no reachable spec gets a ledger note saying so —
-rulings made without one are provisional.
+Read the plan once and note its context and Global Constraints. If the
+plan names a Spec, read that too: the spec is the authority the plan
+argues from, and conflicts inside the plan resolve against it. A plan with
+no reachable spec gets a ledger note saying so — rulings made without one
+are provisional.
 
 **REQUIRED SUB-SKILL:** load superpowers:test-driven-development now,
 before Task 1. It governs every step of every task below; a plan whose
@@ -188,7 +187,6 @@ in the workspace and read its tail; read a brief, not the whole plan.
   Read the brief for every task, including ones you remember from setup:
   what you remember is a summary, the brief has the exact values,
   signatures, and test cases.
-- Mark the task's todo in_progress.
 
 Every tool call is a turn that re-reads your whole context. Bookkeeping
 rides along with work — a ledger append in the same call as the commit,
@@ -243,7 +241,7 @@ if they pass — appends the completion line to the ledger:
 `Task <N>: complete (commits <base7>..<head7>, tests: <command> → <result>)`
 
 A failing run records nothing; the task is not complete. When it records,
-mark the todo complete and take the next task.
+take the next task.
 
 ## Final Review
 
@@ -347,7 +345,6 @@ You: I'm using the executing-plans skill to implement this plan inline.
 [Read plan once: docs/superpowers/plans/feature-plan.md; spec read]
 [Resolve workspace: sdd-workspace docs/superpowers/plans/feature-plan.md — no ledger inside, fresh start]
 [Pre-flight scan: 2 shared-interface rows, 4 self-consistency rows, clean; written to ledger]
-[Create todos for all tasks]
 
 Task 1: Hook installation script
 

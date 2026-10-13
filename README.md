@@ -243,7 +243,7 @@ For local development, run Pi with this checkout loaded as a temporary package:
 pi -e /path/to/superpowers
 ```
 
-The Pi package loads the Superpowers skills and a small extension that injects only Pi-specific tool mapping at session startup and again after compaction. Pi discovers skills natively and loads their `SKILL.md` files on demand, so the extension does not duplicate the full `using-superpowers` body in context. The mapping targets the `@tintinweb/pi-subagents` and `@tintinweb/pi-tasks` companion packages, which are expected to be installed.
+The Pi package loads the Superpowers skills and a small extension that injects only Pi-specific tool mapping at session startup and again after compaction. Pi discovers skills natively and loads their `SKILL.md` files on demand, so the extension does not duplicate the full `using-superpowers` body in context. The mapping targets the `@tintinweb/pi-subagents` companion package, which is expected to be installed.
 
 ### Hermes Agent
 

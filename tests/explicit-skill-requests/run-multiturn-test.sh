@@ -108,8 +108,7 @@ FIRST_SKILL_LINE=$(grep -n '"name":"Skill"' "$TURN3_LOG" | head -1 | cut -d: -f1
 if [ -n "$FIRST_SKILL_LINE" ]; then
     PREMATURE_TOOLS=$(head -n "$FIRST_SKILL_LINE" "$TURN3_LOG" | \
         grep '"type":"tool_use"' | \
-        grep -v '"name":"Skill"' | \
-        grep -vE '"name":"(TodoWrite|TaskCreate|TaskUpdate|TaskList|TaskGet)"' || true)
+        grep -v '"name":"Skill"' || true)
     if [ -n "$PREMATURE_TOOLS" ]; then
         echo "WARNING: Tools invoked BEFORE Skill tool in Turn 3:"
         echo "$PREMATURE_TOOLS" | head -5
