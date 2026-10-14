@@ -106,7 +106,7 @@ Use it for a data structure, a config file, or a directory layout. Each `row` ha
   <div class="tree-head"><span>.superpowers/show-me/</span><span>git-ignored</span></div>
   <div class="row" data-depth="0"><span class="k">show-me/</span><span class="t">dir</span><span class="v"></span><span class="n">everything the skill writes</span></div>
   <div class="row" data-depth="1"><span class="k">screens/</span><span class="t">dir</span><span class="v"></span><span class="n">one .html fragment per screen</span></div>
-  <div class="row" data-depth="2"><span class="k">settings-layouts.html</span><span class="t">file</span><span class="v">3.4 KB</span><span class="n">newest, so the tab opens on it</span></div>
+  <div class="row" data-depth="2"><span class="k">20261014-settings-layouts.html</span><span class="t">file</span><span class="v">3.4 KB</span><span class="n">newest, so the tab opens on it</span></div>
   <div class="row" data-depth="1"><span class="k">server.json</span><span class="t">file</span><span class="v">212 B</span><span class="n">pid, port, key</span></div>
 </div>
 ```

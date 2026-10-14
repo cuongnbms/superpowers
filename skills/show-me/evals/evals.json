@@ -12,7 +12,7 @@
     "expected_behavior": [
       "Runs `scripts/server.py start` before writing the screen",
       "The session dir start reported is `<repo>/.superpowers/show-me/`",
-      "Writes one new `.html` file with a descriptive name in the `screen_dir` that start reported",
+      "Writes one new `.html` file named `<YYYYMMDD>-<descriptive-name>.html` with today's date in the `screen_dir` that start reported",
       "The file is a fragment (no `<!doctype`/`<html`) with a `figure.diagram` containing `pre.mermaid`",
       "The diagram names `add`, `list`, `done`, `load`, `save` and `todo.json`",
       "The reply contains the full URL including `?key=`, and that URL returns 200 with the screen",
