@@ -42,6 +42,16 @@ Write a fragment by default. The frame supplies the page, the theme, the tabs, a
 
 Never reuse a name. The newest file is what the tab shows, and an old name keeps its tab for your human partner to look back at, so a revision gets a new file. Use real content from the project (its actual routes, fields, function names) instead of placeholders, because the point is to check the idea against the real thing.
 
+## Open a screen without the server
+
+Each screen also exists as a standalone page, `<standalone_dir>/<name>.html` (`standalone_dir` is in the `start` output): the same page with the frame's styles and diagrams, without the tabs and the live refresh, so it opens straight from disk. The running server rebuilds it within a second of each write. Give your human partner that path when they want a screen outside the tab: in another browser or viewer, to keep or pass on, or after the server has stopped. When the server is not running or the page is missing, build it first:
+
+```
+python3 <this skill's dir>/scripts/server.py bake <name>.html
+```
+
+`--all` rebuilds every screen. Do not hand over the file in `screen_dir` for this: a fragment opened on its own has no styles, and its diagrams show as source. Mermaid and highlight.js still load from the CDN, so diagrams need a network connection.
+
 ## Reply and stop
 
 Give the full URL every time, including `?key=`, because the key is what lets the browser in. Add at most two sentences on what the screen shows, then end your turn. The page already carries the detail and your human partner is about to look at it, so a recap in the terminal only duplicates the screen. Your human partner reads the tab, and their reply tells you what to change.

@@ -90,5 +90,26 @@
       "Does not load show-me",
       "Does not run `server.py`"
     ]
+  },
+  {
+    "id": 5,
+    "name": "open-without-server",
+    "skills": [
+      "show-me"
+    ],
+    "query": "Màn hình todo-architecture mà show-me vẽ cho todo-cli ở <repo> hôm qua, giờ server đã tắt. Tôi muốn mở nó thẳng từ file trong Chrome, không chạy server. Cho tôi đường dẫn file để mở.",
+    "files": [
+      "../../brainstorming/evals/fixtures/todo-cli",
+      "fixtures/todo-architecture.html"
+    ],
+    "setup": "Copy todo-cli into <repo>, git init and commit, put fixtures/todo-architecture.html at <repo>/.superpowers/show-me/screens/todo-architecture.html with a .gitignore of `*` in .superpowers/show-me/; no server.json and no standalone/ dir.",
+    "expected_behavior": [
+      "The reply gives `<repo>/.superpowers/show-me/standalone/todo-architecture.html` as the file to open",
+      "That file exists, holds the frame (`id=\"sm-content\"` and the frame's `<style>`) around the fixture's mermaid source, and has no `data-show-me-poll`",
+      "The reply does not offer `screens/todo-architecture.html` as the file to open",
+      "`screens/todo-architecture.html` is byte-identical to the fixture (the screen is not redrawn)",
+      "No show-me server is left running for `<repo>`",
+      "`git status` in `<repo>` is clean"
+    ]
   }
 ]

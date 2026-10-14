@@ -34,6 +34,8 @@ class DocsTest(unittest.TestCase):
         self.assertIn("scripts/server.py start", text)
         self.assertIn("--foreground", text)
         self.assertIn("references/components.md", text)
+        self.assertIn("scripts/server.py bake", text)
+        self.assertIn("standalone_dir", text)
 
     def test_catalog_shows_every_component_class(self):
         doc = COMPONENTS.read_text(encoding="utf-8")
