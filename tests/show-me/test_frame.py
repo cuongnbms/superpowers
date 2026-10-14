@@ -41,3 +41,10 @@ class FrameTest(unittest.TestCase):
         self.assertIn("prefers-color-scheme: dark", self.html)
         self.assertIn('[data-theme="dark"]', self.html)
         self.assertIn("show-me-theme", self.html)
+
+    def test_standalone_page_neither_polls_nor_shows_live_chrome(self):
+        self.assertRegex(self.html, r"if \(!boot\.standalone\) setTimeout\(poll, 1000\);")
+        self.assertNotRegex(self.html, r"\nsetTimeout\(poll, 1000\);")  # the unconditional top-level start
+        css = "".join(re.findall(r"<style[^>]*>(.*?)</style>", self.html, re.S))
+        for selector in ("#sm-status .live", "#sm-address", "#sm-count"):
+            self.assertIn(".sm-standalone %s" % selector, css)
