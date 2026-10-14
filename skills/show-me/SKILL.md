@@ -36,7 +36,7 @@ Read `references/components.md` the first time in a conversation that you write 
 
 ## Write the screen
 
-Write `<screen_dir>/<semantic-name>.html` with the file tool, not a shell heredoc: HTML and code snippets break under shell quoting. Use a name that says what is on the screen, such as `settings-layouts.html`.
+Write `<screen_dir>/<YYYYMMDD>-<semantic-name>.html` with the file tool, not a shell heredoc: HTML and code snippets break under shell quoting. Start the name with today's date and follow it with what is on the screen, such as `20261014-settings-layouts.html`; its revisions are `20261014-settings-layouts-v2.html` and so on, keeping the first version's date. The screens stay in the project across conversations, so the date tells your human partner when a screen was drawn and keeps a name from one day apart from the same name on another.
 
 Write a fragment by default. The frame supplies the page, the theme, the tabs, and the live refresh. Write a full document only when the frame gets in the way. The server adds the refresh script to it.
 
