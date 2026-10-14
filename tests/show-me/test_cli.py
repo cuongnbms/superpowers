@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SERVER = ROOT / "skills" / "show-me" / "scripts" / "server.py"
-KEYS = {"url", "screen_dir", "session_dir", "port", "pid", "reused"}
+KEYS = {"url", "screen_dir", "session_dir", "standalone_dir", "port", "pid", "reused"}
 
 
 def load_server():

@@ -1,0 +1,16 @@
+<h1>todo-cli: commands, functions, todo.json</h1>
+<p>Every command loads the whole list, changes it in memory, and saves it back.</p>
+<figure class="diagram">
+<pre class="mermaid">flowchart LR
+  main["main()"] --> add["cmd_add"]
+  main --> list["cmd_list"]
+  main --> done["cmd_done"]
+  add --> load["load()"]
+  list --> load
+  done --> load
+  add --> save["save()"]
+  done --> save
+  load --> file[("todo.json")]
+  save --> file</pre>
+<figcaption>list only reads; add and done read, change, and write the whole file.</figcaption>
+</figure>

@@ -22,7 +22,7 @@ import urllib.request
 from datetime import datetime
 from http.cookies import SimpleCookie
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 from urllib.parse import unquote, urlsplit, parse_qs
 
 POLL_SCRIPT = """<script data-show-me-poll>
@@ -111,8 +111,68 @@ def render_page(frame: str, title: str, content: str, boot: Dict[str, Any]) -> s
     return _PLACEHOLDER.sub(lambda m: values[m.group(1)], frame)
 
 
+def bake_screen(src: Path, out_dir: Path, frame_path: Path, project: str) -> Path:
+    """Write a page that opens without the server: the fragment in the frame, minus tabs and polling."""
+    src, out_dir = Path(src), Path(out_dir)
+    stat = src.stat()  # before reading, so a write that lands mid-bake still looks newer
+    frame_mtime = Path(frame_path).stat().st_mtime
+    raw = src.read_bytes()
+    content = raw.decode("utf-8", errors="replace")
+    if _is_full_document(content):
+        data = raw
+    else:
+        boot = {"screen": src.name, "newest": src.name, "screens": [], "project": project,
+                "address": "", "standalone": True}
+        frame = Path(frame_path).read_text(encoding="utf-8")
+        data = render_page(frame, screen_title(content, src.name), content, boot).encode("utf-8")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    target = out_dir / src.name
+    fd, tmp = tempfile.mkstemp(prefix="." + src.name + ".", suffix=".tmp", dir=str(out_dir))
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+        os.chmod(tmp, stat.st_mode & 0o777)
+        # Stamped with its inputs' mtime, so sync_standalone compares like with like.
+        stamp = max(stat.st_mtime, frame_mtime)
+        os.utime(tmp, (stamp, stamp))
+        os.replace(tmp, str(target))
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    return target
+
+
+_SYNC_LOCK = threading.Lock()
+
+
+def sync_standalone(screen_dir: Path, out_dir: Path, frame_path: Path, project: str) -> List[Path]:
+    """Bake every screen whose standalone copy is missing or older than the screen or the frame."""
+    if not _SYNC_LOCK.acquire(blocking=False):
+        return []  # another thread is syncing; the next poll catches what it misses
+    try:
+        frame_mtime = Path(frame_path).stat().st_mtime
+        baked = []  # type: List[Path]
+        for s in list_screens(screen_dir):
+            try:
+                if (Path(out_dir) / s["name"]).stat().st_mtime >= max(s["mtime"], frame_mtime):
+                    continue
+            except OSError:
+                pass
+            try:
+                baked.append(bake_screen(Path(screen_dir) / s["name"], out_dir, frame_path, project))
+            except OSError:
+                continue  # gone or unreadable mid-write; one bad screen must not block the rest
+        return baked
+    finally:
+        _SYNC_LOCK.release()
+
+
 def make_server(screen_dir: Path, key: str, bind_host: str, port: int, url_host: str,
-                project: str, frame_path: Path) -> http.server.ThreadingHTTPServer:
+                project: str, frame_path: Path, standalone_dir: Optional[Path] = None,
+                log: Optional[Callable[[str], None]] = None) -> http.server.ThreadingHTTPServer:
     screen_dir = Path(screen_dir)
     key_bytes = key.encode("utf-8")
 
@@ -168,6 +228,12 @@ def make_server(screen_dir: Path, key: str, bind_host: str, port: int, url_host:
             elif path.startswith("/s/"):
                 self._screen(path[3:], extra)
             elif path == "/api/screens":
+                if standalone_dir is not None:
+                    try:
+                        sync_standalone(screen_dir, standalone_dir, frame_path, project)
+                    except Exception:
+                        if log:
+                            log(traceback.format_exc())
                 screens = list_screens(screen_dir)
                 data = {"screens": screens, "newest": screens[-1]["name"] if screens else None}
                 self._send(200, json.dumps(data).encode("utf-8"), "application/json; charset=utf-8", extra)
@@ -306,6 +372,7 @@ def _report(info: Dict[str, Any], session: Path, reused: bool) -> Dict[str, Any]
         "url": info["url"],
         "screen_dir": str(session / "screens"),
         "session_dir": str(session),
+        "standalone_dir": str(session / "standalone"),
         "port": info["port"],
         "pid": info["pid"],
         "reused": reused,
@@ -336,9 +403,20 @@ def _serve(args: argparse.Namespace, foreground: bool) -> int:
     key = key or secrets.token_hex(16)
     bind_host, url_host = derive_hosts(os.environ, args.host, args.url_host)
     frame = Path(__file__).with_name("frame.html")
+    standalone = session / "standalone"
+
+    def log(text: str) -> None:
+        _log(session, text)
+
+    def sync() -> None:
+        try:
+            sync_standalone(screens, standalone, frame, project_dir.name)
+        except Exception:
+            log(traceback.format_exc())
 
     def bind(port: int) -> http.server.ThreadingHTTPServer:
-        return make_server(screens, key, bind_host, port, url_host, project_dir.name, frame)
+        return make_server(screens, key, bind_host, port, url_host, project_dir.name, frame,
+                           standalone_dir=standalone, log=log)
 
     try:
         if args.port is not None:
@@ -381,12 +459,14 @@ def _serve(args: argparse.Namespace, foreground: bool) -> int:
         threading.Thread(target=httpd.shutdown, daemon=True).start()
 
     signal.signal(signal.SIGTERM, stop_async)
+    sync()
     idle_seconds = args.idle_minutes * 60.0
     if idle_seconds > 0:
         def watch() -> None:
             interval = min(30.0, max(0.2, idle_seconds / 4))
             while True:
                 time.sleep(interval)
+                sync()  # covers screens written while no tab polls /api/screens
                 try:
                     screens_now = list_screens(screens)
                     last = max([started] + [s["mtime"] for s in screens_now])
@@ -483,10 +563,44 @@ def _cmd_stop(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_bake(args: argparse.Namespace) -> int:
+    project_dir = resolve_project_dir(args.project_dir, Path.cwd())
+    session = _session_dir(project_dir)
+    screens = session / "screens"
+    if args.all:
+        sources = [screens / s["name"] for s in list_screens(screens)]
+    else:
+        sources = []
+        for name in args.screens:
+            src = screens / name if (screens / name).is_file() else Path(name)
+            if not src.is_file():
+                return _fail("no screen %s in %s" % (name, screens))
+            sources.append(src)
+    if args.out:
+        out_dir = Path(args.out).resolve()
+    else:
+        out_dir = session / "standalone"
+        session.mkdir(parents=True, exist_ok=True)
+        if not (session / ".gitignore").exists():
+            (session / ".gitignore").write_text("*\n", encoding="utf-8")
+    frame = Path(__file__).with_name("frame.html")
+    try:
+        baked = [bake_screen(src, out_dir, frame, project_dir.name) for src in sources]
+    except OSError as e:
+        return _fail("cannot bake: %s" % e)
+    print(json.dumps({"standalone_dir": str(out_dir), "baked": [str(p) for p in baked]}))
+    return 0
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(prog="server.py", description="show-me server")
     sub = parser.add_subparsers(dest="command")
     sub.required = True
+    bake = sub.add_parser("bake", help="write screens as pages that open without the server")
+    bake.add_argument("screens", nargs="*", metavar="screen")
+    bake.add_argument("--all", action="store_true")
+    bake.add_argument("--out")
+    bake.add_argument("--project-dir")
     for name in ("start", "status", "stop", "serve"):
         p = sub.add_parser(name, help=argparse.SUPPRESS if name == "serve" else None)
         p.add_argument("--project-dir")
@@ -498,6 +612,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         if name == "start":
             p.add_argument("--foreground", action="store_true")
     args = parser.parse_args(argv)
+    if args.command == "bake":
+        if bool(args.all) == bool(args.screens):
+            bake.error("give screen names or --all")
+        return _cmd_bake(args)
     if args.command == "start":
         return _cmd_start(args)
     if args.command == "serve":

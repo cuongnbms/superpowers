@@ -90,6 +90,8 @@ button { font: inherit; color: inherit; }
   border-radius: var(--r-sm); padding: 4px 10px; font: 400 12px/1 var(--font-code); cursor: pointer;
 }
 #sm-theme:hover { color: var(--ink); border-color: var(--line); }
+/* a baked standalone page has no server behind it */
+.sm-standalone #sm-status .live, .sm-standalone #sm-address, .sm-standalone #sm-count { display: none; }
 
 #sm-banner {
   position: fixed; left: 50%; bottom: 50px; transform: translateX(-50%); z-index: 30;
@@ -299,6 +301,7 @@ function renderChrome() {
   $("sm-count").textContent = n + (n === 1 ? " screen" : " screens");
   $("sm-project").textContent = boot.project || "";
   if (boot.screen === null) { $("sm-empty").hidden = false; }
+  if (boot.standalone) root.classList.add("sm-standalone");
 }
 renderChrome();
 
@@ -328,7 +331,7 @@ async function poll() {
   setDown(false);
   setTimeout(poll, 1000);
 }
-setTimeout(poll, 1000);
+if (!boot.standalone) setTimeout(poll, 1000);
 
 /* ---- theme ---- */
 function effectiveTheme() {
