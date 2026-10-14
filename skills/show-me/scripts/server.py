@@ -161,7 +161,10 @@ def sync_standalone(screen_dir: Path, out_dir: Path, frame_path: Path, project: 
                     continue
             except OSError:
                 pass
-            baked.append(bake_screen(Path(screen_dir) / s["name"], out_dir, frame_path, project))
+            try:
+                baked.append(bake_screen(Path(screen_dir) / s["name"], out_dir, frame_path, project))
+            except OSError:
+                continue  # gone or unreadable mid-write; one bad screen must not block the rest
         return baked
     finally:
         _SYNC_LOCK.release()

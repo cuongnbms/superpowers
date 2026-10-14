@@ -97,6 +97,21 @@ class BakeTest(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in srv.sync_standalone(self.screens, self.out, self.frame, "demo")),
                          ["a.html", "b.html"])
 
+    def test_sync_skips_a_screen_it_cannot_read_and_bakes_the_rest(self):
+        self.write("a.html", FRAGMENT, 1000)
+        self.write("b.html", FRAGMENT, 1000)
+        real = srv.bake_screen
+
+        def flaky(src, *rest):
+            if Path(src).name == "a.html":
+                raise FileNotFoundError(str(src))  # deleted between listing and reading
+            return real(src, *rest)
+
+        srv.bake_screen = flaky
+        self.addCleanup(setattr, srv, "bake_screen", real)
+        self.assertEqual([p.name for p in srv.sync_standalone(self.screens, self.out, self.frame, "demo")],
+                         ["b.html"])
+
     def test_standalone_files_never_become_tabs(self):
         self.write("a.html", FRAGMENT, 1000)
         srv.sync_standalone(self.screens, self.out, self.frame, "demo")
