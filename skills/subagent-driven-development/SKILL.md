@@ -138,6 +138,11 @@ value inherits the session's, not the tier's. High-tier is also a ceiling:
 a session running on a model above it still dispatches the high-tier
 model, never its own.
 
+Pass the alias exactly as the table names it and let the harness resolve
+it. What an alias resolves to is your human partner's configuration: do not
+read harness or extension config to swap in a concrete model, even when the
+alias resolves to the model this session runs on.
+
 ## The Task Loop
 
 **Batch small same-shape work.** When the plan lists several tasks that are
